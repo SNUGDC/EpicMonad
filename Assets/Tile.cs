@@ -71,6 +71,16 @@ public class Tile : MonoBehaviour {
         }
     }
 
+    void OnMouseEnter()
+    {
+        GetComponent<SpriteRenderer>().color -= new Color(0.3f, 0.3f, 0.3f, 0);
+    }
+    
+    void OnMouseExit()
+    {
+        GetComponent<SpriteRenderer>().color += new Color(0.3f, 0.3f, 0.3f, 0);
+    }
+
 	void OnMouseDown()
 	{
 		GameManager gameManager = FindObjectOfType<GameManager>();
