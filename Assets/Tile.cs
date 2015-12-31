@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Enums;
 
 public class Tile : MonoBehaviour {
 
+    public TileType type;
 	Vector2 position;
 	GameObject unitOnTile = null;
 	
@@ -10,11 +12,28 @@ public class Tile : MonoBehaviour {
 	{
 		position = new Vector2(x, y);
 	}
-	
+    	
 	public Vector2 GetTilePos()
 	{
 		return position;
 	}
+
+    public void SetTileType(TileType type)
+    {
+        string imagePath = "TileImage/" + type.ToString();
+        GetComponent<SpriteRenderer>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
+        this.type = type;
+    }
+
+    public TileType GetTileType()
+    {
+        return type;
+    }
+    
+    public int GetRequireAPAtTile()
+    {
+        return GetRequireAPFromTileType(type);
+    }
 
 	public bool IsUnitOnTile ()
 	{
@@ -34,6 +53,23 @@ public class Tile : MonoBehaviour {
 		}
 		return unitOnTile;
 	}
+
+    int GetRequireAPFromTileType(TileType type)
+    {
+        if (type == TileType.flatland)
+        {
+            return 3;
+        }
+        else if (type == TileType.hill)
+        {
+            return 5;
+        }
+        else
+        {
+            Debug.Log("Invaild tiletype : " + type.ToString());
+            return 1;
+        }
+    }
 
 	void OnMouseDown()
 	{

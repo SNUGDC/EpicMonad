@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Enums;
 
 public class TileManager : MonoBehaviour {
 
-	public GameObject grassTilePrefab;
+	public GameObject tilePrefab;
 	
 	Dictionary<Vector2, GameObject> tiles = new Dictionary<Vector2, GameObject>();
 
@@ -41,8 +42,12 @@ public class TileManager : MonoBehaviour {
 		{
 			for (int j = 0; j < y; j++)
 			{
-				GameObject tile = Instantiate(grassTilePrefab, new Vector3(tileWidth * (j+i) * 0.5f, tileHeight * (j-i) * 0.5f, (j-i) * 0.1f), Quaternion.identity) as GameObject;
+				GameObject tile = Instantiate(tilePrefab, new Vector3(tileWidth * (j+i) * 0.5f, tileHeight * (j-i) * 0.5f, (j-i) * 0.1f), Quaternion.identity) as GameObject;
 				tile.GetComponent<Tile>().SetTilePos(i, j);
+                if (Random.Range(0, 3) > 0)
+                    tile.GetComponent<Tile>().SetTileType(TileType.flatland);
+                else
+                    tile.GetComponent<Tile>().SetTileType(TileType.hill);
 				tiles.Add(new Vector2(i, j), tile);
 			}
 		}
