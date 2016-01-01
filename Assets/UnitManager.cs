@@ -54,7 +54,7 @@ public class UnitManager : MonoBehaviour {
 		foreach (var unit in units)
 		{
 			unit.GetComponent<Unit>().RegenerateActionPoint();
-			if (unit.GetComponent<Unit>().GetActionPoint() >= maxActionPoint)
+			if (unit.GetComponent<Unit>().GetCurrentActionPoint() >= maxActionPoint)
 			{
 				readiedUnits.Enqueue(unit);
 				Debug.Log(unit.GetComponent<Unit>().name + " is readied");

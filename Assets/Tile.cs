@@ -7,7 +7,14 @@ public class Tile : MonoBehaviour {
     public TileType type;
 	Vector2 position;
 	GameObject unitOnTile = null;
+
+    bool isPreSeleted = false;
 	
+    public void SetPreSelected(bool input)
+    {
+        isPreSeleted = input;
+    }
+    
 	public void SetTilePos(int x, int y)
 	{
 		position = new Vector2(x, y);
@@ -84,7 +91,7 @@ public class Tile : MonoBehaviour {
 	void OnMouseDown()
 	{
 		GameManager gameManager = FindObjectOfType<GameManager>();
-		if (gameManager != null)
+		if ((isPreSeleted) && (gameManager != null))
 		{
 			gameManager.OnMouseDownHandlerFromTile(position);
 		}

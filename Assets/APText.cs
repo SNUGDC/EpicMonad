@@ -18,7 +18,7 @@ public class APText : MonoBehaviour {
 		string newText = "Current Action Point\n";
 		foreach (var unit in unitManager.units)
 		{
-			string unitText = unit.GetComponent<Unit>().name + " : " + unit.GetComponent<Unit>().GetActionPoint() + "\n";
+			string unitText = unit.GetComponent<Unit>().name + " : " + unit.GetComponent<Unit>().GetCurrentActionPoint() + "\n";
 			newText += unitText;
 		}
 		text.text = newText;

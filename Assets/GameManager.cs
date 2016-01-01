@@ -7,8 +7,6 @@ public class GameManager : MonoBehaviour {
 	TileManager tileManager;
 	UnitManager unitManager;
 	
-	bool isInputPhase = false;
-	bool isWaiting = false;
 	bool isSelectedTileByUser = false;
 	bool isWaitingUserInput = false;
     
@@ -62,9 +60,7 @@ public class GameManager : MonoBehaviour {
 			isSelectedTileByUser = true;
             destTilePosition = position;
 			Debug.Log("Clicked " + position + " tile");
-		} else {
-            Debug.Log("Input is ignored. by isWaitingUserInput");
-        }
+		}
 	}
 		
 	List<GameObject> AddNearbyTiles(List<GameObject> tileList, GameObject unit)
@@ -111,8 +107,6 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 		
-		// Debug.Log("tileList : " + tileList.Count + ", " + "newTileList : " + newTileList.Count);
-		
 		return filteredNewTileList;
 	}
 	
@@ -122,7 +116,7 @@ public class GameManager : MonoBehaviour {
 		List<GameObject> nearbyTiles = new List<GameObject>();
 		nearbyTiles.Add(tileManager.GetTile(pos));
 		
-		int currentAP = unit.GetComponent<Unit>().GetActionPoint();
+		int currentAP = unit.GetComponent<Unit>().GetCurrentActionPoint();
 		int totalRequireAP = 0;
 		for (int i = 0; i < requireActionPoint.Length; i++)
 		{
@@ -151,13 +145,11 @@ public class GameManager : MonoBehaviour {
 		List<GameObject> nearbyTiles = CheckMovableTiles(unit);
 		foreach (var tile in nearbyTiles)
 		{
+            tile.GetComponent<Tile>().SetPreSelected(true);
 			tile.GetComponent<SpriteRenderer>().color -= new Color(0.3f, 0.3f, 0.3f, 0);
 		}
         
         isWaitingUserInput = true;
-		// yield return new WaitForSeconds(3);		
-		
-		
 		while (!isSelectedTileByUser)
 		{
 			yield return null;
@@ -183,11 +175,12 @@ public class GameManager : MonoBehaviour {
 		
 		foreach (var tile in nearbyTiles)
 		{
+            tile.GetComponent<Tile>().SetPreSelected(false);
 			tile.GetComponent<SpriteRenderer>().color += new Color(0.3f, 0.3f, 0.3f, 0);
 		}
 		
 		// Over AP is changed to HP.
-		if (unit.GetComponent<Unit>().GetActionPoint() >= unitManager.maxActionPoint)
+		if (unit.GetComponent<Unit>().GetCurrentActionPoint() >= unitManager.maxActionPoint)
 		{
 			unit.GetComponent<Unit>().UseActionPoint(unitManager.maxActionPoint/2);
 			Debug.Log("Rest and recover HP");
@@ -203,27 +196,8 @@ public class GameManager : MonoBehaviour {
         isSelectedTileByUser = false;
         yield return StartCoroutine(SelectMovingPoint(unit));
         isSelectedTileByUser = false;
-   }
-	
-	// IEnumerator OperateEachReadiedUnit()
-	// {
-	// 	isInputPhase = true;
-	// 	while (readiedUnits.Count > 0)
-	// 	{
-	// 		GameObject unit = readiedUnits.Dequeue();
-	// 		Camera.main.transform.position = new Vector3 (unit.transform.position.x, unit.transform.position.y, -10);
-			
-	// 		isSelectedTileByUser = false;
-	// 		yield return StartCoroutine(SelectMovingPoint(unit));
-	// 		isSelectedTileByUser = false;
-	// 	}
+    }
 		
-	// 	readiedUnits = new Queue<GameObject>();
-	// 	isInputPhase = false;
-		
-	// 	// yield return null;
-	// }
-	
 	IEnumerator EndTurn()
 	{
 		// isWaiting = true;

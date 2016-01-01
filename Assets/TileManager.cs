@@ -12,6 +12,11 @@ public class TileManager : MonoBehaviour {
 	int tileHeight = 100/100;
 	int tileWidth = 200/100;
 
+    public Dictionary<Vector2, GameObject> GetAllTiles()
+    {
+        return tiles;
+    }
+
 	public GameObject GetTile(int x, int y)
 	{
 		Vector2 key = new Vector2 (x, y);

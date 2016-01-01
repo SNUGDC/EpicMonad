@@ -5,11 +5,32 @@ public class Unit : MonoBehaviour {
 
 	// FIXME : public -> private
 	public new string name;
+    
+    // Base stats.
+    float baseHp; //체력 
+    float baseAttackDamage; //공격력
+    float baseDefense; //방어력
+    float baseResist; //저항력
+    float baseSpeed; //행동력
+    float baseRange; //거리
+    float baseArea; //범위
+    
+    // Applied stats.
+    int maxHp;
+    int attackDamage;
+    int defense;
+    int resist;
+    int speed;
+    int range;
+    int area;
+    
+    // Variable values.
 	public Vector2 position;
+    public int currentHp; 
 	public int actionPoint;
 	public int regenerationActionPoint;
 
-	public int GetActionPoint()
+	public int GetCurrentActionPoint()
 	{
 		return actionPoint;
 	}
