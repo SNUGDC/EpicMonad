@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour {
 
 	TileManager tileManager;
 	UnitManager unitManager;
+    GameObject commandUI;
 	
 	bool isSelectedTileByUser = false;
 	bool isWaitingUserInput = false;
@@ -21,7 +22,9 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		tileManager = FindObjectOfType<TileManager>();
 		unitManager = FindObjectOfType<UnitManager>();
-		// selectedUnit = null;
+		commandUI = GameObject.Find("CommandPanel");
+        commandUI.SetActive(false);
+        // selectedUnit = null;
         
         StartCoroutine(InstantiateTurnManager());
 	}
@@ -47,6 +50,22 @@ public class GameManager : MonoBehaviour {
         Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
         yield return StartCoroutine(FocusToUnit(unit));
     }
+    
+    IEnumerator FocusToUnit(GameObject unit)
+    {
+        Camera.main.transform.position = new Vector3 (unit.transform.position.x, unit.transform.position.y, -10);
+
+        commandUI.SetActive(true);
+
+        isSelectedTileByUser = false;
+        yield return StartCoroutine(SelectMovingPoint(unit));
+        isSelectedTileByUser = false;
+    }
+    
+    // IEnumerator WaitingForMove()
+    // {
+    //     yield return null;
+    // }
 	
 	// Update is called once per frame
 	void Update () {
@@ -188,15 +207,6 @@ public class GameManager : MonoBehaviour {
 		
 		yield return new WaitForSeconds(1);
 	}
-
-    IEnumerator FocusToUnit(GameObject unit)
-    {
-        Camera.main.transform.position = new Vector3 (unit.transform.position.x, unit.transform.position.y, -10);
-
-        isSelectedTileByUser = false;
-        yield return StartCoroutine(SelectMovingPoint(unit));
-        isSelectedTileByUser = false;
-    }
 		
 	IEnumerator EndTurn()
 	{
