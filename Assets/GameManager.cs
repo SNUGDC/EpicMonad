@@ -11,9 +11,11 @@ public class GameManager : MonoBehaviour {
 	bool isSelectedTileByUser = false;
 	bool isWaitingUserInput = false;
     
+    bool activeMoveCommand = false;
+    
     Vector2 destTilePosition;
 
-	// GameObject selectedUnit; // NOT used now.
+	GameObject selectedUnit;
 	Queue<GameObject> readiedUnits = new Queue<GameObject>();
 
 	int[] requireActionPoint = {2, 5, 9, 14, 20, 27, 35, 44};
@@ -24,7 +26,7 @@ public class GameManager : MonoBehaviour {
 		unitManager = FindObjectOfType<UnitManager>();
 		commandUI = GameObject.Find("CommandPanel");
         commandUI.SetActive(false);
-        // selectedUnit = null;
+        selectedUnit = null;
         
         StartCoroutine(InstantiateTurnManager());
 	}
@@ -48,24 +50,87 @@ public class GameManager : MonoBehaviour {
     IEnumerator ActionAtTurn(GameObject unit)
     {
         Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
-        yield return StartCoroutine(FocusToUnit(unit));
+        selectedUnit = unit;
+        yield return StartCoroutine(FocusToUnit());
     }
     
-    IEnumerator FocusToUnit(GameObject unit)
+    IEnumerator FocusToUnit()
     {
-        Camera.main.transform.position = new Vector3 (unit.transform.position.x, unit.transform.position.y, -10);
+        Camera.main.transform.position = new Vector3 (selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
 
         commandUI.SetActive(true);
 
-        isSelectedTileByUser = false;
-        yield return StartCoroutine(SelectMovingPoint(unit));
-        isSelectedTileByUser = false;
+        while (!activeMoveCommand)
+        {
+            yield return null;
+        }
+        activeMoveCommand = false;
+        yield return StartCoroutine(SelectMovingPoint(selectedUnit));
     }
     
     // IEnumerator WaitingForMove()
     // {
     //     yield return null;
     // }
+
+    // 'Move' command.
+    public void CallbackMoveCommand()
+    {
+        commandUI.SetActive(false);
+        activeMoveCommand = true;
+        // StartCoroutine(SelectMovingPoint(selectedUnit));
+    }
+    
+    IEnumerator SelectMovingPoint (GameObject unit)
+	{   
+        List<GameObject> nearbyTiles = CheckMovableTiles(unit);
+		foreach (var tile in nearbyTiles)
+		{
+            tile.GetComponent<Tile>().SetPreSelected(true);
+			tile.GetComponent<SpriteRenderer>().color -= new Color(0.3f, 0.3f, 0.3f, 0);
+		}
+        
+        isWaitingUserInput = true;
+        isSelectedTileByUser = false;
+		while (!isSelectedTileByUser)
+		{
+			yield return null;
+		}
+        isSelectedTileByUser = false;
+		isWaitingUserInput = false;
+		
+		// GameObject destTile = nearbyTiles[Random.Range(0, nearbyTiles.Count)];
+		// Vector2 destTilePos = destTile.GetComponent<Tile>().GetTilePos();
+        GameObject destTile = tileManager.GetTile(destTilePosition);
+        Vector2 currentTilePos = unit.GetComponent<Unit>().GetPosition();
+		Vector2 distanceVector = destTilePosition - currentTilePos;
+		int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
+		int totalUseActionPoint = 0;
+		for (int i = 0; i < distance; i++)
+		{
+			totalUseActionPoint += requireActionPoint[i];
+		}
+		
+		MoveToTile(unit, destTile);
+		unit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
+		
+		yield return new WaitForSeconds(1);
+		
+		foreach (var tile in nearbyTiles)
+		{
+            tile.GetComponent<Tile>().SetPreSelected(false);
+			tile.GetComponent<SpriteRenderer>().color += new Color(0.3f, 0.3f, 0.3f, 0);
+		}
+		
+		// Over AP is changed to HP.
+		if (unit.GetComponent<Unit>().GetCurrentActionPoint() >= unitManager.maxActionPoint)
+		{
+			unit.GetComponent<Unit>().UseActionPoint(unitManager.maxActionPoint/2);
+			Debug.Log("Rest and recover HP");
+		}
+		
+		yield return new WaitForSeconds(1);
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -157,55 +222,6 @@ public class GameManager : MonoBehaviour {
 		unit.transform.position = destTile.transform.position + new Vector3(0, 0, -0.01f);
 		unit.GetComponent<Unit>().SetPosition(destTile.GetComponent<Tile>().GetTilePos());
 		destTile.GetComponent<Tile>().SetUnitOnTile(unit);
-	}
-	
-	IEnumerator SelectMovingPoint (GameObject unit)
-	{
-		List<GameObject> nearbyTiles = CheckMovableTiles(unit);
-		foreach (var tile in nearbyTiles)
-		{
-            tile.GetComponent<Tile>().SetPreSelected(true);
-			tile.GetComponent<SpriteRenderer>().color -= new Color(0.3f, 0.3f, 0.3f, 0);
-		}
-        
-        isWaitingUserInput = true;
-		while (!isSelectedTileByUser)
-		{
-			yield return null;
-		}
-		isWaitingUserInput = false;
-		
-		// GameObject destTile = nearbyTiles[Random.Range(0, nearbyTiles.Count)];
-		// Vector2 destTilePos = destTile.GetComponent<Tile>().GetTilePos();
-        GameObject destTile = tileManager.GetTile(destTilePosition);
-        Vector2 currentTilePos = unit.GetComponent<Unit>().GetPosition();
-		Vector2 distanceVector = destTilePosition - currentTilePos;
-		int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
-		int totalUseActionPoint = 0;
-		for (int i = 0; i < distance; i++)
-		{
-			totalUseActionPoint += requireActionPoint[i];
-		}
-		
-		MoveToTile(unit, destTile);
-		unit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
-		
-		yield return new WaitForSeconds(1);
-		
-		foreach (var tile in nearbyTiles)
-		{
-            tile.GetComponent<Tile>().SetPreSelected(false);
-			tile.GetComponent<SpriteRenderer>().color += new Color(0.3f, 0.3f, 0.3f, 0);
-		}
-		
-		// Over AP is changed to HP.
-		if (unit.GetComponent<Unit>().GetCurrentActionPoint() >= unitManager.maxActionPoint)
-		{
-			unit.GetComponent<Unit>().UseActionPoint(unitManager.maxActionPoint/2);
-			Debug.Log("Rest and recover HP");
-		}
-		
-		yield return new WaitForSeconds(1);
 	}
 		
 	IEnumerator EndTurn()
