@@ -2,6 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 
+enum Command
+{
+    Waiting,
+    Move,
+    Attack,
+    Rest,
+    Standby
+}
+
 public class GameManager : MonoBehaviour {
 
 	TileManager tileManager;
@@ -11,7 +20,7 @@ public class GameManager : MonoBehaviour {
 	bool isSelectedTileByUser = false;
 	bool isWaitingUserInput = false;
     
-    bool activeMoveCommand = false;
+    Command command = Command.Waiting;
     
     Vector2 destTilePosition;
 
@@ -60,30 +69,75 @@ public class GameManager : MonoBehaviour {
 
         commandUI.SetActive(true);
 
-        while (!activeMoveCommand)
+        command = Command.Waiting;
+        while (command == Command.Waiting)
         {
             yield return null;
         }
-        activeMoveCommand = false;
-        yield return StartCoroutine(SelectMovingPoint(selectedUnit));
+        
+        if (command == Command.Move)
+        {
+            command = Command.Waiting;
+            yield return StartCoroutine(SelectMovingPoint());
+        }
+        else if (command == Command.Rest)
+        {
+            command = Command.Waiting;
+            yield return StartCoroutine(RestAndRecover());
+        }
+        else if (command == Command.Standby)
+        {
+            command = Command.Waiting;
+            yield return StartCoroutine(Standby());
+        }
     }
     
-    // IEnumerator WaitingForMove()
-    // {
-    //     yield return null;
-    // }
-
-    // 'Move' command.
     public void CallbackMoveCommand()
     {
         commandUI.SetActive(false);
-        activeMoveCommand = true;
-        // StartCoroutine(SelectMovingPoint(selectedUnit));
+        command = Command.Move;
     }
     
-    IEnumerator SelectMovingPoint (GameObject unit)
+    public void CallbackRestCommand()
+    {
+        commandUI.SetActive(false);
+        command = Command.Rest;
+    }
+    
+    public void CallbackStandbyCommand()
+    {
+        commandUI.SetActive(false);
+        command = Command.Standby;
+    }
+    
+    IEnumerator Standby()
+    {
+        if (selectedUnit.GetComponent<Unit>().GetCurrentActionPoint() >= unitManager.maxActionPoint)
+        {
+            yield return StartCoroutine(RestAndRecover());
+            Debug.Log("Auto rest");
+        }
+        else
+        {
+            yield return new WaitForSeconds(1);
+        }
+    }
+    
+    IEnumerator RestAndRecover ()
+    {        
+        int usingAPToRest = (int)(selectedUnit.GetComponent<Unit>().GetCurrentActionPoint() * 0.9f);
+        int recoverHPDuringRest = (int)(selectedUnit.GetComponent<Unit>().GetMaxHp() * (usingAPToRest/100f));
+        selectedUnit.GetComponent<Unit>().UseActionPoint(usingAPToRest);
+        selectedUnit.GetComponent<Unit>().RecoverHp(recoverHPDuringRest);
+        
+        Debug.Log("Rest. Using " + usingAPToRest + "AP and recover " + recoverHPDuringRest + " HP");
+        
+        yield return new WaitForSeconds(1);
+    }
+    
+    IEnumerator SelectMovingPoint ()
 	{   
-        List<GameObject> nearbyTiles = CheckMovableTiles(unit);
+        List<GameObject> nearbyTiles = CheckMovableTiles(selectedUnit);
 		foreach (var tile in nearbyTiles)
 		{
             tile.GetComponent<Tile>().SetPreSelected(true);
@@ -102,7 +156,7 @@ public class GameManager : MonoBehaviour {
 		// GameObject destTile = nearbyTiles[Random.Range(0, nearbyTiles.Count)];
 		// Vector2 destTilePos = destTile.GetComponent<Tile>().GetTilePos();
         GameObject destTile = tileManager.GetTile(destTilePosition);
-        Vector2 currentTilePos = unit.GetComponent<Unit>().GetPosition();
+        Vector2 currentTilePos = selectedUnit.GetComponent<Unit>().GetPosition();
 		Vector2 distanceVector = destTilePosition - currentTilePos;
 		int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
 		int totalUseActionPoint = 0;
@@ -111,8 +165,8 @@ public class GameManager : MonoBehaviour {
 			totalUseActionPoint += requireActionPoint[i];
 		}
 		
-		MoveToTile(unit, destTile);
-		unit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
+		MoveToTile(selectedUnit, destTile);
+		selectedUnit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
 		
 		yield return new WaitForSeconds(1);
 		
@@ -122,14 +176,9 @@ public class GameManager : MonoBehaviour {
 			tile.GetComponent<SpriteRenderer>().color += new Color(0.3f, 0.3f, 0.3f, 0);
 		}
 		
-		// Over AP is changed to HP.
-		if (unit.GetComponent<Unit>().GetCurrentActionPoint() >= unitManager.maxActionPoint)
-		{
-			unit.GetComponent<Unit>().UseActionPoint(unitManager.maxActionPoint/2);
-			Debug.Log("Rest and recover HP");
-		}
-		
 		yield return new WaitForSeconds(1);
+        
+        yield return StartCoroutine(FocusToUnit());
 	}
 	
 	// Update is called once per frame

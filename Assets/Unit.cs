@@ -30,6 +30,11 @@ public class Unit : MonoBehaviour {
 	public int actionPoint;
 	public int regenerationActionPoint;
 
+    public int GetMaxHp()
+    {
+        return maxHp;
+    }
+
 	public int GetCurrentActionPoint()
 	{
 		return actionPoint;
@@ -49,6 +54,13 @@ public class Unit : MonoBehaviour {
 	{
 		return position;
 	}
+
+    public void RecoverHp(int amount)
+    {
+        currentHp += amount;
+        if (currentHp > maxHp)
+            currentHp = maxHp;
+    }
 
 	public void RegenerateActionPoint()
 	{
