@@ -6,7 +6,7 @@ class TileWithPath
 {
     public GameObject tile;
     public List<GameObject> path;
-    public int requireAP;
+    public int requireActivityPoint;
     
     public TileWithPath(GameObject destTile, TileWithPath prevTileWithPath)
     {
@@ -18,7 +18,7 @@ class TileWithPath
             this.path.Add(prevTile);
         this.path.Add(lastPrevTile);
 
-        this.requireAP += (tile.GetComponent<Tile>().GetRequireAPAtTile() + prevPath.Count);
+        this.requireActivityPoint += (tile.GetComponent<Tile>().GetRequireAPAtTile() + prevPath.Count);
     }
 }
 
@@ -33,7 +33,7 @@ public class PathFinder {
     public PathFinder(GameObject unit)
     {
         this.unitPosition = unit.GetComponent<Unit>().GetPosition();
-        this.remainAP = unit.GetComponent<Unit>().GetCurrentActionPoint();
+        this.remainAP = unit.GetComponent<Unit>().GetCurrentActivityPoint();
         
         this.tiles = GameObject.FindObjectOfType<TileManager>().GetAllTiles();
     }

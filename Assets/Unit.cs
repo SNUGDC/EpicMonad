@@ -7,37 +7,37 @@ public class Unit : MonoBehaviour {
 	public new string name;
     
     // Base stats.
-    float baseHp; //체력 
-    float baseAttackDamage; //공격력
+    float baseHealth; //체력 
+    float basePower; //공격력
     float baseDefense; //방어력
-    float baseResist; //저항력
-    float baseSpeed; //행동력
-    float baseRange; //거리
-    float baseArea; //범위
+    float baseResistence; //저항력
+    float baseDexturity; //행동력
+    float baseReach; //거리
+    float baseRange; //범위
     
     // Applied stats.
-    int maxHp;
-    int attackDamage;
+    int maxHealth;
+    int power;
     int defense;
-    int resist;
-    int speed;
+    int resistence;
+    int dexturity;
+    int reach;
     int range;
-    int area;
     
     // Variable values.
 	public Vector2 position;
-    public int currentHp; 
-	public int actionPoint;
+    public int currentHealth; 
+	public int activityPoint;
 	public int regenerationActionPoint;
 
-    public int GetMaxHp()
+    public int GetMaxHealth()
     {
-        return maxHp;
+        return maxHealth;
     }
 
-	public int GetCurrentActionPoint()
+	public int GetCurrentActivityPoint()
 	{
-		return actionPoint;
+		return activityPoint;
 	}
 
 	public void SetName(string name)
@@ -55,28 +55,28 @@ public class Unit : MonoBehaviour {
 		return position;
 	}
 
-    public void RecoverHp(int amount)
+    public void RecoverHealth(int amount)
     {
-        currentHp += amount;
-        if (currentHp > maxHp)
-            currentHp = maxHp;
+        currentHealth += amount;
+        if (currentHealth > maxHealth)
+            currentHealth = maxHealth;
     }
 
 	public void RegenerateActionPoint()
 	{
-		actionPoint += regenerationActionPoint;
-		Debug.Log(name + " recover " + regenerationActionPoint + "AP. Current AP : " + actionPoint);
+		activityPoint += regenerationActionPoint;
+		Debug.Log(name + " recover " + regenerationActionPoint + "AP. Current AP : " + activityPoint);
 	}
 
 	public void UseActionPoint(int amount)
 	{
-		actionPoint -= amount;
-		Debug.Log(name + " use " + amount + "AP. Current AP : " + actionPoint);
+		activityPoint -= amount;
+		Debug.Log(name + " use " + amount + "AP. Current AP : " + activityPoint);
 	}
 
 	// Use this for initialization
 	void Start () {
-		actionPoint = 0;
+		activityPoint = 0;
 	}
 	
 	// Update is called once per frame

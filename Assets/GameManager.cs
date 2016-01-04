@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour {
         foreach (var unit in unitManager.GetAllUnits())
         {
             if ((unit != selectedUnit) && 
-            (unit.GetComponent<Unit>().GetCurrentActionPoint() >= selectedUnit.GetComponent<Unit>().GetCurrentActionPoint()))
+            (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint()))
             {
                 isPossible = true;
             }
@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator Standby()
     {
-        if (selectedUnit.GetComponent<Unit>().GetCurrentActionPoint() >= unitManager.maxActionPoint)
+        if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() >= unitManager.maxActivityPoint)
         {
             yield return StartCoroutine(RestAndRecover());
             Debug.Log("Auto rest");
@@ -147,12 +147,12 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator RestAndRecover ()
     {        
-        int usingAPToRest = (int)(selectedUnit.GetComponent<Unit>().GetCurrentActionPoint() * 0.9f);
-        int recoverHPDuringRest = (int)(selectedUnit.GetComponent<Unit>().GetMaxHp() * (usingAPToRest/100f));
-        selectedUnit.GetComponent<Unit>().UseActionPoint(usingAPToRest);
-        selectedUnit.GetComponent<Unit>().RecoverHp(recoverHPDuringRest);
+        int usingActivityPointToRest = (int)(selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() * 0.9f);
+        int recoverHealthDuringRest = (int)(selectedUnit.GetComponent<Unit>().GetMaxHealth() * (usingActivityPointToRest/100f));
+        selectedUnit.GetComponent<Unit>().UseActionPoint(usingActivityPointToRest);
+        selectedUnit.GetComponent<Unit>().RecoverHealth(recoverHealthDuringRest);
         
-        Debug.Log("Rest. Using " + usingAPToRest + "AP and recover " + recoverHPDuringRest + " HP");
+        Debug.Log("Rest. Using " + usingActivityPointToRest + "AP and recover " + recoverHealthDuringRest + " HP");
         
         yield return new WaitForSeconds(1);
     }
@@ -272,16 +272,16 @@ public class GameManager : MonoBehaviour {
 		List<GameObject> nearbyTiles = new List<GameObject>();
 		nearbyTiles.Add(tileManager.GetTile(pos));
 		
-		int currentAP = unit.GetComponent<Unit>().GetCurrentActionPoint();
-		int totalRequireAP = 0;
+		int currentActivityPoint = unit.GetComponent<Unit>().GetCurrentActivityPoint();
+		int totalRequireActivityPoint = 0;
 		for (int i = 0; i < requireActionPoint.Length; i++)
 		{
-			if (currentAP < totalRequireAP + requireActionPoint[i])
+			if (currentActivityPoint < totalRequireActivityPoint + requireActionPoint[i])
 			{
 				break;
 			}
 			nearbyTiles = AddNearbyTiles(nearbyTiles, unit);
-			totalRequireAP += requireActionPoint[i];
+			totalRequireActivityPoint += requireActionPoint[i];
 		}
 		
 		return nearbyTiles;
