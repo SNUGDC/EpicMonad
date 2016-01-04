@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 enum Command
 {
@@ -8,7 +9,8 @@ enum Command
     Move,
     Attack,
     Rest,
-    Standby
+    Standby,
+    Cancel
 }
 
 public class GameManager : MonoBehaviour {
@@ -22,8 +24,8 @@ public class GameManager : MonoBehaviour {
     
     Command command = Command.Waiting;
     
+    int moveCount;
     Vector2 destTilePosition;
-
 	GameObject selectedUnit;
 	Queue<GameObject> readiedUnits = new Queue<GameObject>();
 
@@ -60,7 +62,25 @@ public class GameManager : MonoBehaviour {
     {
         Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
         selectedUnit = unit;
+        moveCount = 0;
         yield return StartCoroutine(FocusToUnit());
+    }
+    
+    void CheckStandbyPossible()
+    {
+        bool isPossible = false;
+        GameObject.Find("StandbyButton").GetComponent<Button>().interactable = isPossible;
+
+        foreach (var unit in unitManager.GetAllUnits())
+        {
+            if ((unit != selectedUnit) && 
+            (unit.GetComponent<Unit>().GetCurrentActionPoint() >= selectedUnit.GetComponent<Unit>().GetCurrentActionPoint()))
+            {
+                isPossible = true;
+            }
+        }
+        
+        GameObject.Find("StandbyButton").GetComponent<Button>().interactable = isPossible;
     }
     
     IEnumerator FocusToUnit()
@@ -68,6 +88,8 @@ public class GameManager : MonoBehaviour {
         Camera.main.transform.position = new Vector3 (selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
 
         commandUI.SetActive(true);
+        
+        CheckStandbyPossible();
 
         command = Command.Waiting;
         while (command == Command.Waiting)
@@ -165,6 +187,7 @@ public class GameManager : MonoBehaviour {
 			totalUseActionPoint += requireActionPoint[i];
 		}
 		
+        moveCount += distance;
 		MoveToTile(selectedUnit, destTile);
 		selectedUnit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
 		

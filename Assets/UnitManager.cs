@@ -11,6 +11,11 @@ public class UnitManager : MonoBehaviour {
 	public List<GameObject> units = new List<GameObject>();
 	public Queue<GameObject> readiedUnits = new Queue<GameObject>();
 
+    public List<GameObject> GetAllUnits()
+    {
+        return units;
+    }
+
 	void GenerateUnits ()
 	{
 		int tileWidth = 200/100;
@@ -29,11 +34,16 @@ public class UnitManager : MonoBehaviour {
 				x = 8;
 				y = 3;
 			}
-			else
+			else if (unit.GetComponent<Unit>().name == "Pale")
 			{
 				x = 5;
 				y = 3;
 			}
+            else
+            {
+                x = 1;
+                y = 1;
+            }
 			
 			Vector3 respawnPos = new Vector3(tileWidth * (y + x) * 0.5f, tileHeight * (y - x) * 0.5f, (y - x) * 0.1f - 0.01f);
 			unit.transform.position = respawnPos;
