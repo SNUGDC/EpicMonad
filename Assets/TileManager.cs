@@ -41,6 +41,78 @@ public class TileManager : MonoBehaviour {
 		return tile.transform.position;
 	}
 
+    public List<GameObject> GetTilesInSquareRange(Vector2 mid, int reach, bool includeUnitPos)
+    {
+        List<GameObject> tilesInRange = new List<GameObject>();
+        tilesInRange.Add(GetTile(mid));
+        for (int i = 0; i < reach; i++)
+        {
+            tilesInRange = AddNearbyTiles(tilesInRange);
+        }
+        
+        if (!includeUnitPos)
+        {
+            tilesInRange.Remove(tilesInRange[0]);
+        }
+        
+        return tilesInRange;
+    }
+    
+    public void ChangeTilesToSeletedColor(List<GameObject> tiles)
+    {
+        foreach(var tile in tiles)
+        {
+            tile.GetComponent<SpriteRenderer>().color -= new Color(0, 0.5f, 0.5f, 0);
+            tile.GetComponent<Tile>().SetPreSelected(true);
+        }
+    }
+    
+    public void ChangeTilesFromSeletedColorToDefaultColor(List<GameObject> tiles)
+    {
+        foreach(var tile in tiles)
+        {
+            tile.GetComponent<SpriteRenderer>().color += new Color(0, 0.5f, 0.5f, 0);
+            tile.GetComponent<Tile>().SetPreSelected(false);
+        }
+    }
+    
+    List<GameObject> AddNearbyTiles(List<GameObject> tileList)
+	{
+		List<GameObject> newTileList = new List<GameObject>();
+		foreach (var tile in tileList)
+		{
+			Vector2 position = tile.GetComponent<Tile>().GetTilePos();
+			
+			if (!newTileList.Contains(tile))
+			{
+				newTileList.Add(tile);
+			}
+
+			GameObject nearbyUpTile = GetTile(position + Vector2.up);
+			if (nearbyUpTile != null && !newTileList.Contains(nearbyUpTile))
+			{
+				newTileList.Add(nearbyUpTile);
+			}
+			GameObject nearbyDownTile = GetTile(position + Vector2.down);
+			if (nearbyDownTile != null && !newTileList.Contains(nearbyDownTile))
+			{
+				newTileList.Add(nearbyDownTile);
+			}
+			GameObject nearbyLeftTile = GetTile(position + Vector2.left);
+			if (nearbyLeftTile != null && !newTileList.Contains(nearbyLeftTile))
+			{
+				newTileList.Add(nearbyLeftTile);
+			}
+			GameObject nearbyRightTile = GetTile(position + Vector2.right);
+			if (nearbyRightTile != null && !newTileList.Contains(nearbyRightTile))
+			{
+				newTileList.Add(nearbyRightTile);
+			}
+		}
+        
+        return newTileList;
+    }
+
 	void GenerateTiles (int x, int y)
 	{
 		for (int i = 0; i < x; i++)

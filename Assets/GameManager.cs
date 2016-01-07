@@ -202,13 +202,43 @@ public class GameManager : MonoBehaviour {
         {
             yield return null;
         }
-        indexOfSeletedSkillByUser = 0;
         isWaitingUserInput = false;
         
         skillUI.SetActive(false);
-        selectedUnit.GetComponent<Unit>().UseActionPoint(40); // temp value.
-        yield return new WaitForSeconds(1);
+        
+        yield return new WaitForSeconds(0.5f);
                 
+        yield return StartCoroutine(SelectSkillApplyPoint());
+    }
+    
+    IEnumerator SelectSkillApplyPoint()
+    {
+        Vector2 selectedUnitPos = selectedUnit.GetComponent<Unit>().GetPosition();
+        
+        // temp values.
+        List<GameObject> activeRange = new List<GameObject>();
+        if (indexOfSeletedSkillByUser == 1)
+            activeRange = tileManager.GetTilesInSquareRange(selectedUnitPos, 3, false);
+        else 
+            activeRange = tileManager.GetTilesInSquareRange(selectedUnitPos, 0, true);
+        tileManager.ChangeTilesToSeletedColor(activeRange);
+        //
+        
+        isWaitingUserInput = true;
+        isSelectedTileByUser = false;
+		while (!isSelectedTileByUser)
+		{
+			yield return null;
+		}
+        isSelectedTileByUser = false;
+		isWaitingUserInput = false; 
+        
+        tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+        
+        int requireAP = selectedUnit.GetComponent<Unit>().requireAPOfSkills[indexOfSeletedSkillByUser-1];
+        selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
+        indexOfSeletedSkillByUser = 0; // return to init value.
+        
         yield return StartCoroutine(FocusToUnit());
     }
     
@@ -218,7 +248,7 @@ public class GameManager : MonoBehaviour {
 		foreach (var tile in nearbyTiles)
 		{
             tile.GetComponent<Tile>().SetPreSelected(true);
-			tile.GetComponent<SpriteRenderer>().color -= new Color(0.3f, 0.3f, 0.3f, 0);
+			tile.GetComponent<SpriteRenderer>().color -= new Color(0.4f, 0.4f, 0, 0);
 		}
         
         isWaitingUserInput = true;
@@ -251,10 +281,10 @@ public class GameManager : MonoBehaviour {
 		foreach (var tile in nearbyTiles)
 		{
             tile.GetComponent<Tile>().SetPreSelected(false);
-			tile.GetComponent<SpriteRenderer>().color += new Color(0.3f, 0.3f, 0.3f, 0);
+			tile.GetComponent<SpriteRenderer>().color += new Color(0.4f, 0.4f, 0, 0);
 		}
 		
-		yield return new WaitForSeconds(1);
+		yield return new WaitForSeconds(0.5f);
         
         yield return StartCoroutine(FocusToUnit());
 	}
