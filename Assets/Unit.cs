@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Enums;
 
 public class Unit : MonoBehaviour {
 
@@ -7,13 +8,13 @@ public class Unit : MonoBehaviour {
 	public new string name;
     
     // Base stats.
-    float baseHealth; //체력 
-    float basePower; //공격력
-    float baseDefense; //방어력
-    float baseResistence; //저항력
-    float baseDexturity; //행동력
-    float baseReach; //거리
-    float baseRange; //범위
+    public float baseHealth; //체력 
+    public float basePower; //공격력
+    public float baseDefense; //방어력
+    public float baseResistence; //저항력
+    public float baseDexturity; //행동력
+    public float baseReach; //거리
+    public float baseRange; //범위
     
     // Applied stats.
     int maxHealth;
@@ -26,9 +27,10 @@ public class Unit : MonoBehaviour {
     
     // Variable values.
 	public Vector2 position;
+    public Direction direction;
     public int currentHealth; 
 	public int activityPoint;
-	public int regenerationActionPoint;
+	// public int regenerationActionPoint;
 
     public int GetMaxHealth()
     {
@@ -64,8 +66,8 @@ public class Unit : MonoBehaviour {
 
 	public void RegenerateActionPoint()
 	{
-		activityPoint += regenerationActionPoint;
-		Debug.Log(name + " recover " + regenerationActionPoint + "AP. Current AP : " + activityPoint);
+		activityPoint += dexturity; // 페이즈당 행동력 회복량 = 민첩성
+		Debug.Log(name + " recover " + dexturity + "AP. Current AP : " + activityPoint);
 	}
 
 	public void UseActionPoint(int amount)
@@ -74,9 +76,27 @@ public class Unit : MonoBehaviour {
 		Debug.Log(name + " use " + amount + "AP. Current AP : " + activityPoint);
 	}
 
+    void applyStats()
+    {
+        maxHealth = (int)baseHealth;
+        power = (int)basePower;
+        defense = (int)baseDefense;
+        resistence = (int)baseResistence;
+        dexturity = (int)baseDexturity;
+        reach = (int)baseReach;
+        range = (int)baseRange;
+    }
+
+    void initialize()
+    {
+        currentHealth = maxHealth;
+        activityPoint = 0;
+    }
+
 	// Use this for initialization
 	void Start () {
-		activityPoint = 0;
+        applyStats();
+        initialize();
 	}
 	
 	// Update is called once per frame

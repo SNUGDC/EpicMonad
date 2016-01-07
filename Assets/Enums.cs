@@ -7,4 +7,12 @@ namespace Enums {
         flatland,
         hill
     }
+    
+    public enum Direction
+    {
+        up,
+        down,
+        left,
+        right
+    }
 }

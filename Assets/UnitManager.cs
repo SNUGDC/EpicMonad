@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class UnitManager : MonoBehaviour {
 
-	public int maxActivityPoint = 50;
+	public int standardActionPoint = 50;
 
 	// FIXME : unit is only one.
 	public GameObject[] unitPrefabs;
@@ -64,7 +64,7 @@ public class UnitManager : MonoBehaviour {
 		foreach (var unit in units)
 		{
 			unit.GetComponent<Unit>().RegenerateActionPoint();
-			if (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= maxActivityPoint)
+			if (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= standardActionPoint)
 			{
 				readiedUnits.Enqueue(unit);
 				Debug.Log(unit.GetComponent<Unit>().name + " is readied");
