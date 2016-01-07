@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour {
             readiedUnits.Clear();
             yield return null;
             
-            yield return StartCoroutine(EndTurn());
+            yield return StartCoroutine(EndPhase());
             readiedUnits = unitManager.readiedUnits;
         }
     }
@@ -149,15 +149,15 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator Standby()
     {
-        if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() >= unitManager.standardActionPoint)
-        {
-            yield return StartCoroutine(RestAndRecover());
-            Debug.Log("Auto rest");
-        }
-        else
-        {
+        // if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() >= unitManager.standardActionPoint)
+        // {
+        //     yield return StartCoroutine(RestAndRecover());
+        //     Debug.Log("Auto rest");
+        // }
+        // else
+        // {
             yield return new WaitForSeconds(1);
-        }
+        // }
     }
     
     IEnumerator RestAndRecover ()
@@ -178,9 +178,23 @@ public class GameManager : MonoBehaviour {
         Debug.Log(index + "th skill is selected");
     }
     
+    void CheckUsableSkill()
+    {
+        int[] requireAPOfSkills = selectedUnit.GetComponent<Unit>().requireAPOfSkills;
+        for (int i = 0; i < requireAPOfSkills.Length; i++)
+        {
+            GameObject.Find((i+1).ToString() + "SkillButton").GetComponent<Button>().interactable = true;
+            if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() < requireAPOfSkills[i])
+            {
+                GameObject.Find((i+1).ToString() + "SkillButton").GetComponent<Button>().interactable = false;
+            }
+        }
+    }
+    
     IEnumerator SelectSkill()
     {
         skillUI.SetActive(true);
+        CheckUsableSkill();
         
         isWaitingUserInput = true;
         indexOfSeletedSkillByUser = 0;
@@ -337,10 +351,10 @@ public class GameManager : MonoBehaviour {
 		destTile.GetComponent<Tile>().SetUnitOnTile(unit);
 	}
 		
-	IEnumerator EndTurn()
+	IEnumerator EndPhase()
 	{
-		Debug.Log("Turn End.");
-		unitManager.EndTurn();
+		Debug.Log("Phase End.");
+		unitManager.EndPhase();
 		yield return new WaitForSeconds(0.5f);
 	}
 }

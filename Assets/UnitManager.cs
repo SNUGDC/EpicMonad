@@ -58,7 +58,7 @@ public class UnitManager : MonoBehaviour {
 		Debug.Log("Generate units complete");
 	}
 
-	public void EndTurn()
+	public void EndPhase()
 	{
 		// check each unit and enqueue all readied units.
 		foreach (var unit in units)
