@@ -18,8 +18,10 @@ public class GameManager : MonoBehaviour {
 	TileManager tileManager;
 	UnitManager unitManager;
     GameObject commandUI;
-	
+	GameObject skillUI;
+    
 	bool isSelectedTileByUser = false;
+    int indexOfSeletedSkillByUser = 0;
 	bool isWaitingUserInput = false;
     
     Command command = Command.Waiting;
@@ -37,6 +39,8 @@ public class GameManager : MonoBehaviour {
 		unitManager = FindObjectOfType<UnitManager>();
 		commandUI = GameObject.Find("CommandPanel");
         commandUI.SetActive(false);
+        skillUI = GameObject.Find("SkillPanel");
+        skillUI.SetActive(false);
         selectedUnit = null;
         
         StartCoroutine(InstantiateTurnManager());
@@ -88,7 +92,7 @@ public class GameManager : MonoBehaviour {
         Camera.main.transform.position = new Vector3 (selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
 
         commandUI.SetActive(true);
-        
+        GameObject.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().name;
         CheckStandbyPossible();
 
         command = Command.Waiting;
@@ -101,6 +105,11 @@ public class GameManager : MonoBehaviour {
         {
             command = Command.Waiting;
             yield return StartCoroutine(SelectMovingPoint());
+        }
+        else if (command == Command.Attack)
+        {
+            command = Command.Waiting;
+            yield return StartCoroutine(SelectSkill());
         }
         else if (command == Command.Rest)
         {
@@ -120,6 +129,12 @@ public class GameManager : MonoBehaviour {
         command = Command.Move;
     }
     
+    public void CallbackAttackCommand()
+    {
+        commandUI.SetActive(false);
+        command = Command.Attack;
+    }
+    
     public void CallbackRestCommand()
     {
         commandUI.SetActive(false);
@@ -134,7 +149,7 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator Standby()
     {
-        if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() >= unitManager.maxActivityPoint)
+        if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() >= unitManager.standardActionPoint)
         {
             yield return StartCoroutine(RestAndRecover());
             Debug.Log("Auto rest");
@@ -155,6 +170,20 @@ public class GameManager : MonoBehaviour {
         Debug.Log("Rest. Using " + usingActivityPointToRest + "AP and recover " + recoverHealthDuringRest + " HP");
         
         yield return new WaitForSeconds(1);
+    }
+    
+    IEnumerator SelectSkill()
+    {
+        skillUI.SetActive(true);
+        
+        isWaitingUserInput = true;
+        indexOfSeletedSkillByUser = 0;
+        while (indexOfSeletedSkillByUser == 0)
+        {
+            yield return null;
+        }
+        indexOfSeletedSkillByUser = 0;
+        isWaitingUserInput = false;
     }
     
     IEnumerator SelectMovingPoint ()
@@ -298,10 +327,8 @@ public class GameManager : MonoBehaviour {
 		
 	IEnumerator EndTurn()
 	{
-		// isWaiting = true;
 		Debug.Log("Turn End.");
 		unitManager.EndTurn();
 		yield return new WaitForSeconds(0.5f);
-		// isWaiting = false;
 	}
 }
