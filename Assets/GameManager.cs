@@ -31,7 +31,8 @@ public class GameManager : MonoBehaviour {
 	GameObject selectedUnit;
 	Queue<GameObject> readiedUnits = new Queue<GameObject>();
 
-	int[] requireActionPoint = {2, 5, 9, 14, 20, 27, 35, 44};
+	int[] requireActionPoint = {4, 10, 18, 28, 40, 54, 70, 88};
+	// int[] requireActionPoint = {2, 5, 9, 14, 20, 27, 35, 44};
 
 	// Use this for initialization
 	void Start () {

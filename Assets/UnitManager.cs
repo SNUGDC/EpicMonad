@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class UnitManager : MonoBehaviour {
 
-	public int standardActionPoint = 50;
+	int standardActionPoint = 100;
 
 	// FIXME : unit is only one.
 	public GameObject[] unitPrefabs;
@@ -28,22 +28,8 @@ public class UnitManager : MonoBehaviour {
 			int x, y;
 			GameObject unit = Instantiate(unitPrefab) as GameObject;
 			
-			// Using test.
-			if (unit.GetComponent<Unit>().name == "Jade")
-			{
-				x = 8;
-				y = 3;
-			}
-			else if (unit.GetComponent<Unit>().name == "Pale")
-			{
-				x = 5;
-				y = 3;
-			}
-            else
-            {
-                x = 1;
-                y = 1;
-            }
+            x = (int)unit.GetComponent<Unit>().initPosition.x;
+            y = (int)unit.GetComponent<Unit>().initPosition.y;
 			
 			Vector3 respawnPos = new Vector3(tileWidth * (y + x) * 0.5f, tileHeight * (y - x) * 0.5f, (y - x) * 0.1f - 0.01f);
 			unit.transform.position = respawnPos;

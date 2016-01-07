@@ -7,8 +7,9 @@ public class Unit : MonoBehaviour {
 	// FIXME : public -> private
 	public new string name;
     
-    // FIXME : temp skills
+    // FIXME : temp values
     public int[] requireAPOfSkills;
+    public Vector2 initPosition;
     
     // Base stats.
     public float baseHealth; //체력 
