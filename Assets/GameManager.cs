@@ -172,6 +172,12 @@ public class GameManager : MonoBehaviour {
         yield return new WaitForSeconds(1);
     }
     
+    public void CallbackSkillIndex(int index)
+    {
+        indexOfSeletedSkillByUser = index;
+        Debug.Log(index + "th skill is selected");
+    }
+    
     IEnumerator SelectSkill()
     {
         skillUI.SetActive(true);
@@ -184,6 +190,12 @@ public class GameManager : MonoBehaviour {
         }
         indexOfSeletedSkillByUser = 0;
         isWaitingUserInput = false;
+        
+        skillUI.SetActive(false);
+        selectedUnit.GetComponent<Unit>().UseActionPoint(40); // temp value.
+        yield return new WaitForSeconds(1);
+                
+        yield return StartCoroutine(FocusToUnit());
     }
     
     IEnumerator SelectMovingPoint ()
