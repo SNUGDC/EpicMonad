@@ -61,8 +61,27 @@ public class Unit : MonoBehaviour {
 		return position;
 	}
 
+    public void SetBuff(Buff buff)
+    {
+        // 껍데기.
+    }
+
+    public void SetDebuff(Debuff debuff)
+    {
+        // 껍데기.
+    }
+
+    public void Damaged(DamageType type, int amount)
+    {
+        // 공격이 물리인지 마법인지 체크
+        // 방어력 / 저항력 중 맞는 값을 적용
+        // 방어 감소 / 저항 감소 적용
+        // 체력 깎임 
+    }
+
     public void RecoverHealth(int amount)
     {
+        // 내상 효과 적용할 것! 아직 미적용
         currentHealth += amount;
         if (currentHealth > maxHealth)
             currentHealth = maxHealth;

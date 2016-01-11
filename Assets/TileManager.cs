@@ -41,7 +41,17 @@ public class TileManager : MonoBehaviour {
 		return tile.transform.position;
 	}
 
-    public List<GameObject> GetTilesInSquareRange(Vector2 mid, int reach, bool includeUnitPos)
+    public List<GameObject> GetTilesInRange(RangeForm form, Vector2 mid, int reach, bool includeMyself)
+    {
+        if (form == RangeForm.square)
+        {
+            return GetTilesInSquareRange(mid, reach, includeMyself);
+        }
+        else
+            return GetTilesInSquareRange(mid, reach, includeMyself); // temp return value.
+    }
+    
+    List<GameObject> GetTilesInSquareRange(Vector2 mid, int reach, bool includeMyself)
     {
         List<GameObject> tilesInRange = new List<GameObject>();
         tilesInRange.Add(GetTile(mid));
@@ -50,7 +60,7 @@ public class TileManager : MonoBehaviour {
             tilesInRange = AddNearbyTiles(tilesInRange);
         }
         
-        if (!includeUnitPos)
+        if (!includeMyself)
         {
             tilesInRange.Remove(tilesInRange[0]);
         }
@@ -122,9 +132,9 @@ public class TileManager : MonoBehaviour {
 				GameObject tile = Instantiate(tilePrefab, new Vector3(tileWidth * (j+i) * 0.5f, tileHeight * (j-i) * 0.5f, (j-i) * 0.1f), Quaternion.identity) as GameObject;
 				tile.GetComponent<Tile>().SetTilePos(i, j);
                 if (Random.Range(0, 3) > 0)
-                    tile.GetComponent<Tile>().SetTileType(TileType.flatland);
+                    tile.GetComponent<Tile>().SetTileForm(TileForm.flatland);
                 else
-                    tile.GetComponent<Tile>().SetTileType(TileType.hill);
+                    tile.GetComponent<Tile>().SetTileForm(TileForm.hill);
 				tiles.Add(new Vector2(i, j), tile);
 			}
 		}

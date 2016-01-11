@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using Enums;
 
 enum Command
 {
@@ -13,21 +14,30 @@ enum Command
     Cancel
 }
 
+enum SkillApplyCommand
+{
+    Waiting,
+    Apply,
+    Chain
+}
+
 public class GameManager : MonoBehaviour {
 
 	TileManager tileManager;
 	UnitManager unitManager;
     GameObject commandUI;
 	GameObject skillUI;
+    GameObject skillCheckUI;
     
 	bool isSelectedTileByUser = false;
     int indexOfSeletedSkillByUser = 0;
 	bool isWaitingUserInput = false;
     
     Command command = Command.Waiting;
+    SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
     
     int moveCount;
-    Vector2 destTilePosition;
+    Vector2 selectedTilePosition;
 	GameObject selectedUnit;
 	Queue<GameObject> readiedUnits = new Queue<GameObject>();
 
@@ -42,6 +52,8 @@ public class GameManager : MonoBehaviour {
         commandUI.SetActive(false);
         skillUI = GameObject.Find("SkillPanel");
         skillUI.SetActive(false);
+        skillCheckUI = GameObject.Find("SkillCheckPanel");
+        skillCheckUI.SetActive(false);
         selectedUnit = null;
         
         StartCoroutine(InstantiateTurnManager());
@@ -219,9 +231,15 @@ public class GameManager : MonoBehaviour {
         // temp values.
         List<GameObject> activeRange = new List<GameObject>();
         if (indexOfSeletedSkillByUser == 1)
-            activeRange = tileManager.GetTilesInSquareRange(selectedUnitPos, 3, false);
-        else 
-            activeRange = tileManager.GetTilesInSquareRange(selectedUnitPos, 0, true);
+            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 4, false);
+        else if (indexOfSeletedSkillByUser == 2)
+            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 4, true);
+        else if (indexOfSeletedSkillByUser == 3)
+            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 2, false);    
+        else if (indexOfSeletedSkillByUser == 4)
+            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 0, true);
+        else
+            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 3, false);
         tileManager.ChangeTilesToSeletedColor(activeRange);
         //
         
@@ -234,13 +252,75 @@ public class GameManager : MonoBehaviour {
         isSelectedTileByUser = false;
 		isWaitingUserInput = false; 
         
+        // 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요
+        
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+        skillUI.SetActive(false);
+        
+        yield return StartCoroutine(CheckApplyOrChain(selectedTilePosition));
+    }
+    
+    IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition)
+    {
+        List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, true);
+        tileManager.ChangeTilesToSeletedColor(selectedTiles);
+        skillCheckUI.SetActive(true);
+        
+        skillApplyCommand = SkillApplyCommand.Waiting;
+        while (skillApplyCommand == SkillApplyCommand.Waiting)
+        {
+            yield return null;
+        }
+
+        if (skillApplyCommand == SkillApplyCommand.Apply)
+        {
+            skillApplyCommand = SkillApplyCommand.Waiting;
+            yield return StartCoroutine(ApplySkill(selectedTiles));
+        }
+        else if (skillApplyCommand == SkillApplyCommand.Chain)
+        {
+            skillApplyCommand = SkillApplyCommand.Waiting;
+            yield return StartCoroutine(SelectMovingPoint());
+        }
+    }
+    
+    public void CallbackApplyCommand()
+    {
+        skillCheckUI.SetActive(false);
+        skillApplyCommand = SkillApplyCommand.Apply;
+    }
+    
+    public void CallbackChainCommand()
+    {
+        skillCheckUI.SetActive(false);
+        skillApplyCommand = SkillApplyCommand.Chain;
+    }
+    
+    IEnumerator ApplySkill(List<GameObject> selectedTiles)
+    {
+        foreach (var tile in selectedTiles)
+        {
+            GameObject target = tile.GetComponent<Tile>().GetUnitOnTile();
+            if (target != null)
+            {
+                Debug.Log("Apply skill to " + target.GetComponent<Unit>().name);
+            }
+        }
+        
+        tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
         
         int requireAP = selectedUnit.GetComponent<Unit>().requireAPOfSkills[indexOfSeletedSkillByUser-1];
         selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
         indexOfSeletedSkillByUser = 0; // return to init value.
         
+        yield return new WaitForSeconds(0.5f);
+        
         yield return StartCoroutine(FocusToUnit());
+    }
+    
+    IEnumerator ChainAndStandby()
+    {
+        yield return null;
     }
     
     IEnumerator SelectMovingPoint ()
@@ -263,9 +343,9 @@ public class GameManager : MonoBehaviour {
 		
 		// GameObject destTile = nearbyTiles[Random.Range(0, nearbyTiles.Count)];
 		// Vector2 destTilePos = destTile.GetComponent<Tile>().GetTilePos();
-        GameObject destTile = tileManager.GetTile(destTilePosition);
+        GameObject destTile = tileManager.GetTile(selectedTilePosition);
         Vector2 currentTilePos = selectedUnit.GetComponent<Unit>().GetPosition();
-		Vector2 distanceVector = destTilePosition - currentTilePos;
+		Vector2 distanceVector = selectedTilePosition - currentTilePos;
 		int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
 		int totalUseActionPoint = 0;
 		for (int i = 0; i < distance; i++)
@@ -300,7 +380,7 @@ public class GameManager : MonoBehaviour {
 		if (isWaitingUserInput)
 		{
 			isSelectedTileByUser = true;
-            destTilePosition = position;
+            selectedTilePosition = position;
 			Debug.Log("Clicked " + position + " tile");
 		}
 	}

@@ -4,7 +4,7 @@ using Enums;
 
 public class Tile : MonoBehaviour {
 
-    public TileType type;
+    public TileForm form;
 	Vector2 position;
 	GameObject unitOnTile = null;
 
@@ -25,21 +25,26 @@ public class Tile : MonoBehaviour {
 		return position;
 	}
 
-    public void SetTileType(TileType type)
+    public void SetTileImage(TileForm form, TileElement element)
     {
-        string imagePath = "TileImage/" + type.ToString();
-        GetComponent<SpriteRenderer>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
-        this.type = type;
+        
     }
 
-    public TileType GetTileType()
+    public void SetTileForm(TileForm form)
     {
-        return type;
+        string imagePath = "TileImage/" + form.ToString();
+        GetComponent<SpriteRenderer>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
+        this.form = form;
+    }
+
+    public TileForm GetTileForm()
+    {
+        return form;
     }
     
     public int GetRequireAPAtTile()
     {
-        return GetRequireAPFromTileType(type);
+        return GetRequireAPFromTileType(form);
     }
 
 	public bool IsUnitOnTile ()
@@ -54,20 +59,20 @@ public class Tile : MonoBehaviour {
 	
 	public GameObject GetUnitOnTile ()
 	{
-		if (unitOnTile == null)
-		{
-			Debug.Log("(" + position.x + ", " + position.y + ") is empty.");
-		}
+		// if (unitOnTile == null)
+		// {
+		// 	Debug.Log("(" + position.x + ", " + position.y + ") is empty.");
+		// }
 		return unitOnTile;
 	}
 
-    int GetRequireAPFromTileType(TileType type)
+    int GetRequireAPFromTileType(TileForm type)
     {
-        if (type == TileType.flatland)
+        if (type == TileForm.flatland)
         {
             return 3;
         }
-        else if (type == TileType.hill)
+        else if (type == TileForm.hill)
         {
             return 5;
         }
