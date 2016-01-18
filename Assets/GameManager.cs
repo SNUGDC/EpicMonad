@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour {
 	GameObject selectedUnit;
 	Queue<GameObject> readiedUnits = new Queue<GameObject>();
 
+    int currentPhase;
+
 	int[] requireActionPoint = {4, 10, 18, 28, 40, 54, 70, 88};
 	// int[] requireActionPoint = {2, 5, 9, 14, 20, 27, 35, 44};
 
@@ -56,8 +58,23 @@ public class GameManager : MonoBehaviour {
         skillCheckUI.SetActive(false);
         selectedUnit = null;
         
+        currentPhase = 1;
+        
+        InitCameraPosition(new Vector2(5, 5)); // temp init position;
+        
         StartCoroutine(InstantiateTurnManager());
 	}
+    
+    public int GetCurrentPhase()
+    {
+        return currentPhase;
+    }
+    
+    void InitCameraPosition(Vector2 initTilePosition)
+    {
+        Vector2 tilePosition = tileManager.GetTilePos(initTilePosition);
+        Camera.main.transform.position = new Vector3(tilePosition.x, tilePosition.y, -10);
+    }
     
     IEnumerator InstantiateTurnManager()
     {
@@ -162,15 +179,7 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator Standby()
     {
-        // if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() >= unitManager.standardActionPoint)
-        // {
-        //     yield return StartCoroutine(RestAndRecover());
-        //     Debug.Log("Auto rest");
-        // }
-        // else
-        // {
-            yield return new WaitForSeconds(1);
-        // }
+        yield return new WaitForSeconds(1);
     }
     
     IEnumerator RestAndRecover ()
@@ -341,6 +350,8 @@ public class GameManager : MonoBehaviour {
         isSelectedTileByUser = false;
 		isWaitingUserInput = false;
 		
+        //yield break 넣으면 코루틴 강제종료 
+                
 		// GameObject destTile = nearbyTiles[Random.Range(0, nearbyTiles.Count)];
 		// Vector2 destTilePos = destTile.GetComponent<Tile>().GetTilePos();
         GameObject destTile = tileManager.GetTile(selectedTilePosition);
@@ -465,7 +476,10 @@ public class GameManager : MonoBehaviour {
 	IEnumerator EndPhase()
 	{
 		Debug.Log("Phase End.");
-		unitManager.EndPhase();
+		
+        currentPhase ++;
+        
+        unitManager.EndPhase();
 		yield return new WaitForSeconds(0.5f);
 	}
 }

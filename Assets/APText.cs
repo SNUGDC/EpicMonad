@@ -15,7 +15,12 @@ public class APText : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		string newText = "Current Action Point\n";
+        string newText = "";
+        
+        string phaseText = "[Phase " + FindObjectOfType<GameManager>().GetCurrentPhase() + "]\n";
+		newText += phaseText;
+        string apText = "[Action Point]\n";
+        newText += apText;
 		foreach (var unit in unitManager.GetAllUnits())
 		{
 			string unitText = unit.GetComponent<Unit>().name + " : " + unit.GetComponent<Unit>().GetCurrentActivityPoint() + "\n";
