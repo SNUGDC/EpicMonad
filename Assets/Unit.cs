@@ -113,7 +113,7 @@ public class Unit : MonoBehaviour {
     void initialize()
     {
         currentHealth = maxHealth;
-        activityPoint = 0;
+        activityPoint = (int)(dexturity * 1.5f);
     }
 
 	// Use this for initialization
