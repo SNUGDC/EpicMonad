@@ -4,6 +4,22 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using Enums;
 
+enum CurrentState
+{
+    None,
+    FocusToUnit,
+    SelectMovingPoint,
+    CheckDestination,
+    MoveToTile,
+    SelectSkill,
+    SelectSkillApplyPoint,
+    CheckApplyOrChain,
+    ApplySkill,
+    ChainAndStandby,
+    RestAndRecover,
+    Standby
+}
+
 enum Command
 {
     Waiting,
@@ -29,9 +45,13 @@ public class GameManager : MonoBehaviour {
 	GameObject skillUI;
     GameObject skillCheckUI;
     
+    CurrentState currentState = CurrentState.None;
+    
 	bool isSelectedTileByUser = false;
     int indexOfSeletedSkillByUser = 0;
 	bool isWaitingUserInput = false;
+    
+    bool rightClicked = false;
     
     Command command = Command.Waiting;
     SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
@@ -97,6 +117,8 @@ public class GameManager : MonoBehaviour {
         Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
         selectedUnit = unit;
         moveCount = 0;
+        
+        currentState = CurrentState.FocusToUnit;
         yield return StartCoroutine(FocusToUnit());
     }
     
@@ -119,38 +141,46 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator FocusToUnit()
     {
-        Camera.main.transform.position = new Vector3 (selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+        while (currentState == CurrentState.FocusToUnit)
+        {
+            Camera.main.transform.position = new Vector3 (selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
 
-        commandUI.SetActive(true);
-        GameObject.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().name;
-        CheckStandbyPossible();
+            commandUI.SetActive(true);
+            GameObject.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().name;
+            CheckStandbyPossible();
 
-        command = Command.Waiting;
-        while (command == Command.Waiting)
-        {
-            yield return null;
-        }
-        
-        if (command == Command.Move)
-        {
             command = Command.Waiting;
-            yield return StartCoroutine(SelectMovingPoint());
+            while (command == Command.Waiting)
+            {
+                yield return null;
+            }
+            
+            if (command == Command.Move)
+            {
+                command = Command.Waiting;
+                currentState = CurrentState.SelectMovingPoint;
+                yield return StartCoroutine(SelectMovingPoint());
+            }
+            else if (command == Command.Attack)
+            {
+                command = Command.Waiting;
+                currentState = CurrentState.SelectSkill;
+                yield return StartCoroutine(SelectSkill());
+            }
+            else if (command == Command.Rest)
+            {
+                command = Command.Waiting;
+                currentState = CurrentState.RestAndRecover;
+                yield return StartCoroutine(RestAndRecover());
+            }
+            else if (command == Command.Standby)
+            {
+                command = Command.Waiting;
+                currentState = CurrentState.Standby;
+                yield return StartCoroutine(Standby());
+            }
         }
-        else if (command == Command.Attack)
-        {
-            command = Command.Waiting;
-            yield return StartCoroutine(SelectSkill());
-        }
-        else if (command == Command.Rest)
-        {
-            command = Command.Waiting;
-            yield return StartCoroutine(RestAndRecover());
-        }
-        else if (command == Command.Standby)
-        {
-            command = Command.Waiting;
-            yield return StartCoroutine(Standby());
-        }
+        yield return null;
     }
     
     public void CallbackMoveCommand()
@@ -249,7 +279,7 @@ public class GameManager : MonoBehaviour {
             activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 0, true);
         else
             activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 3, false);
-        tileManager.ChangeTilesToSeletedColor(activeRange);
+        tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.red);
         //
         
         isWaitingUserInput = true;
@@ -263,7 +293,7 @@ public class GameManager : MonoBehaviour {
         
         // 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요
         
-        tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+        tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange, TileColor.red);
         skillUI.SetActive(false);
         
         yield return StartCoroutine(CheckApplyOrChain(selectedTilePosition));
@@ -272,7 +302,7 @@ public class GameManager : MonoBehaviour {
     IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition)
     {
         List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, true);
-        tileManager.ChangeTilesToSeletedColor(selectedTiles);
+        tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
         skillCheckUI.SetActive(true);
         
         skillApplyCommand = SkillApplyCommand.Waiting;
@@ -316,7 +346,7 @@ public class GameManager : MonoBehaviour {
             }
         }
         
-        tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+        tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles, TileColor.red);
         
         int requireAP = selectedUnit.GetComponent<Unit>().requireAPOfSkills[indexOfSeletedSkillByUser-1];
         selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
@@ -332,29 +362,40 @@ public class GameManager : MonoBehaviour {
         yield return null;
     }
     
+    public void CallbackRightClick()
+    {
+        rightClicked = true;
+    }
+    
     IEnumerator SelectMovingPoint ()
 	{   
         List<GameObject> nearbyTiles = CheckMovableTiles(selectedUnit);
-		foreach (var tile in nearbyTiles)
-		{
-            tile.GetComponent<Tile>().SetPreSelected(true);
-			tile.GetComponent<SpriteRenderer>().color -= new Color(0.4f, 0.4f, 0, 0);
-		}
+		tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.blue);
+        
+        rightClicked = false;
         
         isWaitingUserInput = true;
         isSelectedTileByUser = false;
 		while (!isSelectedTileByUser)
 		{
-			yield return null;
+            //yield break 넣으면 코루틴 강제종료 
+			if (rightClicked)
+            {
+                rightClicked = false;
+                
+                tileManager.ChangeTilesFromSeletedColorToDefaultColor(nearbyTiles, TileColor.blue);
+
+                currentState = CurrentState.FocusToUnit;
+                yield break;
+            }
+            yield return null;
 		}
         isSelectedTileByUser = false;
 		isWaitingUserInput = false;
 		
-        //yield break 넣으면 코루틴 강제종료 
-                
-		// GameObject destTile = nearbyTiles[Random.Range(0, nearbyTiles.Count)];
-		// Vector2 destTilePos = destTile.GetComponent<Tile>().GetTilePos();
-        GameObject destTile = tileManager.GetTile(selectedTilePosition);
+       
+        // FIXME : 어딘가로 옮겨야 할 텐데...        
+		GameObject destTile = tileManager.GetTile(selectedTilePosition);
         Vector2 currentTilePos = selectedUnit.GetComponent<Unit>().GetPosition();
 		Vector2 distanceVector = selectedTilePosition - currentTilePos;
 		int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
@@ -365,25 +406,24 @@ public class GameManager : MonoBehaviour {
 		}
 		
         moveCount += distance;
-		MoveToTile(selectedUnit, destTile);
-		selectedUnit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
+		yield return StartCoroutine(MoveToTile(selectedUnit, destTile, totalUseActionPoint));
 		
 		yield return new WaitForSeconds(1);
 		
-		foreach (var tile in nearbyTiles)
-		{
-            tile.GetComponent<Tile>().SetPreSelected(false);
-			tile.GetComponent<SpriteRenderer>().color += new Color(0.4f, 0.4f, 0, 0);
-		}
+        tileManager.ChangeTilesFromSeletedColorToDefaultColor(nearbyTiles, TileColor.blue);
 		
 		yield return new WaitForSeconds(0.5f);
         
+        currentState = CurrentState.FocusToUnit;
         yield return StartCoroutine(FocusToUnit());
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
+        if (Input.GetMouseButtonDown(1))
+        {
+            CallbackRightClick();
+        }
 	}
 	
 	public void OnMouseDownHandlerFromTile(Vector2 position)
@@ -464,13 +504,17 @@ public class GameManager : MonoBehaviour {
 		return nearbyTiles;
 	}
 	
-	void MoveToTile(GameObject unit, GameObject destTile)
+	IEnumerator MoveToTile(GameObject unit, GameObject destTile, int totalUseActionPoint)
 	{
 		GameObject currentTile = tileManager.GetTile(unit.GetComponent<Unit>().GetPosition());
 		currentTile.GetComponent<Tile>().SetUnitOnTile(null);
 		unit.transform.position = destTile.transform.position + new Vector3(0, 0, -0.01f);
 		unit.GetComponent<Unit>().SetPosition(destTile.GetComponent<Tile>().GetTilePos());
 		destTile.GetComponent<Tile>().SetUnitOnTile(unit);
+        
+        unit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
+        
+        yield return null;
 	}
 		
 	IEnumerator EndPhase()

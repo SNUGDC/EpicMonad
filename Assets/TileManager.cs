@@ -68,20 +68,23 @@ public class TileManager : MonoBehaviour {
         return tilesInRange;
     }
     
-    public void ChangeTilesToSeletedColor(List<GameObject> tiles)
+    public void ChangeTilesToSeletedColor(List<GameObject> tiles, TileColor color)
     {
         foreach(var tile in tiles)
         {
-            tile.GetComponent<SpriteRenderer>().color -= new Color(0, 0.5f, 0.5f, 0);
+            if (color == TileColor.red)
+                tile.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f, 1);
+            else if (color == TileColor.blue)
+                tile.GetComponent<SpriteRenderer>().color = new Color(0.6f, 0.6f, 1, 1);
             tile.GetComponent<Tile>().SetPreSelected(true);
         }
     }
     
-    public void ChangeTilesFromSeletedColorToDefaultColor(List<GameObject> tiles)
+    public void ChangeTilesFromSeletedColorToDefaultColor(List<GameObject> tiles, TileColor color)
     {
         foreach(var tile in tiles)
         {
-            tile.GetComponent<SpriteRenderer>().color += new Color(0, 0.5f, 0.5f, 0);
+            tile.GetComponent<SpriteRenderer>().color = Color.white;
             tile.GetComponent<Tile>().SetPreSelected(false);
         }
     }
