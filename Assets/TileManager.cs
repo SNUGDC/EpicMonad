@@ -80,7 +80,7 @@ public class TileManager : MonoBehaviour {
         }
     }
     
-    public void ChangeTilesFromSeletedColorToDefaultColor(List<GameObject> tiles, TileColor color)
+    public void ChangeTilesFromSeletedColorToDefaultColor(List<GameObject> tiles)
     {
         foreach(var tile in tiles)
         {
