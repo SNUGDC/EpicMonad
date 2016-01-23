@@ -240,7 +240,7 @@ public class GameManager : MonoBehaviour {
         Debug.Log(index + "th skill is selected");
     }
     
-    void UpdateSkillNameAndRequireAP()
+    void UpdateSkillInfo()
     {
         SkillSet skillSet = selectedUnit.GetComponent<Unit>().GetSkillSet();
         for (int i = 0; i < skillSet.Count(); i++)
@@ -248,6 +248,7 @@ public class GameManager : MonoBehaviour {
             GameObject skillButton = GameObject.Find((i+1).ToString() + "SkillButton"); //?? skillUI.transform.Find(i + "SkillButton")
             skillButton.transform.Find("NameText").GetComponent<Text>().text = skillSet.GetSkill(i).GetName();
             skillButton.transform.Find("APText").GetComponent<Text>().text = skillSet.GetSkill(i).GetRequireAP().ToString() + " AP";
+            skillButton.transform.Find("CooldownText").GetComponent<Text>().text = "";
         }
     }
     
@@ -269,7 +270,7 @@ public class GameManager : MonoBehaviour {
         while (currentState == CurrentState.SelectSkill)
         {
             skillUI.SetActive(true);
-            UpdateSkillNameAndRequireAP();
+            UpdateSkillInfo();
             CheckUsableSkill();
             
             rightClicked = false;
