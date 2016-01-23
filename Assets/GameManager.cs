@@ -340,6 +340,11 @@ public class GameManager : MonoBehaviour {
             List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, true);
             tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
             skillCheckUI.SetActive(true);
+         
+            int requireAP = selectedUnit.GetComponent<Unit>().requireAPOfSkills[indexOfSeletedSkillByUser-1];
+            string newAPText = "소모 AP : " + requireAP + "\n" +
+                               "잔여 AP : " + (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP);
+            skillCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
             
             rightClicked = false;
             
@@ -496,6 +501,10 @@ public class GameManager : MonoBehaviour {
             tileManager.ChangeTilesToSeletedColor(destTileList, TileColor.blue);
             // UI를 띄우고
             destCheckUI.SetActive(true);
+            string newAPText = "소모 AP : " + totalUseActionPoint + "\n" +
+                               "잔여 AP : " + (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - totalUseActionPoint);
+            destCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
+            
             // 카메라를 옮기고
             Camera.main.transform.position = new Vector3(destTile.transform.position.x, destTile.transform.position.y, -10);
             // 클릭 대기
