@@ -248,99 +248,132 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator SelectSkill()
     {
-        skillUI.SetActive(true);
-        CheckUsableSkill();
-        
-        rightClicked = false;
-        
-        isWaitingUserInput = true;
-        indexOfSeletedSkillByUser = 0;
-        while (indexOfSeletedSkillByUser == 0)
+        while (currentState == CurrentState.SelectSkill)
         {
-            if (rightClicked)
+            skillUI.SetActive(true);
+            CheckUsableSkill();
+            
+            rightClicked = false;
+            
+            isWaitingUserInput = true;
+            indexOfSeletedSkillByUser = 0;
+            while (indexOfSeletedSkillByUser == 0)
             {
-                rightClicked = false;
-             
-                skillUI.SetActive(false);
-                currentState = CurrentState.FocusToUnit;
-                yield break;
-            }
-            yield return null;
-        }
-        isWaitingUserInput = false;
-        
-        skillUI.SetActive(false);
-        
-        yield return new WaitForSeconds(0.5f);
+                if (rightClicked)
+                {
+                    rightClicked = false;
                 
-        yield return StartCoroutine(SelectSkillApplyPoint());
+                    skillUI.SetActive(false);
+                    currentState = CurrentState.FocusToUnit;
+                    yield break;
+                }
+                yield return null;
+            }
+            isWaitingUserInput = false;
+            
+            skillUI.SetActive(false);
+            
+            yield return new WaitForSeconds(0.5f);
+                    
+            currentState = CurrentState.SelectSkillApplyPoint;        
+            yield return StartCoroutine(SelectSkillApplyPoint());
+        }
     }
     
     IEnumerator SelectSkillApplyPoint()
     {
-        Vector2 selectedUnitPos = selectedUnit.GetComponent<Unit>().GetPosition();
-        
-        // temp values.
-        List<GameObject> activeRange = new List<GameObject>();
-        if (indexOfSeletedSkillByUser == 1)
-            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 4, false);
-        else if (indexOfSeletedSkillByUser == 2)
-            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 4, true);
-        else if (indexOfSeletedSkillByUser == 3)
-            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 2, false);    
-        else if (indexOfSeletedSkillByUser == 4)
-            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 0, true);
-        else
-            activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 3, false);
-        tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.red);
-        //
-        
-        isWaitingUserInput = true;
-        isSelectedTileByUser = false;
-		while (!isSelectedTileByUser)
-		{
-			yield return null;
-		}
-        isSelectedTileByUser = false;
-		isWaitingUserInput = false; 
-        
-        // 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요
-        
-        tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
-        skillUI.SetActive(false);
-        
-        yield return StartCoroutine(CheckApplyOrChain(selectedTilePosition));
+        while (currentState == CurrentState.SelectSkillApplyPoint)
+        {
+            Vector2 selectedUnitPos = selectedUnit.GetComponent<Unit>().GetPosition();
+            
+            // temp values.
+            List<GameObject> activeRange = new List<GameObject>();
+            if (indexOfSeletedSkillByUser == 1)
+                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 4, false);
+            else if (indexOfSeletedSkillByUser == 2)
+                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 4, true);
+            else if (indexOfSeletedSkillByUser == 3)
+                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 2, false);    
+            else if (indexOfSeletedSkillByUser == 4)
+                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 0, true);
+            else
+                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 3, false);
+            //
+            tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.red);
+            
+            rightClicked = false;
+            
+            isWaitingUserInput = true;
+            isSelectedTileByUser = false;
+            while (!isSelectedTileByUser)
+            {
+                if (rightClicked)
+                {
+                    rightClicked = false;
+                    
+                    tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+                    currentState = CurrentState.SelectSkill;
+                    yield break;
+                }
+                yield return null;
+            }
+            isSelectedTileByUser = false;
+            isWaitingUserInput = false; 
+            
+            // 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요
+            
+            tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+            skillUI.SetActive(false);
+            
+            currentState = CurrentState.CheckApplyOrChain;
+            yield return StartCoroutine(CheckApplyOrChain(selectedTilePosition));
+        }
     }
     
     IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition)
     {
-        GameObject selectedTile = tileManager.GetTile(selectedTilePosition);
-        Camera.main.transform.position = new Vector3(selectedTile.transform.position.x, selectedTile.transform.position.y, -10);
-                
-        List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, true);
-        tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
-        skillCheckUI.SetActive(true);
-        
-        skillApplyCommand = SkillApplyCommand.Waiting;
-        while (skillApplyCommand == SkillApplyCommand.Waiting)
+        while (currentState == CurrentState.CheckApplyOrChain)
         {
-            yield return null;
-        }
-
-        if (skillApplyCommand == SkillApplyCommand.Apply)
-        {
-            skillApplyCommand = SkillApplyCommand.Waiting;
-            yield return StartCoroutine(ApplySkill(selectedTiles));
-        }
-        else if (skillApplyCommand == SkillApplyCommand.Chain)
-        {
-            skillApplyCommand = SkillApplyCommand.Waiting;
-            // 스킬 시전에 필요한 ap만큼 선 차감. 
-            // 체인 목록에 추가. 
+            GameObject selectedTile = tileManager.GetTile(selectedTilePosition);
+            Camera.main.transform.position = new Vector3(selectedTile.transform.position.x, selectedTile.transform.position.y, -10);
+                    
+            List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, true);
+            tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
+            skillCheckUI.SetActive(true);
             
-            Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
-            yield return StartCoroutine(Standby()); // 이후 대기. 
+            rightClicked = false;
+            
+            skillApplyCommand = SkillApplyCommand.Waiting;
+            while (skillApplyCommand == SkillApplyCommand.Waiting)
+            {
+                if (rightClicked)
+                {
+                    rightClicked = false;
+                    
+                    Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+                    skillCheckUI.SetActive(false);
+                    currentState = CurrentState.SelectSkillApplyPoint;
+                    yield break;
+                }
+                yield return null;
+            }
+
+            if (skillApplyCommand == SkillApplyCommand.Apply)
+            {
+                skillApplyCommand = SkillApplyCommand.Waiting;
+                currentState = CurrentState.ApplySkill;
+                yield return StartCoroutine(ApplySkill(selectedTiles));
+            }
+            else if (skillApplyCommand == SkillApplyCommand.Chain)
+            {
+                skillApplyCommand = SkillApplyCommand.Waiting;
+                currentState = CurrentState.ChainAndStandby;
+                yield return StartCoroutine(ChainAndStandby()); 
+            }
+            else
+                yield return null;
         }
+        yield return null;
     }
     
     public void CallbackApplyCommand()
@@ -375,12 +408,25 @@ public class GameManager : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
         
         Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+        currentState = CurrentState.FocusToUnit;
         yield return StartCoroutine(FocusToUnit());
     }
     
+    
     IEnumerator ChainAndStandby()
     {
-        yield return null;
+        // 스킬 시전에 필요한 ap만큼 선 차감. 
+        int requireAP = selectedUnit.GetComponent<Unit>().requireAPOfSkills[indexOfSeletedSkillByUser-1];
+        selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
+        indexOfSeletedSkillByUser = 0; // return to init value.
+        
+        // FIXME : 체인 목록에 추가. 
+        
+        yield return new WaitForSeconds(0.5f);
+        
+        Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+        currentState = CurrentState.Standby;         
+        yield return StartCoroutine(Standby()); // 이후 대기.
     }
     
     public void CallbackRightClick()
