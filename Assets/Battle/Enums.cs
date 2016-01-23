@@ -32,6 +32,13 @@ namespace Enums {
         right
     }
     
+    public enum SkillType
+    {
+        point,
+        area,
+        route
+    }
+    
     public enum RangeForm
     {
         square,
