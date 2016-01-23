@@ -20,7 +20,7 @@ public class SkillSet {
         Skill skill2 = new Skill("태초의 빛", 35, 1.0f, 
                                  RangeForm.square, 0, 4, 0, true);
         Skill skill3 = new Skill("사념 포박", 100, 1.5f, 
-                                 RangeForm.square, 0, 3, 0, false);
+                                 RangeForm.square, 0, 2, 0, false);
         Skill skill4 = new Skill("마력 보호막", 80, 1.3f, 
                                  RangeForm.square, 0, 0, 0, true);
         Skill skill5 = new Skill("영혼의 불꽃", 130, 2.0f, 
@@ -30,5 +30,15 @@ public class SkillSet {
         skillList.Add(skill3);
         skillList.Add(skill4);
         skillList.Add(skill5);
+    }
+    
+    public Skill GetSkill(int index)
+    {
+        return skillList[index];
+    }
+    
+    public int Count()
+    {
+        return skillList.Count;
     }
 }

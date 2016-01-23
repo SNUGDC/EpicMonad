@@ -70,7 +70,7 @@ public class Skill {
         return firstWidth;
     }
     
-    public bool IncludeMyself()
+    public bool GetIncludeMyself()
     {
         return includeMyself;
     }

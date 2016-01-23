@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 public class UnitManager : MonoBehaviour {
 
-	int standardActionPoint = 100;
+	int standardActionPoint = 100; // FIXME : stdAP는 파티 레벨 + 60
 
-	// FIXME : unit is only one.
+	// FIXME : unit is only one. - 현재는 해당하는 유닛의 프리펩을 직접 넣어줘야 하지만, 추후 데이터에서 읽어와서 유닛을 띄워야 함. 
 	public GameObject[] unitPrefabs;
 	public List<GameObject> units = new List<GameObject>();
-	public Queue<GameObject> readiedUnits = new Queue<GameObject>();
+	public List<GameObject> readiedUnits = new List<GameObject>();
 
     public List<GameObject> GetAllUnits()
     {
@@ -52,10 +52,12 @@ public class UnitManager : MonoBehaviour {
 			unit.GetComponent<Unit>().RegenerateActionPoint();
 			if (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= standardActionPoint)
 			{
-				readiedUnits.Enqueue(unit);
+				readiedUnits.Add(unit);
 				Debug.Log(unit.GetComponent<Unit>().name + " is readied");
 			}
 		}
+        
+        // FIXME : AP가 큰 순서대로 소팅. - 추가할 것.
 	}
 
 	// Use this for initialization

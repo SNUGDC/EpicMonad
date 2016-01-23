@@ -41,21 +41,21 @@ public class TileManager : MonoBehaviour {
 		return tile.transform.position;
 	}
 
-    public List<GameObject> GetTilesInRange(RangeForm form, Vector2 mid, int reach, bool includeMyself)
+    public List<GameObject> GetTilesInRange(RangeForm form, Vector2 mid, int minReach, int maxReach, bool includeMyself)
     {
         if (form == RangeForm.square)
         {
-            return GetTilesInSquareRange(mid, reach, includeMyself);
+            return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself);
         }
         else
-            return GetTilesInSquareRange(mid, reach, includeMyself); // temp return value.
+            return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself); // temp return value.
     }
     
-    List<GameObject> GetTilesInSquareRange(Vector2 mid, int reach, bool includeMyself)
+    List<GameObject> GetTilesInSquareRange(Vector2 mid, int minReach, int maxReach, bool includeMyself)
     {
         List<GameObject> tilesInRange = new List<GameObject>();
         tilesInRange.Add(GetTile(mid));
-        for (int i = 0; i < reach; i++)
+        for (int i = 0; i < maxReach; i++)
         {
             tilesInRange = AddNearbyTiles(tilesInRange);
         }

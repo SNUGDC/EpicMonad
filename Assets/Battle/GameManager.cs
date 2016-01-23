@@ -60,7 +60,9 @@ public class GameManager : MonoBehaviour {
     int moveCount;
     Vector2 selectedTilePosition;
 	GameObject selectedUnit;
-	Queue<GameObject> readiedUnits = new Queue<GameObject>();
+	List<GameObject> readiedUnits = new List<GameObject>();
+    
+    List<ChainInfo> chainList = new List<ChainInfo>();
 
     int currentPhase;
 
@@ -93,6 +95,11 @@ public class GameManager : MonoBehaviour {
         return currentPhase;
     }
     
+    public GameObject GetSelectedUnit()
+    {
+        return selectedUnit;
+    }
+    
     void InitCameraPosition(Vector2 initTilePosition)
     {
         Vector2 tilePosition = tileManager.GetTilePos(initTilePosition);
@@ -106,6 +113,7 @@ public class GameManager : MonoBehaviour {
             foreach (var readiedUnit in readiedUnits)
             {
                 yield return StartCoroutine(ActionAtTurn(readiedUnit));
+                selectedUnit = null;
             }
             readiedUnits.Clear();
             yield return null;
@@ -119,8 +127,7 @@ public class GameManager : MonoBehaviour {
     {
         Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
         selectedUnit = unit;
-        moveCount = 0;
-        
+        moveCount = 0; // 누적 이동 수        
         currentState = CurrentState.FocusToUnit;
         yield return StartCoroutine(FocusToUnit());
     }
@@ -233,13 +240,24 @@ public class GameManager : MonoBehaviour {
         Debug.Log(index + "th skill is selected");
     }
     
+    void UpdateSkillNameAndRequireAP()
+    {
+        SkillSet skillSet = selectedUnit.GetComponent<Unit>().GetSkillSet();
+        for (int i = 0; i < skillSet.Count(); i++)
+        {
+            GameObject skillButton = GameObject.Find((i+1).ToString() + "SkillButton"); //?? skillUI.transform.Find(i + "SkillButton")
+            skillButton.transform.Find("NameText").GetComponent<Text>().text = skillSet.GetSkill(i).GetName();
+            skillButton.transform.Find("APText").GetComponent<Text>().text = skillSet.GetSkill(i).GetRequireAP().ToString() + " AP";
+        }
+    }
+    
     void CheckUsableSkill()
     {
-        int[] requireAPOfSkills = selectedUnit.GetComponent<Unit>().requireAPOfSkills;
-        for (int i = 0; i < requireAPOfSkills.Length; i++)
+        SkillSet skillSet = selectedUnit.GetComponent<Unit>().GetSkillSet();
+        for (int i = 0; i < skillSet.Count(); i++)
         {
             GameObject.Find((i+1).ToString() + "SkillButton").GetComponent<Button>().interactable = true;
-            if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() < requireAPOfSkills[i])
+            if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() < skillSet.GetSkill(i).GetRequireAP())
             {
                 GameObject.Find((i+1).ToString() + "SkillButton").GetComponent<Button>().interactable = false;
             }
@@ -251,6 +269,7 @@ public class GameManager : MonoBehaviour {
         while (currentState == CurrentState.SelectSkill)
         {
             skillUI.SetActive(true);
+            UpdateSkillNameAndRequireAP();
             CheckUsableSkill();
             
             rightClicked = false;
@@ -286,19 +305,13 @@ public class GameManager : MonoBehaviour {
         {
             Vector2 selectedUnitPos = selectedUnit.GetComponent<Unit>().GetPosition();
             
-            // temp values.
             List<GameObject> activeRange = new List<GameObject>();
-            if (indexOfSeletedSkillByUser == 1)
-                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 4, false);
-            else if (indexOfSeletedSkillByUser == 2)
-                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 4, true);
-            else if (indexOfSeletedSkillByUser == 3)
-                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 2, false);    
-            else if (indexOfSeletedSkillByUser == 4)
-                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 0, true);
-            else
-                activeRange = tileManager.GetTilesInRange(RangeForm.square, selectedUnitPos, 3, false);
-            //
+            Skill selectedSkill = selectedUnit.GetComponent<Unit>().GetSkillSet().GetSkill(indexOfSeletedSkillByUser-1);
+            activeRange = tileManager.GetTilesInRange(selectedSkill.GetFirstRangeForm(),
+                                                      selectedUnitPos,
+                                                      selectedSkill.GetFirstMinReach(),
+                                                      selectedSkill.GetFirstMaxReach(),
+                                                      selectedSkill.GetIncludeMyself());
             tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.red);
             
             rightClicked = false;
@@ -337,11 +350,11 @@ public class GameManager : MonoBehaviour {
             GameObject selectedTile = tileManager.GetTile(selectedTilePosition);
             Camera.main.transform.position = new Vector3(selectedTile.transform.position.x, selectedTile.transform.position.y, -10);
                     
-            List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, true);
+            List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, 0, true);
             tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
             skillCheckUI.SetActive(true);
          
-            int requireAP = selectedUnit.GetComponent<Unit>().requireAPOfSkills[indexOfSeletedSkillByUser-1];
+            int requireAP = selectedUnit.GetComponent<Unit>().GetSkillSet().GetSkill(indexOfSeletedSkillByUser-1).GetRequireAP();
             string newAPText = "소모 AP : " + requireAP + "\n" +
                                "잔여 AP : " + (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP);
             skillCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
@@ -406,7 +419,7 @@ public class GameManager : MonoBehaviour {
         
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
         
-        int requireAP = selectedUnit.GetComponent<Unit>().requireAPOfSkills[indexOfSeletedSkillByUser-1];
+        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillSet().GetSkill(indexOfSeletedSkillByUser-1).GetRequireAP();
         selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
         indexOfSeletedSkillByUser = 0; // return to init value.
         
@@ -421,7 +434,7 @@ public class GameManager : MonoBehaviour {
     IEnumerator ChainAndStandby()
     {
         // 스킬 시전에 필요한 ap만큼 선 차감. 
-        int requireAP = selectedUnit.GetComponent<Unit>().requireAPOfSkills[indexOfSeletedSkillByUser-1];
+        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillSet().GetSkill(indexOfSeletedSkillByUser-1).GetRequireAP();
         selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
         indexOfSeletedSkillByUser = 0; // return to init value.
         
@@ -476,7 +489,7 @@ public class GameManager : MonoBehaviour {
             int totalUseActionPoint = 0;
             for (int i = 0; i < distance; i++)
             {
-                totalUseActionPoint += requireActionPoint[i];
+                totalUseActionPoint += requireActionPoint[i + moveCount];
             }
             
             moveCount += distance;
@@ -622,12 +635,13 @@ public class GameManager : MonoBehaviour {
 		int totalRequireActivityPoint = 0;
 		for (int i = 0; i < requireActionPoint.Length; i++)
 		{
-			if (currentActivityPoint < totalRequireActivityPoint + requireActionPoint[i])
+            // 누적 이동 수 계산을 위해 i 대신 i + moveCount 대입.
+			if (currentActivityPoint < totalRequireActivityPoint + requireActionPoint[i + moveCount])
 			{
 				break;
 			}
 			nearbyTiles = AddNearbyTiles(nearbyTiles, unit);
-			totalRequireActivityPoint += requireActionPoint[i];
+			totalRequireActivityPoint += requireActionPoint[i + moveCount];
 		}
 		
 		return nearbyTiles;

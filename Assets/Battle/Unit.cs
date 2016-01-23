@@ -7,8 +7,11 @@ public class Unit : MonoBehaviour {
 	// FIXME : public -> private
 	public new string name;
     
+    // 하드코딩된 기본 스킬셋을 받아옴.
+    SkillSet skillSet = new SkillSet();
+    
     // FIXME : temp values
-    public int[] requireAPOfSkills;
+    // public int[] requireAPOfSkills;
     public Vector2 initPosition;
     
     // Base stats.
@@ -35,6 +38,11 @@ public class Unit : MonoBehaviour {
     public int currentHealth; 
 	public int activityPoint;
 	// public int regenerationActionPoint;
+
+    public SkillSet GetSkillSet()
+    {
+        return skillSet;
+    }
 
     public int GetMaxHealth()
     {
