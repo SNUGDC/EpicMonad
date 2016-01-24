@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Enums;
 
 public class Unit : MonoBehaviour {
@@ -7,8 +8,8 @@ public class Unit : MonoBehaviour {
 	// FIXME : public -> private
 	public new string name;
     
-    // 하드코딩된 기본 스킬셋을 받아옴.
-    SkillSet skillSet = new SkillSet();
+    // 하드코딩된 기본 스킬리스트를 받아옴.
+    List<Skill> skillList = new List<Skill>();
     
     // FIXME : temp values
     // public int[] requireAPOfSkills;
@@ -39,9 +40,9 @@ public class Unit : MonoBehaviour {
 	public int activityPoint;
 	// public int regenerationActionPoint;
 
-    public SkillSet GetSkillSet()
+    public List<Skill> GetSkillList()
     {
-        return skillSet;
+        return skillList;
     }
 
     public int GetMaxHealth()
@@ -122,6 +123,7 @@ public class Unit : MonoBehaviour {
     {
         currentHealth = maxHealth;
         activityPoint = (int)(dexturity * 1.5f);
+        skillList = SkillLoader.MakeSkillList();
     }
 
 	// Use this for initialization

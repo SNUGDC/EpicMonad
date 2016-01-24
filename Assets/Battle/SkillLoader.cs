@@ -3,18 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Enums;
     
-public class SkillSet {
-
-    List<Skill> skillList;
-
-	public SkillSet ()
-    {
+public class SkillLoader {
+    public static List<Skill> MakeSkillList() {
         // 일단 임의로 하드코딩된 스킬셋을 사용.
         // 스킬에 필요한 정보는 아래와 같음. 
         // string name, int requireAP, float powerFactor,
         // RangeForm firstRangeForm, int firstMinReach, int firstMaxReach, int firstWidth,
         // bool includeMyself
-        skillList = new List<Skill>();
+        List<Skill> skillList = new List<Skill>();
         Skill skill1 = new Skill("암흑 폭발", 40, 1.0f, 
                                  RangeForm.square, 0, 4, 0, false);
         Skill skill2 = new Skill("태초의 빛", 35, 1.0f, 
@@ -30,15 +26,7 @@ public class SkillSet {
         skillList.Add(skill3);
         skillList.Add(skill4);
         skillList.Add(skill5);
-    }
-    
-    public Skill GetSkill(int index)
-    {
-        return skillList[index];
-    }
-    
-    public int Count()
-    {
-        return skillList.Count;
+        
+        return skillList;
     }
 }

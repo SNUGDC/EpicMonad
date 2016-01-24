@@ -242,23 +242,23 @@ public class GameManager : MonoBehaviour {
     
     void UpdateSkillInfo()
     {
-        SkillSet skillSet = selectedUnit.GetComponent<Unit>().GetSkillSet();
-        for (int i = 0; i < skillSet.Count(); i++)
+        List<Skill> skillList = selectedUnit.GetComponent<Unit>().GetSkillList();
+        for (int i = 0; i < skillList.Count; i++)
         {
             GameObject skillButton = GameObject.Find((i+1).ToString() + "SkillButton"); //?? skillUI.transform.Find(i + "SkillButton")
-            skillButton.transform.Find("NameText").GetComponent<Text>().text = skillSet.GetSkill(i).GetName();
-            skillButton.transform.Find("APText").GetComponent<Text>().text = skillSet.GetSkill(i).GetRequireAP().ToString() + " AP";
+            skillButton.transform.Find("NameText").GetComponent<Text>().text = skillList[i].GetName();
+            skillButton.transform.Find("APText").GetComponent<Text>().text = skillList[i].GetRequireAP().ToString() + " AP";
             skillButton.transform.Find("CooldownText").GetComponent<Text>().text = "";
         }
     }
     
     void CheckUsableSkill()
     {
-        SkillSet skillSet = selectedUnit.GetComponent<Unit>().GetSkillSet();
-        for (int i = 0; i < skillSet.Count(); i++)
+        List<Skill> skillList = selectedUnit.GetComponent<Unit>().GetSkillList();
+        for (int i = 0; i < skillList.Count; i++)
         {
             GameObject.Find((i+1).ToString() + "SkillButton").GetComponent<Button>().interactable = true;
-            if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() < skillSet.GetSkill(i).GetRequireAP())
+            if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() < skillList[i].GetRequireAP())
             {
                 GameObject.Find((i+1).ToString() + "SkillButton").GetComponent<Button>().interactable = false;
             }
@@ -307,7 +307,7 @@ public class GameManager : MonoBehaviour {
             Vector2 selectedUnitPos = selectedUnit.GetComponent<Unit>().GetPosition();
             
             List<GameObject> activeRange = new List<GameObject>();
-            Skill selectedSkill = selectedUnit.GetComponent<Unit>().GetSkillSet().GetSkill(indexOfSeletedSkillByUser-1);
+            Skill selectedSkill = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser-1];
             activeRange = tileManager.GetTilesInRange(selectedSkill.GetFirstRangeForm(),
                                                       selectedUnitPos,
                                                       selectedSkill.GetFirstMinReach(),
@@ -355,7 +355,7 @@ public class GameManager : MonoBehaviour {
             tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
             skillCheckUI.SetActive(true);
          
-            int requireAP = selectedUnit.GetComponent<Unit>().GetSkillSet().GetSkill(indexOfSeletedSkillByUser-1).GetRequireAP();
+            int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser-1].GetRequireAP();
             string newAPText = "소모 AP : " + requireAP + "\n" +
                                "잔여 AP : " + (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP);
             skillCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
@@ -420,7 +420,7 @@ public class GameManager : MonoBehaviour {
         
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
         
-        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillSet().GetSkill(indexOfSeletedSkillByUser-1).GetRequireAP();
+        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser-1].GetRequireAP();
         selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
         indexOfSeletedSkillByUser = 0; // return to init value.
         
@@ -435,7 +435,7 @@ public class GameManager : MonoBehaviour {
     IEnumerator ChainAndStandby()
     {
         // 스킬 시전에 필요한 ap만큼 선 차감. 
-        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillSet().GetSkill(indexOfSeletedSkillByUser-1).GetRequireAP();
+        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser-1].GetRequireAP();
         selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
         indexOfSeletedSkillByUser = 0; // return to init value.
         
@@ -497,7 +497,7 @@ public class GameManager : MonoBehaviour {
             
             tileManager.ChangeTilesFromSeletedColorToDefaultColor(nearbyTiles);
             currentState = CurrentState.CheckDestination;
-            yield return StartCoroutine(CheckDestination(nearbyTiles, destTile, totalUseActionPoint));
+            yield return StartCoroutine(CheckDestination(nearbyTiles, destTile, totalUseActionPoint, distance));
             // yield return StartCoroutine(MoveToTile(destTile, totalUseActionPoint));
             
             yield return new WaitForSeconds(0.5f);
@@ -505,7 +505,7 @@ public class GameManager : MonoBehaviour {
         yield return null;
 	}
     
-    IEnumerator CheckDestination(List<GameObject> nearbyTiles, GameObject destTile, int totalUseActionPoint)
+    IEnumerator CheckDestination(List<GameObject> nearbyTiles, GameObject destTile, int totalUseActionPoint, int distance)
     {
         while (currentState == CurrentState.CheckDestination)
         {
@@ -529,12 +529,14 @@ public class GameManager : MonoBehaviour {
             while (!isSelectedTileByUser)
             {
                 // 클릭 중 취소하면 돌아감
+                // moveCount 되돌리기 
                 // 카메라 유닛 위치로 원상복구
                 // 이동가능 위치 다시 표시해주고 
                 // UI 숨기고
                 if (rightClicked)
                 {
                     rightClicked = false;
+                    moveCount -= distance;
                     Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
                     tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.blue);
                     destCheckUI.SetActive(false);
