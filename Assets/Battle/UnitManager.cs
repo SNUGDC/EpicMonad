@@ -57,7 +57,14 @@ public class UnitManager : MonoBehaviour {
 			}
 		}
         
-        // FIXME : AP가 큰 순서대로 소팅. - 추가할 것.
+        // AP가 큰 순서대로 소팅.
+        readiedUnits.Sort(delegate(GameObject x, GameObject y)
+        {
+            if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
+            else if (y.GetComponent<Unit>() == null) return -1;
+            else if (x.GetComponent<Unit>() == null) return 1;
+            else return y.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(x.GetComponent<Unit>().GetCurrentActivityPoint());
+        });
 	}
 
 	// Use this for initialization
