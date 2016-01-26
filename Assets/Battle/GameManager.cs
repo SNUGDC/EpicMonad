@@ -45,6 +45,8 @@ public class GameManager : MonoBehaviour {
 	GameObject skillUI;
     GameObject skillCheckUI;
     GameObject destCheckUI;
+    GameObject unitViewerUI;
+    GameObject tileViewerUI;
     
     CurrentState currentState = CurrentState.None;
     
@@ -81,6 +83,10 @@ public class GameManager : MonoBehaviour {
         skillCheckUI.SetActive(false);
         destCheckUI = GameObject.Find("DestCheckPanel");
         destCheckUI.SetActive(false);
+        unitViewerUI = GameObject.Find("UnitViewerPanel");
+        unitViewerUI.SetActive(false);
+        tileViewerUI = GameObject.Find("TileViewerPanel");
+        tileViewerUI.SetActive(false);
         selectedUnit = null;
         
         currentPhase = 1;
@@ -89,6 +95,16 @@ public class GameManager : MonoBehaviour {
         
         StartCoroutine(InstantiateTurnManager());
 	}
+    
+    public GameObject GetUnitViewerUI()
+    {
+        return unitViewerUI;
+    }
+    
+    public GameObject GetTileViewerUI()
+    {
+        return tileViewerUI;
+    }
     
     public int GetCurrentPhase()
     {
@@ -156,7 +172,7 @@ public class GameManager : MonoBehaviour {
             Camera.main.transform.position = new Vector3 (selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
 
             commandUI.SetActive(true);
-            GameObject.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().name;
+            commandUI.transform.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().name;
             CheckStandbyPossible();
 
             command = ActionCommand.Waiting;

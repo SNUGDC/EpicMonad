@@ -3,6 +3,8 @@ using System.Collections;
 
 namespace Enums {
     
+    
+    
     public enum TileColor // highlighting selected tile
     {
         blue,
@@ -15,7 +17,22 @@ namespace Enums {
         hill
     }
     
-    public enum TileElement
+    public enum UnitClass
+    {
+        None,
+        Melee,
+        Magic
+    }
+    
+    public enum Celestial
+    {
+        None,
+        Sun,
+        Moon,
+        Earth
+    }
+    
+    public enum Element
     {
         None,
         Fire,
