@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using Enums;
+using LitJson;
+using System.IO;
+using System;
 
 enum CurrentState
 {
@@ -69,10 +72,25 @@ public class GameManager : MonoBehaviour {
     int currentPhase;
 
 	int[] requireActionPoint = {4, 10, 18, 28, 40, 54, 70, 88};
-	// int[] requireActionPoint = {2, 5, 9, 14, 20, 27, 35, 44};
+
+    // Load from json.
+    int partyLevel;
+
+    int GetLevelInfoFromJson()
+    {
+        string jsonString;
+        JsonData jsonData;
+        
+        jsonString = File.ReadAllText(Application.dataPath + "/Data/PartyInfo.json");
+        jsonData = JsonMapper.ToObject(jsonString);
+        
+        return Int32.Parse(jsonData["level"].ToString());
+    }
 
 	// Use this for initialization
-	void Start () {
+	void Start () {        
+        partyLevel = GetLevelInfoFromJson();
+        
 		tileManager = FindObjectOfType<TileManager>();
 		unitManager = FindObjectOfType<UnitManager>();
 		commandUI = GameObject.Find("CommandPanel");
