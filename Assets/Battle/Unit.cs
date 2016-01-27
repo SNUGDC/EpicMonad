@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Enums;
+using System.Linq;
 
 public class Unit : MonoBehaviour {
 
@@ -43,7 +44,9 @@ public class Unit : MonoBehaviour {
     public Direction direction;
     public int currentHealth; 
 	public int activityPoint;
-	// public int regenerationActionPoint;
+
+    List<Buff> buffList;
+    List<Debuff> debuffList;
 
     public List<Skill> GetSkillList()
     {
@@ -62,8 +65,27 @@ public class Unit : MonoBehaviour {
     
     public int GetActualDexturity()
     {
+        int actualDexturity = dexturity;
         // FIXME : 버프 / 디버프 값 적용
-        return dexturity;
+        
+        // 디버프값만 적용.
+        if (debuffList.Any(k => k.GetName() == DebuffType.faint))
+        {
+            actualDexturity = 0;
+        }
+        else if (debuffList.Any(k => k.GetName() == DebuffType.exhaust))
+        {
+            int totalDegree = 0;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.exhaust)
+                {
+                    totalDegree = debuff.GetDegree();
+                }
+            }
+            actualDexturity *= (totalDegree/100);
+        }
+        return actualDexturity;
     }
 
 	public int GetCurrentActivityPoint()
@@ -123,12 +145,57 @@ public class Unit : MonoBehaviour {
 
     public void SetBuff(Buff buff)
     {
-        // 껍데기.
+        buffList.Add(buff);
+    }
+    
+    public void RemainBuff()
+    {
+        buffList.Remove(buffList[0]);
+    }
+    
+    public void RemainAllBuff()
+    {
+        buffList.Clear();
     }
 
     public void SetDebuff(Debuff debuff)
     {
-        // 껍데기.
+        debuffList.Add(debuff);
+    }
+    
+    public void RemainDebuff()
+    {
+        debuffList.Remove(debuffList[0]);
+    }
+    
+    public void RemainAllDebuff()
+    {
+        debuffList.Clear();
+    }
+    
+    public void DecreaseRemainPhaseBuffAndDebuff()
+    {
+        List<Buff> newBuffList = new List<Buff>();
+        foreach (var buff in buffList)
+        {
+            buff.DecreaseRemainPhase();
+            if (buff.GetRemainPhase() > 0)
+            {
+                newBuffList.Add(buff);
+            }
+        }
+        buffList = newBuffList;
+        
+        List<Debuff> newDebuffList = new List<Debuff>();
+        foreach (var debuff in debuffList)
+        {
+            debuff.DecreaseRemainPhase();
+            if (debuff.GetRemainPhase() > 0)
+            {
+                newDebuffList.Add(debuff);
+            }
+        }
+        debuffList = newDebuffList;
     }
 
     public void Damaged(DamageType type, int amount)
@@ -141,7 +208,20 @@ public class Unit : MonoBehaviour {
 
     public void RecoverHealth(int amount)
     {
-        // 내상 효과 적용할 것! 아직 미적용
+        // 내상 효과
+        if (debuffList.Any(k => k.GetName() == DebuffType.wound))
+        {
+            int totalDegree = 0;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.exhaust)
+                {
+                    totalDegree = debuff.GetDegree();
+                }
+            }
+            amount *= (totalDegree/100);
+        }
+        
         currentHealth += amount;
         if (currentHealth > maxHealth)
             currentHealth = maxHealth;
@@ -159,7 +239,7 @@ public class Unit : MonoBehaviour {
 		Debug.Log(name + " use " + amount + "AP. Current AP : " + activityPoint);
 	}
 
-    void applyStats()
+    void ApplyStats()
     {
         maxHealth = (int)baseHealth;
         power = (int)basePower;
@@ -170,17 +250,19 @@ public class Unit : MonoBehaviour {
         range = (int)baseRange;
     }
 
-    void initialize()
+    void Initialize()
     {
         currentHealth = maxHealth;
         activityPoint = (int)(dexturity * 1.5f);
         skillList = SkillLoader.MakeSkillList();
+        buffList = new List<Buff>();
+        debuffList = new List<Debuff>();
     }
 
 	// Use this for initialization
 	void Start () {
-        applyStats();
-        initialize();
+        ApplyStats();
+        Initialize();
 	}
 	
 	// Update is called once per frame

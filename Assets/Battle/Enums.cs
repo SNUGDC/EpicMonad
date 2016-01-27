@@ -80,6 +80,7 @@ namespace Enums {
         bleed,
         exhaust,
         bind,
+        faint,
         silence,
         slow,
         wound
@@ -89,13 +90,43 @@ namespace Enums {
     {
         BuffType name;
         int degree;
-        int remainTurn;
+        int remainPhase;
         
-        public Buff(BuffType name, int degree, int remainTurn)
+        public Buff(BuffType name, int degree, int remainPhase)
         {
             this.name = name;
             this.degree = degree;
-            this.remainTurn = remainTurn;
+            this.remainPhase = remainPhase;
+        }
+        
+        public BuffType GetName()
+        {
+            return name;
+        }
+        
+        public int GetDegree()
+        {
+            return degree;
+        }
+        
+        public int GetRemainPhase()
+        {
+            return remainPhase;   
+        }
+        
+        public void AddRemainPhase(int phase)
+        {
+            remainPhase += phase;
+        }
+        
+        public void SubRemainPhase(int phase)
+        {
+            remainPhase -= phase;
+        }
+        
+        public void DecreaseRemainPhase()
+        {
+            remainPhase --;
         }
     }
     
@@ -103,13 +134,43 @@ namespace Enums {
     {
         DebuffType name;
         int degree;
-        int remainTurn;
+        int remainPhase;
         
-        public Debuff(DebuffType name, int degree, int remainTurn)
+        public Debuff(DebuffType name, int degree, int remainPhase)
         {
             this.name = name;
             this.degree = degree;
-            this.remainTurn = remainTurn;
+            this.remainPhase = remainPhase;
+        }
+        
+        public DebuffType GetName()
+        {
+            return name;
+        }
+        
+        public int GetDegree()
+        {
+            return degree;
+        }
+        
+        public int GetRemainPhase()
+        {
+            return remainPhase;   
+        }
+        
+        public void AddRemainPhase(int phase)
+        {
+            remainPhase += phase;
+        }
+        
+        public void SubRemainPhase(int phase)
+        {
+            remainPhase -= phase;
+        }
+        
+        public void DecreaseRemainPhase()
+        {
+            remainPhase --;
         }
     }
 }

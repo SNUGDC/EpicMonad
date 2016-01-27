@@ -57,6 +57,12 @@ public class UnitManager : MonoBehaviour {
 			}
 		}
         
+        // Decrease each buff & debuff phase
+        foreach (var unit in units)
+        {
+            unit.GetComponent<Unit>().DecreaseRemainPhaseBuffAndDebuff();
+        }
+        
         // AP가 큰 순서대로 소팅.
         readiedUnits.Sort(delegate(GameObject x, GameObject y)
         {
