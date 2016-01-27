@@ -27,8 +27,19 @@ public class UnitViewer : MonoBehaviour {
         SetClassImage(unitInfo.GetUnitClass());
         SetElementImage(unitInfo.GetElement());
         SetCelestialImage(unitInfo.GetCelestial());
+        UpdateHp(unitInfo);
+        UpdateAp(unitInfo);
+    }
+
+    void UpdateHp(Unit unitInfo)
+    {
         hpText.text = unitInfo.GetCurrentHealth() + " / " + unitInfo.GetMaxHealth();
-        apText.text = unitInfo.GetCurrentActivityPoint() + " (+" + unitInfo.GetActualDexturity() + ")";        
+        hpBarImage.transform.localScale = new Vector3(((float)unitInfo.GetCurrentHealth())/((float)unitInfo.GetMaxHealth()), 1, 1);
+    }
+    
+    void UpdateAp(Unit unitInfo)
+    {
+                apText.text = unitInfo.GetCurrentActivityPoint() + " (+" + unitInfo.GetActualDexturity() + ")";
     }
 
     void SetClassImage(UnitClass unitClass)
