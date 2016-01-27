@@ -198,12 +198,30 @@ public class Unit : MonoBehaviour {
         debuffList = newDebuffList;
     }
 
-    public void Damaged(DamageType type, int amount)
+    public void Damaged(UnitClass unitClass, int amount)
     {
+        int actualDamage = 0;
         // 공격이 물리인지 마법인지 체크
         // 방어력 / 저항력 중 맞는 값을 적용
-        // 방어 감소 / 저항 감소 적용
+        // 방어 증가/감소 / 저항 증가/감소 적용             // FIXME : 미적용
         // 체력 깎임 
+        if (unitClass == UnitClass.Melee)
+        {
+            // 실제 피해 = 원래 피해 x 100/(100+방어력)
+            actualDamage = amount * 100 / (100 + defense);
+        }
+        else if (unitClass == UnitClass.Magic)
+        {
+            actualDamage = amount * 100 / (100 * resistence);
+        }
+        else
+        {
+            actualDamage = amount * 100 / (100 + Mathf.Max(defense, resistence));
+        }
+        
+        currentHealth -= actualDamage;
+        if (currentHealth < 0)
+            currentHealth = 0;
     }
 
     public void RecoverHealth(int amount)

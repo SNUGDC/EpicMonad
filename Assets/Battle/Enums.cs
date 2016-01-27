@@ -63,12 +63,6 @@ namespace Enums {
         diagonal
     }
     
-    public enum DamageType
-    {
-        Melee,
-        Magic
-    }
-    
     public enum BuffType
     {
         None
