@@ -90,11 +90,12 @@ public class GameManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {        
+        tileManager = FindObjectOfType<TileManager>();
+		unitManager = FindObjectOfType<UnitManager>();
+        
         partyLevel = GetLevelInfoFromJson();
         unitManager.SetStandardActionPoint(partyLevel);
         
-		tileManager = FindObjectOfType<TileManager>();
-		unitManager = FindObjectOfType<UnitManager>();
 		commandUI = GameObject.Find("CommandPanel");
         commandUI.SetActive(false);
         skillUI = GameObject.Find("SkillPanel");
@@ -445,19 +446,41 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator ApplySkill(List<GameObject> selectedTiles)
     {
+        // FIXME : 이펙트는 따로 들어가야 할 듯.
+        
+        Unit selectedUnitInfo = selectedUnit.GetComponent<Unit>();
+        Skill appliedSkill = selectedUnitInfo.GetSkillList()[indexOfSeletedSkillByUser-1];
+        
         foreach (var tile in selectedTiles)
         {
             GameObject target = tile.GetComponent<Tile>().GetUnitOnTile();
             if (target != null)
             {
-                Debug.Log("Apply skill to " + target.GetComponent<Unit>().name);
+                if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+                {
+                    target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(), 
+                                                        (int)(selectedUnitInfo.GetPower() * appliedSkill.GetPowerFactor()));
+                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().name);
+                }
+                else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+                {
+                    target.GetComponent<Unit>().RecoverHealth( 
+                                                        (int)(selectedUnitInfo.GetPower() * appliedSkill.GetPowerFactor()));
+                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().name);
+                }
+                else
+                {
+                    Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
+                }
+                
+                // FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것. 
             }
         }
         
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
         
-        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser-1].GetRequireAP();
-        selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);  
+        int requireAP = appliedSkill.GetRequireAP();
+        selectedUnitInfo.UseActionPoint(requireAP);  
         indexOfSeletedSkillByUser = 0; // return to init value.
         
         yield return new WaitForSeconds(0.5f);

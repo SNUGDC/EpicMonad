@@ -63,6 +63,13 @@ namespace Enums {
         diagonal
     }
     
+    public enum SkillApplyType
+    {
+        Damage,
+        Heal,
+        Etc
+    }
+    
     public enum BuffType
     {
         None

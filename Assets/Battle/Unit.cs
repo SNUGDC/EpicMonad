@@ -48,6 +48,12 @@ public class Unit : MonoBehaviour {
     List<Buff> buffList;
     List<Debuff> debuffList;
 
+    // FIXME : 임시로 공격력만 외부에서 읽음.
+    public int GetPower()
+    {
+        return power;
+    }
+
     public List<Skill> GetSkillList()
     {
         return skillList;
@@ -209,10 +215,12 @@ public class Unit : MonoBehaviour {
         {
             // 실제 피해 = 원래 피해 x 100/(100+방어력)
             actualDamage = amount * 100 / (100 + defense);
+            Debug.Log("Actual melee damage : " + actualDamage);
         }
         else if (unitClass == UnitClass.Magic)
         {
-            actualDamage = amount * 100 / (100 * resistence);
+            actualDamage = amount * 100 / (100 + resistence);
+            Debug.Log("Actual magic damage : " + actualDamage);
         }
         else
         {
