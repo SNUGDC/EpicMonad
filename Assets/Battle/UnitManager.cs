@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class UnitManager : MonoBehaviour {
 
-	int standardActionPoint = 100; // FIXME : stdAP는 파티 레벨 + 60
+	int standardActionPoint;
 
 	// FIXME : unit is only one. - 현재는 해당하는 유닛의 프리펩을 직접 넣어줘야 하지만, 추후 데이터에서 읽어와서 유닛을 띄워야 함. 
 	public GameObject[] unitPrefabs;
@@ -14,6 +14,11 @@ public class UnitManager : MonoBehaviour {
     public List<GameObject> GetAllUnits()
     {
         return units;
+    }
+    
+    public void SetStandardActionPoint(int partyLevel)
+    {
+        standardActionPoint = partyLevel + 60;
     }
 
 	void GenerateUnits ()

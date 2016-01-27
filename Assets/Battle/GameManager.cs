@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour {
 
 	TileManager tileManager;
 	UnitManager unitManager;
+    
     GameObject commandUI;
 	GameObject skillUI;
     GameObject skillCheckUI;
@@ -90,6 +91,7 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {        
         partyLevel = GetLevelInfoFromJson();
+        unitManager.SetStandardActionPoint(partyLevel);
         
 		tileManager = FindObjectOfType<TileManager>();
 		unitManager = FindObjectOfType<UnitManager>();
