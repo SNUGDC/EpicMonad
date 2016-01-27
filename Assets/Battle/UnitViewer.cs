@@ -75,11 +75,11 @@ public class UnitViewer : MonoBehaviour {
         elementImage = transform.Find("ElementImage").GetComponent<Image>();
         celestialImage = transform.Find("CelestialImage").GetComponent<Image>();
     
-        hpText = GameObject.Find("HPText").GetComponent<Text>();;
-        hpBarImage = GameObject.Find("HPBarImage").GetComponent<Image>();
+        hpText = transform.Find("HP").transform.Find("HPText").GetComponent<Text>();;
+        hpBarImage = transform.Find("HP").transform.Find("HPBarImage").GetComponent<Image>();
 
-        apText = GameObject.Find("APText").GetComponent<Text>();;
-        apBarImage = GameObject.Find("APBarImage").GetComponent<Image>();
+        apText = transform.Find("AP").transform.Find("APText").GetComponent<Text>();;
+        apBarImage = transform.Find("AP").transform.Find("APBarImage").GetComponent<Image>();
 	}
 	
 	// Update is called once per frame
