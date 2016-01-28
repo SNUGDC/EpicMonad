@@ -13,6 +13,10 @@ public class TileViewer : MonoBehaviour {
     public void UpdateTileViewer(GameObject tile)
     {
         Tile tileInfo = tile.GetComponent<Tile>();
+        if (tileImage == null) {
+            
+            Debug.LogError("TileImage is not exist : " + gameObject.GetInstanceID());
+        }
         tileImage.sprite = tile.GetComponent<SpriteRenderer>().sprite;
         nameText.text = tileInfo.GetTileName();
         apText.text = "AP " + tileInfo.GetRequireAPAtTile();
@@ -33,12 +37,16 @@ public class TileViewer : MonoBehaviour {
             elementImage.sprite = Resources.Load("Icon/transparent", typeof(Sprite)) as Sprite;
     }
 
+    void Awake () {
+        tileImage = transform.Find("TileImage").GetComponent<Image>();
+        nameText = transform.Find("NameText").GetComponent<Text>();
+        apText = transform.Find("APText").GetComponent<Text>();
+        elementImage = transform.Find("ElementImage").GetComponent<Image>();    
+    }
+
 	// Use this for initialization
 	void Start () {
-	   tileImage = transform.Find("TileImage").GetComponent<Image>();
-       nameText = transform.Find("NameText").GetComponent<Text>();
-       apText = transform.Find("APText").GetComponent<Text>();
-       elementImage = transform.Find("ElementImage").GetComponent<Image>();
+	   
 	}
 	
 	// Update is called once per frame

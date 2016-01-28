@@ -77,9 +77,8 @@ public class UnitViewer : MonoBehaviour {
         else
             celestialImage.sprite = Resources.Load("Icon/transparent", typeof(Sprite)) as Sprite;
     }
-
-	// Use this for initialization
-	void Start () {
+    
+    void Awake () {
         unitImage = transform.Find("UnitImage").GetComponent<Image>();
         nameText = transform.Find("NameText").GetComponent<Text>();
         classImage = transform.Find("ClassImage").GetComponent<Image>();
@@ -91,6 +90,11 @@ public class UnitViewer : MonoBehaviour {
 
         apText = transform.Find("AP").transform.Find("APText").GetComponent<Text>();;
         apBarImage = transform.Find("AP").transform.Find("APBarImage").GetComponent<Image>();
+    }
+
+	// Use this for initialization
+	void Start () {
+        
 	}
 	
 	// Update is called once per frame
