@@ -88,6 +88,80 @@ public class GameManager : MonoBehaviour
         
         return levelData.level;
     }
+    
+    ////////////////////////////////////////////////////
+    // FIXME : 체인 관련 함수. 따로 옮기는게 나을 것 같은데 어디다가 옮기지...
+    ////////////////////////////////////////////////////
+    void AddChains(GameObject unit, List<GameObject> targets, int skillIndex)
+    {
+        ChainInfo newChainInfo;
+        foreach (var target in targets)
+        {
+            newChainInfo = new ChainInfo(unit, target, skillIndex);
+            chainList.Add(newChainInfo);
+        }
+    }
+    
+    // 자신이 건 체인 삭제.
+    public void RemoveChainsFromUnit(GameObject unit)
+    {
+        List<ChainInfo> newChainList = new List<ChainInfo>();
+        foreach (var chainInfo in chainList)
+        {
+            if (chainInfo.GetUnit() != unit)
+            {
+                newChainList.Add(chainInfo);
+            }
+        }
+        chainList = newChainList;
+    }
+    
+    // 자신에게 체인을 건 모든 유닛의 체인 삭제.
+    public void RemoveChainsToTarget(GameObject target)
+    {
+        List<GameObject> units = new List<GameObject>();
+        foreach (var chainInfo in chainList)
+        {
+            if (chainInfo.GetTarget() == target)
+            {
+                units.Add(chainInfo.GetUnit());
+            }
+        }
+        
+        foreach (var unit in units)
+        {
+            RemoveChainsFromUnit(unit);
+        }
+    }
+    
+    // 해당 타겟이 체인 타겟인 모든 정보 추출 
+    List<ChainInfo> GetAllChainsToTarget(GameObject target)
+    {
+        List<ChainInfo> allChainInfoToTarget = new List<ChainInfo>(); 
+        foreach (var chainInfo in chainList)
+        {
+            if (chainInfo.GetTarget() == target)
+            {
+                allChainInfoToTarget.Add(chainInfo);
+            }
+        }
+        return allChainInfoToTarget;
+    }
+    
+    // 서로 다른 모든 체인 유닛 추출 
+    List<GameObject> GetAllUnitsInChainList(List<ChainInfo> chainInfoList)
+    {
+        List<GameObject> units = new List<GameObject>();
+        foreach (var chainInfo in chainInfoList)
+        {
+            if (units.Contains(chainInfo.GetUnit()));
+            {
+                units.Add(chainInfo.GetUnit());
+            }
+        }
+        return units;
+    }
+    ////////////////////////////////////////////////////
 
     void Awake ()
     {
@@ -429,6 +503,8 @@ public class GameManager : MonoBehaviour
             }
             else if (skillApplyCommand == SkillApplyCommand.Chain)
             {
+                // FIXME : 체인 대기. 체인 정보를 리스트에 추가. - 아직 미구현 
+                
                 skillApplyCommand = SkillApplyCommand.Waiting;
                 currentState = CurrentState.ChainAndStandby;
                 yield return StartCoroutine(ChainAndStandby());

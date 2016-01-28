@@ -16,6 +16,11 @@ public class UnitManager : MonoBehaviour {
         return units;
     }
     
+    public int GetStandardActionPoint()
+    {
+        return standardActionPoint;
+    }
+    
     public void SetStandardActionPoint(int partyLevel)
     {
         standardActionPoint = partyLevel + 60;
@@ -70,6 +75,15 @@ public class UnitManager : MonoBehaviour {
         
         // AP가 큰 순서대로 소팅.
         readiedUnits.Sort(delegate(GameObject x, GameObject y)
+        {
+            if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
+            else if (y.GetComponent<Unit>() == null) return -1;
+            else if (x.GetComponent<Unit>() == null) return 1;
+            else return y.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(x.GetComponent<Unit>().GetCurrentActivityPoint());
+        });
+        
+        // 유닛 전체에 대해서도 소팅. - FIXME : 유닛 하나하나의 행동을 반영해야 하나?
+        units.Sort(delegate(GameObject x, GameObject y)
         {
             if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
             else if (y.GetComponent<Unit>() == null) return -1;

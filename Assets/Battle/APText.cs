@@ -21,7 +21,7 @@ public class APText : MonoBehaviour {
         
         string phaseText = "[Phase " + FindObjectOfType<GameManager>().GetCurrentPhase() + "]\n";
 		newText += phaseText;
-        string apText = "[Action Point]\n";
+        string apText = "[Standard AP : " + unitManager.GetStandardActionPoint() + "]\n";
         newText += apText;
 		foreach (var unit in unitManager.GetAllUnits())
 		{
