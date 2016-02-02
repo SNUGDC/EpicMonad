@@ -9,8 +9,8 @@ public class TileManager : MonoBehaviour {
 	
 	Dictionary<Vector2, GameObject> tiles = new Dictionary<Vector2, GameObject>();
 
-	int tileHeight = 100/100;
-	int tileWidth = 200/100;
+	float tileHeight = 0.7f*100/100;
+	float tileWidth = 0.7f*200/100;
 
     public Dictionary<Vector2, GameObject> GetAllTiles()
     {

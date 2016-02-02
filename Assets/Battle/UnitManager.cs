@@ -28,13 +28,11 @@ public class UnitManager : MonoBehaviour {
 
 	void GenerateUnits ()
 	{
-		int tileWidth = 200/100;
-		int tileHeight = 100/100;
+		float tileWidth = 0.7f*200/100;
+		float tileHeight = 0.7f*100/100;
 		
 		foreach (var unitPrefab in unitPrefabs)
 		{
-			// int x = Random.Range(0, 10);
-			// int y = Random.Range(0, 10);
 			int x, y;
 			GameObject unit = Instantiate(unitPrefab) as GameObject;
 			
