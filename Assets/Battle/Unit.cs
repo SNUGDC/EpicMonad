@@ -7,7 +7,8 @@ using System.Linq;
 public class Unit : MonoBehaviour {
 
 	// FIXME : public -> private
-	public new string name;
+	public new string name; // 한글이름
+    public string unitName; // 영어이름 
     
     // 하드코딩된 기본 스킬리스트를 받아옴.
     List<Skill> skillList = new List<Skill>();
@@ -48,10 +49,38 @@ public class Unit : MonoBehaviour {
     List<Buff> buffList;
     List<Debuff> debuffList;
 
-    // FIXME : 임시로 공격력만 외부에서 읽음.
-    public int GetPower()
+    // FIXME : 임시로 공격력만 외부에서 참조.
+    public int GetActualPower()
     {
-        return power;
+        int actualPower = power;
+        
+        // 방어력 감소 효과 적용.
+        if (debuffList.Any(k => k.GetName() == DebuffType.PowerDecrease))
+        {
+            // 상대치 곱연산 
+            float totalDegree = 1.0f;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.PowerDecrease)
+                {
+                    totalDegree *= (100.0f - debuff.GetDegree())/100.0f;
+                }
+            }
+            actualPower = (int)((float)actualPower * totalDegree);  
+            
+            // 절대치 합연산 
+            int totalAmount = 0;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.PowerDecrease)
+                {
+                    totalAmount += debuff.GetAmount();
+                }
+            }
+            actualPower -= totalAmount;  
+        }
+
+        return actualPower;
     }
 
     public List<Skill> GetSkillList()
@@ -69,27 +98,44 @@ public class Unit : MonoBehaviour {
         return maxHealth;
     }
     
+    public bool IsBound()
+    {
+        return debuffList.Any(k => k.GetName() == DebuffType.Bind);
+    }
+    
+    public bool IsSilenced()
+    {
+        return debuffList.Any(k => k.GetName() == DebuffType.Silence);
+    }
+    
+    public bool IsFainted()
+    {
+        return debuffList.Any(k => k.GetName() == DebuffType.Bind) &&
+               debuffList.Any(k => k.GetName() == DebuffType.Silence);
+    }
+    
     public int GetActualDexturity()
     {
         int actualDexturity = dexturity;
         // FIXME : 버프 / 디버프 값 적용
         
         // 디버프값만 적용.
-        if (debuffList.Any(k => k.GetName() == DebuffType.faint))
+        if (debuffList.Any(k => k.GetName() == DebuffType.Faint))
         {
             actualDexturity = 0;
         }
-        else if (debuffList.Any(k => k.GetName() == DebuffType.exhaust))
+        else if (debuffList.Any(k => k.GetName() == DebuffType.Exhaust))
         {
-            int totalDegree = 0;
+            // 상대치 곱연산 
+            float totalDegree = 1.0f;
             foreach (var debuff in debuffList)
             {
-                if (debuff.GetName() == DebuffType.exhaust)
+                if (debuff.GetName() == DebuffType.ResistanceDecrease)
                 {
-                    totalDegree = debuff.GetDegree();
+                    totalDegree *= (100.0f - debuff.GetDegree())/100.0f;
                 }
             }
-            actualDexturity *= (totalDegree/100);
+            actualDexturity = (int)((float)actualDexturity * totalDegree);
         }
         return actualDexturity;
     }
@@ -127,6 +173,11 @@ public class Unit : MonoBehaviour {
     public Celestial GetCelestial()
     {
         return celestial;
+    }
+
+    public string GetUnitName()
+    {
+        return unitName;
     }
 
     public string GetName()
@@ -203,28 +254,94 @@ public class Unit : MonoBehaviour {
         }
         debuffList = newDebuffList;
     }
+    
+    public int GetActualDefense()
+    {
+        int actualDefense = defense;
+        
+        // 방어력 감소 효과 적용.
+        if (debuffList.Any(k => k.GetName() == DebuffType.DefenseDecrease))
+        {
+            // 상대치 곱연산 
+            float totalDegree = 1.0f;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.DefenseDecrease)
+                {
+                    totalDegree *= (100.0f - debuff.GetDegree())/100.0f;
+                }
+            }
+            actualDefense = (int)((float)actualDefense * totalDegree);  
+            
+            // 절대치 합연산 
+            int totalAmount = 0;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.DefenseDecrease)
+                {
+                    totalAmount += debuff.GetAmount();
+                }
+            }
+            actualDefense -= totalAmount;  
+        }
+
+        return actualDefense;
+    }
+
+    public int GetActualResistance()
+    {
+        int actualResistance = resistence;
+        
+        // 저항력 감소 효과 적용. 
+        if (debuffList.Any(k => k.GetName() == DebuffType.ResistanceDecrease))
+        {
+            // 상대치 곱연산 
+            float totalDegree = 1.0f;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.ResistanceDecrease)
+                {
+                    totalDegree *= (100.0f - debuff.GetDegree())/100.0f;
+                }
+            }
+            actualResistance = (int)((float)actualResistance * totalDegree);
+            
+            // 절대치 합연산 
+            int totalAmount = 0;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.ResistanceDecrease)
+                {
+                    totalAmount += debuff.GetAmount();
+                }
+            }
+            actualResistance -= totalAmount;
+        }
+
+        return actualResistance;
+    }
 
     public void Damaged(UnitClass unitClass, int amount)
     {
         int actualDamage = 0;
         // 공격이 물리인지 마법인지 체크
         // 방어력 / 저항력 중 맞는 값을 적용
-        // 방어 증가/감소 / 저항 증가/감소 적용             // FIXME : 미적용
+        // 방어 증가/감소 / 저항 증가/감소 적용             // FIXME : 증가분 미적용 
         // 체력 깎임 
         if (unitClass == UnitClass.Melee)
         {
             // 실제 피해 = 원래 피해 x 100/(100+방어력)
-            actualDamage = amount * 100 / (100 + defense);
+            actualDamage = amount * 100 / (100 + GetActualDefense());
             Debug.Log("Actual melee damage : " + actualDamage);
         }
         else if (unitClass == UnitClass.Magic)
         {
-            actualDamage = amount * 100 / (100 + resistence);
+            actualDamage = amount * 100 / (100 + GetActualResistance());
             Debug.Log("Actual magic damage : " + actualDamage);
         }
-        else
+        else if (unitClass == UnitClass.None)
         {
-            actualDamage = amount * 100 / (100 + Mathf.Max(defense, resistence));
+            actualDamage = amount;
         }
         
         currentHealth -= actualDamage;
@@ -232,20 +349,42 @@ public class Unit : MonoBehaviour {
             currentHealth = 0;
     }
 
-    public void RecoverHealth(int amount)
+    public void ApplyDamageOverPhase()
     {
-        // 내상 효과
-        if (debuffList.Any(k => k.GetName() == DebuffType.wound))
+        int totalAmount = 0;
+        
+        if (debuffList.Any(k => k.GetName() == DebuffType.DamageOverPhase))
         {
-            int totalDegree = 0;
             foreach (var debuff in debuffList)
             {
-                if (debuff.GetName() == DebuffType.exhaust)
+                if (debuff.GetName() == DebuffType.DamageOverPhase)
                 {
-                    totalDegree = debuff.GetDegree();
+                    totalAmount += debuff.GetAmount();
                 }
             }
-            amount *= (totalDegree/100);
+            
+            // FIXME : 도트데미지는 물뎀인가 마뎀인가? 현재는 트루뎀.
+            Damaged(UnitClass.None, totalAmount);
+        }
+    }
+
+    public void RecoverHealth(int amount)
+    {
+        // FIXME : 치유량 증가 효과
+         
+        // 내상 효과
+        if (debuffList.Any(k => k.GetName() == DebuffType.Wound))
+        {
+            // 상대치 곱연산 
+            float totalDegree = 1.0f;
+            foreach (var debuff in debuffList)
+            {
+                if (debuff.GetName() == DebuffType.Exhaust)
+                {
+                    totalDegree *= (100.0f - debuff.GetDegree())/100.0f;
+                }
+            }
+            amount = (int)((float)amount * totalDegree);
         }
         
         currentHealth += amount;

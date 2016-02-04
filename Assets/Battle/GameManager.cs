@@ -228,6 +228,9 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
+            FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+            FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+            
             foreach (var readiedUnit in readiedUnits)
             {
                 yield return StartCoroutine(ActionAtTurn(readiedUnit));
@@ -243,6 +246,9 @@ public class GameManager : MonoBehaviour
 
     IEnumerator ActionAtTurn(GameObject unit)
     {
+        FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+        FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+        
         Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
         selectedUnit = unit;
         moveCount = 0; // 누적 이동 수        
@@ -253,7 +259,6 @@ public class GameManager : MonoBehaviour
     void CheckStandbyPossible()
     {
         bool isPossible = false;
-        GameObject.Find("StandbyButton").GetComponent<Button>().interactable = isPossible;
 
         foreach (var unit in unitManager.GetAllUnits())
         {
@@ -266,6 +271,26 @@ public class GameManager : MonoBehaviour
 
         GameObject.Find("StandbyButton").GetComponent<Button>().interactable = isPossible;
     }
+    
+    void CheckSkillPossible()
+    {
+        bool isPossible = false;
+
+        isPossible = !(selectedUnit.GetComponent<Unit>().IsSilenced() ||
+                     selectedUnit.GetComponent<Unit>().IsFainted());
+
+        GameObject.Find("SkillButton").GetComponent<Button>().interactable = isPossible;   
+    }
+    
+    void CheckMovePossible()
+    {
+        bool isPossible = false;
+
+        isPossible = !(selectedUnit.GetComponent<Unit>().IsBound() ||
+                     selectedUnit.GetComponent<Unit>().IsFainted());
+
+        GameObject.Find("MoveButton").GetComponent<Button>().interactable = isPossible;        
+    }
 
     IEnumerator FocusToUnit()
     {
@@ -276,6 +301,8 @@ public class GameManager : MonoBehaviour
             commandUI.SetActive(true);
             commandUI.transform.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().name;
             CheckStandbyPossible();
+            CheckMovePossible();
+            CheckSkillPossible();
 
             command = ActionCommand.Waiting;
             while (command == ActionCommand.Waiting)
@@ -542,14 +569,14 @@ public class GameManager : MonoBehaviour
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
                     target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(),
-                                                        (int)(selectedUnitInfo.GetPower() * appliedSkill.GetPowerFactor()));
-                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().name);
+                                                        (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()));
+                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().name);
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
                     target.GetComponent<Unit>().RecoverHealth(
-                                                        (int)(selectedUnitInfo.GetPower() * appliedSkill.GetPowerFactor()));
-                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().name);
+                                                        (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()));
+                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().name);
                 }
                 else
                 {

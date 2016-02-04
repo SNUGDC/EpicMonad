@@ -1,0 +1,111 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
+
+public class APDisplayNextViewer : MonoBehaviour {
+
+    public GameObject portraitPrefab;
+
+    List<GameObject> portraits;
+
+    public void UpdateAPDisplay(List<GameObject> units)
+    {
+        ClearViewer();
+        
+        List<GameObject> sortedUnits = SortByNextPhaseAP(units);
+        
+        int count = 1;
+        foreach (var unit in sortedUnits)
+        {
+            GameObject portrait = Instantiate(portraitPrefab) as GameObject;
+            string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetUnitName().ToString();
+            portrait.GetComponent<Image>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
+            
+            portraits.Add(portrait);
+            
+            portrait.transform.SetParent(GameObject.Find("APDisplayNextPanel").transform);
+            portrait.transform.localPosition = new Vector3 (120 + 40 * count, -20, 0); // ?? 왜 y좌표 반영이 이상하게 되는것인가..
+            portrait.transform.localScale = new Vector3 (1, 1, 1);
+            
+            bool isFirst = (count == 0);
+            ActiveBorder(unit, portrait, isFirst);
+            
+            count ++;
+        }
+    }
+    
+    void ActiveBorder(GameObject unit, GameObject portrait, bool isFirst)
+    {
+        int standardActionPoint = FindObjectOfType<UnitManager>().GetStandardActionPoint();
+        int unitActionPoint = unit.GetComponent<Unit>().GetCurrentActivityPoint();
+        
+        if (isFirst)
+        {
+            portrait.transform.Find("GreenBorder").gameObject.SetActive(false);
+        }
+        else if (unitActionPoint >= standardActionPoint)
+        {
+            portrait.transform.Find("RedBorder").gameObject.SetActive(false);
+        }
+        else
+        {
+            portrait.transform.Find("GreenBorder").gameObject.SetActive(false);
+            portrait.transform.Find("RedBorder").gameObject.SetActive(false);
+        }
+    }
+
+    List<GameObject> SortByNextPhaseAP(List<GameObject> units)
+    {
+        List<GameObject> sortedUnits = new List<GameObject>();
+        
+        for (int i = 1; i < units.Count; i++)
+        {
+            sortedUnits.Add(units[i]);
+        }
+        
+        // 소팅. 레디 상태일 경우 가중치 1000. (무조건 앞에 온다)
+        sortedUnits.Sort(delegate(GameObject x, GameObject y)
+        {
+            if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
+            else if (y.GetComponent<Unit>() == null) return -1;
+            else if (x.GetComponent<Unit>() == null) return 1;
+            else return GetNextPhaseAP(y).CompareTo(GetNextPhaseAP(x));
+        });
+        
+        return sortedUnits;
+    }
+    
+    int GetNextPhaseAP(GameObject unit)
+    {
+        Unit unitInfo = unit.GetComponent<Unit>();
+        int standardActionPoint = FindObjectOfType<UnitManager>().GetStandardActionPoint();
+        int nextPhaseAP;
+        
+        if (unitInfo.GetCurrentActivityPoint() >= standardActionPoint)
+            nextPhaseAP = 1000 + unitInfo.GetCurrentActivityPoint();
+        else
+            nextPhaseAP = unitInfo.GetCurrentActivityPoint() + unitInfo.GetActualDexturity();
+
+        return nextPhaseAP;   
+    }
+    
+    void ClearViewer()
+    {
+        int length = portraits.Count;
+        for (int i = 0; i < length; i++)
+        {
+            Destroy(portraits[i]);
+        }   
+    }
+
+	// Use this for initialization
+	void Start () {
+	   portraits = new List<GameObject>();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	
+	}
+}

@@ -77,26 +77,34 @@ namespace Enums {
     
     public enum DebuffType
     {
-        poison,
-        bleed,
-        exhaust,
-        bind,
-        faint,
-        silence,
-        slow,
-        wound
+        Retire,
+        DamageOverPhase,
+        Exhaust,
+        Bind,
+        Silence,
+        Faint,
+        Slow,
+        Wound,
+        PowerDecrease,
+        DefenseDecrease,
+        ResistanceDecrease,
+        Mark,
+        Poison,
+        Bleed
     }
     
     public class Buff
     {
         BuffType name;
         int degree;
+        int amount;
         int remainPhase;
         
-        public Buff(BuffType name, int degree, int remainPhase)
+        public Buff(BuffType name, int degree, int amount, int remainPhase)
         {
             this.name = name;
             this.degree = degree;
+            this.amount = amount;
             this.remainPhase = remainPhase;
         }
         
@@ -108,6 +116,11 @@ namespace Enums {
         public int GetDegree()
         {
             return degree;
+        }
+        
+        public int GetAmount()
+        {
+            return amount;
         }
         
         public int GetRemainPhase()
@@ -135,12 +148,14 @@ namespace Enums {
     {
         DebuffType name;
         int degree;
+        int amount;
         int remainPhase;
         
-        public Debuff(DebuffType name, int degree, int remainPhase)
+        public Debuff(DebuffType name, int degree, int amount, int remainPhase)
         {
             this.name = name;
             this.degree = degree;
+            this.amount = amount;
             this.remainPhase = remainPhase;
         }
         
@@ -152,6 +167,11 @@ namespace Enums {
         public int GetDegree()
         {
             return degree;
+        }
+        
+        public int GetAmount()
+        {
+            return amount;
         }
         
         public int GetRemainPhase()
