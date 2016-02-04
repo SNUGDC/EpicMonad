@@ -330,13 +330,13 @@ public class Unit : MonoBehaviour {
         // 체력 깎임 
         if (unitClass == UnitClass.Melee)
         {
-            // 실제 피해 = 원래 피해 x 100/(100+방어력)
-            actualDamage = amount * 100 / (100 + GetActualDefense());
+            // 실제 피해 = 원래 피해 x 200/(200+방어력)
+            actualDamage = amount * 200 / (200 + GetActualDefense());
             Debug.Log("Actual melee damage : " + actualDamage);
         }
         else if (unitClass == UnitClass.Magic)
         {
-            actualDamage = amount * 100 / (100 + GetActualResistance());
+            actualDamage = amount * 200 / (200 + GetActualResistance());
             Debug.Log("Actual magic damage : " + actualDamage);
         }
         else if (unitClass == UnitClass.None)
