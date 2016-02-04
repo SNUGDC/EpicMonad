@@ -79,15 +79,6 @@ public class UnitManager : MonoBehaviour {
             else if (x.GetComponent<Unit>() == null) return 1;
             else return y.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(x.GetComponent<Unit>().GetCurrentActivityPoint());
         });
-        
-        // 유닛 전체에 대해서도 소팅. - FIXME : 유닛 하나하나의 행동을 반영해야 하나?
-        units.Sort(delegate(GameObject x, GameObject y)
-        {
-            if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
-            else if (y.GetComponent<Unit>() == null) return -1;
-            else if (x.GetComponent<Unit>() == null) return 1;
-            else return y.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(x.GetComponent<Unit>().GetCurrentActivityPoint());
-        });
 	}
 
 	// Use this for initialization
@@ -97,6 +88,13 @@ public class UnitManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+	   // 유닛 전체에 대해서도 소팅. 변경점이 있을때마다 반영된다.
+        units.Sort(delegate(GameObject x, GameObject y)
+        {
+            if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
+            else if (y.GetComponent<Unit>() == null) return -1;
+            else if (x.GetComponent<Unit>() == null) return 1;
+            else return y.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(x.GetComponent<Unit>().GetCurrentActivityPoint());
+        });
 	}
 }
