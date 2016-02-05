@@ -429,6 +429,7 @@ public class GameManager : MonoBehaviour
     {
         bool isPossible = false;
         
+        // ap 조건으로 체크.
         int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();        
         int remainAPAfterChain = selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP;
 
@@ -439,6 +440,13 @@ public class GameManager : MonoBehaviour
             {
                 isPossible = true;
             }
+        }
+        
+        // 스킬 타입으로 체크. 공격스킬만 체인을 걸 수 있음.
+        if (selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetSkillApplyType() 
+            != SkillApplyType.Damage)
+        {
+            isPossible = false;
         }
 
         GameObject.Find("ChainButton").GetComponent<Button>().interactable = isPossible;
