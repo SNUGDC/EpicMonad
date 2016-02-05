@@ -65,6 +65,7 @@ public class GameManager : MonoBehaviour
     SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
 
     int moveCount;
+    bool alreadyMoved;
     Vector2 selectedTilePosition;
     GameObject selectedUnit;
     List<GameObject> readiedUnits = new List<GameObject>();
@@ -251,7 +252,8 @@ public class GameManager : MonoBehaviour
         
         Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
         selectedUnit = unit;
-        moveCount = 0; // 누적 이동 수        
+        moveCount = 0; // 누적 이동 수 
+        alreadyMoved = false; // 연속 이동 불가를 위한 변수.       
         currentState = CurrentState.FocusToUnit;
         yield return StartCoroutine(FocusToUnit());
     }
@@ -287,7 +289,8 @@ public class GameManager : MonoBehaviour
         bool isPossible = false;
 
         isPossible = !(selectedUnit.GetComponent<Unit>().IsBound() ||
-                     selectedUnit.GetComponent<Unit>().IsFainted());
+                     selectedUnit.GetComponent<Unit>().IsFainted() ||
+                     alreadyMoved);
 
         GameObject.Find("MoveButton").GetComponent<Button>().interactable = isPossible;        
     }
@@ -597,6 +600,7 @@ public class GameManager : MonoBehaviour
 
         Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
         currentState = CurrentState.FocusToUnit;
+        alreadyMoved = false;
         yield return StartCoroutine(FocusToUnit());
     }
 
@@ -614,6 +618,7 @@ public class GameManager : MonoBehaviour
 
         Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
         currentState = CurrentState.Standby;
+        alreadyMoved = false;
         yield return StartCoroutine(Standby()); // 이후 대기.
     }
 
@@ -831,6 +836,7 @@ public class GameManager : MonoBehaviour
         selectedUnit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
 
         currentState = CurrentState.FocusToUnit;
+        alreadyMoved = true;
         yield return StartCoroutine(FocusToUnit());
 
         yield return null;
