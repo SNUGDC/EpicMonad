@@ -93,60 +93,31 @@ public class GameManager : MonoBehaviour
     ////////////////////////////////////////////////////
     // FIXME : 체인 관련 함수. 따로 옮기는게 나을 것 같은데 어디다가 옮기지...
     ////////////////////////////////////////////////////
-    void AddChains(GameObject unit, List<GameObject> targets, int skillIndex)
+    void AddChains(GameObject unit, List<GameObject> targetArea, int skillIndex)
     {
-        ChainInfo newChainInfo;
-        foreach (var target in targets)
-        {
-            newChainInfo = new ChainInfo(unit, target, skillIndex);
-            chainList.Add(newChainInfo);
-        }
+        ChainInfo newChainInfo = new ChainInfo(unit, targetArea, skillIndex);
+        chainList.Add(newChainInfo);
     }
     
     // 자신이 건 체인 삭제.
     public void RemoveChainsFromUnit(GameObject unit)
     {
-        List<ChainInfo> newChainList = new List<ChainInfo>();
-        foreach (var chainInfo in chainList)
-        {
-            if (chainInfo.GetUnit() != unit)
-            {
-                newChainList.Add(chainInfo);
-            }
-        }
-        chainList = newChainList;
+        ChainInfo deleteChainInfo = chainList.Find(x => x.GetUnit() == unit);
+        chainList.Remove(deleteChainInfo);
     }
-    
-    // 자신에게 체인을 건 모든 유닛의 체인 삭제.
-    public void RemoveChainsToTarget(GameObject target)
+
+    // 해당 영역에 체인을 대기중인 모든 정보 추출 
+    List<ChainInfo> GetAllChainInfoToTargetArea(List<GameObject> targetArea)
     {
-        List<GameObject> units = new List<GameObject>();
+        List<ChainInfo> allChainInfoToTargetArea = new List<ChainInfo>(); 
         foreach (var chainInfo in chainList)
         {
-            if (chainInfo.GetTarget() == target)
+            if (chainInfo.Overlapped(targetArea))
             {
-                units.Add(chainInfo.GetUnit());
+                allChainInfoToTargetArea.Add(chainInfo);
             }
         }
-        
-        foreach (var unit in units)
-        {
-            RemoveChainsFromUnit(unit);
-        }
-    }
-    
-    // 해당 타겟이 체인 타겟인 모든 정보 추출 
-    List<ChainInfo> GetAllChainsToTarget(GameObject target)
-    {
-        List<ChainInfo> allChainInfoToTarget = new List<ChainInfo>(); 
-        foreach (var chainInfo in chainList)
-        {
-            if (chainInfo.GetTarget() == target)
-            {
-                allChainInfoToTarget.Add(chainInfo);
-            }
-        }
-        return allChainInfoToTarget;
+        return allChainInfoToTargetArea;
     }
     
     // 서로 다른 모든 체인 유닛 추출 
@@ -155,7 +126,7 @@ public class GameManager : MonoBehaviour
         List<GameObject> units = new List<GameObject>();
         foreach (var chainInfo in chainInfoList)
         {
-            if (units.Contains(chainInfo.GetUnit()));
+            if (!units.Contains(chainInfo.GetUnit()));
             {
                 units.Add(chainInfo.GetUnit());
             }
