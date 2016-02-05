@@ -18,7 +18,7 @@ public class APDisplayCurrentViewer : MonoBehaviour {
         {
             bool isFirst = (count == 0);
             GameObject portrait = Instantiate(portraitPrefab) as GameObject;
-            string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetUnitName().ToString();
+            string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetNameInCode().ToString();
             portrait.GetComponent<Image>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
             
             ApplyCurrentAPText(unit, portrait);

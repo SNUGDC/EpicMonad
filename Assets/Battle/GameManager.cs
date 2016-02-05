@@ -490,7 +490,7 @@ public class GameManager : MonoBehaviour
                 
                 skillApplyCommand = SkillApplyCommand.Waiting;
                 currentState = CurrentState.ChainAndStandby;
-                yield return StartCoroutine(ChainAndStandby());
+                yield return StartCoroutine(ChainAndStandby(selectedTiles));
             }
             else
                 yield return null;
@@ -558,15 +558,16 @@ public class GameManager : MonoBehaviour
     }
 
 
-    IEnumerator ChainAndStandby()
+    IEnumerator ChainAndStandby(List<GameObject> selectedTiles)
     {
+        tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+        
         // 스킬 시전에 필요한 ap만큼 선 차감. 
         int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
         selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);
-        indexOfSeletedSkillByUser = 0; // return to init value.
-
         // FIXME : 체인 목록에 추가. 
-
+        ChainList.AddChains(selectedUnit, selectedTiles, indexOfSeletedSkillByUser);
+        indexOfSeletedSkillByUser = 0; // return to init value.
         yield return new WaitForSeconds(0.5f);
 
         Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);

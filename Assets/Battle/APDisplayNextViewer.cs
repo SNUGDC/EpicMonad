@@ -19,7 +19,7 @@ public class APDisplayNextViewer : MonoBehaviour {
         foreach (var unit in sortedUnits)
         {
             GameObject portrait = Instantiate(portraitPrefab) as GameObject;
-            string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetUnitName().ToString();
+            string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetNameInCode().ToString();
             portrait.GetComponent<Image>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
             
             ApplyNextAPText(unit, portrait);

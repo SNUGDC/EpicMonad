@@ -8,7 +8,7 @@ public class Unit : MonoBehaviour {
 
 	// FIXME : public -> private
 	public new string name; // 한글이름
-    public string unitName; // 영어이름 
+    public string nameInCode; // 영어이름 
     
     // 하드코딩된 기본 스킬리스트를 받아옴.
     List<Skill> skillList = new List<Skill>();
@@ -180,9 +180,9 @@ public class Unit : MonoBehaviour {
         return celestial;
     }
 
-    public string GetUnitName()
+    public string GetNameInCode()
     {
-        return unitName;
+        return nameInCode;
     }
 
     public string GetName()
