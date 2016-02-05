@@ -74,6 +74,8 @@ public class GameManager : MonoBehaviour
 
     int currentPhase;
 
+    // temp values.
+    int chainDamageFactor = 1;
     int[] requireActionPoint = { 4, 10, 18, 28, 40, 54, 70, 88 };
 
     // Load from json.
@@ -90,51 +92,11 @@ public class GameManager : MonoBehaviour
         return levelData.level;
     }
     
-    ////////////////////////////////////////////////////
-    // FIXME : 체인 관련 함수. 따로 옮기는게 나을 것 같은데 어디다가 옮기지...
-    ////////////////////////////////////////////////////
-    void AddChains(GameObject unit, List<GameObject> targetArea, int skillIndex)
+    public List<ChainInfo> GetChainList()
     {
-        ChainInfo newChainInfo = new ChainInfo(unit, targetArea, skillIndex);
-        chainList.Add(newChainInfo);
+        return chainList;
     }
     
-    // 자신이 건 체인 삭제.
-    public void RemoveChainsFromUnit(GameObject unit)
-    {
-        ChainInfo deleteChainInfo = chainList.Find(x => x.GetUnit() == unit);
-        chainList.Remove(deleteChainInfo);
-    }
-
-    // 해당 영역에 체인을 대기중인 모든 정보 추출 
-    List<ChainInfo> GetAllChainInfoToTargetArea(List<GameObject> targetArea)
-    {
-        List<ChainInfo> allChainInfoToTargetArea = new List<ChainInfo>(); 
-        foreach (var chainInfo in chainList)
-        {
-            if (chainInfo.Overlapped(targetArea))
-            {
-                allChainInfoToTargetArea.Add(chainInfo);
-            }
-        }
-        return allChainInfoToTargetArea;
-    }
-    
-    // 서로 다른 모든 체인 유닛 추출 
-    List<GameObject> GetAllUnitsInChainList(List<ChainInfo> chainInfoList)
-    {
-        List<GameObject> units = new List<GameObject>();
-        foreach (var chainInfo in chainInfoList)
-        {
-            if (!units.Contains(chainInfo.GetUnit()));
-            {
-                units.Add(chainInfo.GetUnit());
-            }
-        }
-        return units;
-    }
-    ////////////////////////////////////////////////////
-
     void Awake ()
     {
         tileManager = FindObjectOfType<TileManager>();
@@ -236,7 +198,7 @@ public class GameManager : MonoBehaviour
         foreach (var unit in unitManager.GetAllUnits())
         {
             if ((unit != selectedUnit) &&
-            (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint()))
+            (unit.GetComponent<Unit>().GetCurrentActivityPoint() > selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint()))
             {
                 isPossible = true;
             }
@@ -463,6 +425,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void CheckChainPossible()
+    {
+        bool isPossible = false;
+        
+        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();        
+        int remainAPAfterChain = selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP;
+
+        foreach (var unit in unitManager.GetAllUnits())
+        {
+            if ((unit != selectedUnit) &&
+            (unit.GetComponent<Unit>().GetCurrentActivityPoint() > remainAPAfterChain))
+            {
+                isPossible = true;
+            }
+        }
+
+        GameObject.Find("ChainButton").GetComponent<Button>().interactable = isPossible;
+    }
+
     IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition)
     {
         while (currentState == CurrentState.CheckApplyOrChain)
@@ -473,6 +454,7 @@ public class GameManager : MonoBehaviour
             List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, 0, true);
             tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
             skillCheckUI.SetActive(true);
+            CheckChainPossible();
 
             int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
             string newAPText = "소모 AP : " + requireAP + "\n" +
