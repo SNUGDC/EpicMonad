@@ -186,7 +186,8 @@ public class GameManager : MonoBehaviour
         Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
         selectedUnit = unit;
         moveCount = 0; // 누적 이동 수 
-        alreadyMoved = false; // 연속 이동 불가를 위한 변수.       
+        alreadyMoved = false; // 연속 이동 불가를 위한 변수.  
+        ChainList.RemoveChainsFromUnit(selectedUnit); // 턴이 돌아오면 자신이 건 체인 삭제.     
         currentState = CurrentState.FocusToUnit;
         yield return StartCoroutine(FocusToUnit());
     }
