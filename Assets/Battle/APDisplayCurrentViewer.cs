@@ -21,23 +21,36 @@ public class APDisplayCurrentViewer : MonoBehaviour {
             string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetUnitName().ToString();
             portrait.GetComponent<Image>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
             
+            ApplyCurrentAPText(unit, portrait);
+            
             portraits.Add(portrait);
             
             portrait.transform.SetParent(GameObject.Find("APDisplayCurrentPanel").transform);
             portrait.transform.localPosition = new Vector3 (120 + 40 * count, -20, 0); // ?? 왜 y좌표 반영이 이상하게 되는것인가..
             portrait.transform.localScale = new Vector3 (1, 1, 1);
             
-            // 첫번째 아이콘 크게.
+            // 첫번째 아이콘 크게. 폰트 위치 
             if (isFirst)
             {
                 portrait.transform.localPosition = new Vector3 (100, -10, 0);
-                portrait.transform.localScale = new Vector3 (1.5f, 1.5f, 1);    
+                portrait.transform.localScale = new Vector3 (1.5f, 1.5f, 1); 
+                
+                Text APText = portrait.transform.Find("APText").GetComponent<Text>(); 
+                APText.transform.localPosition = new Vector3(17.5f, -24, 0); // 이번엔 x좌표 반영이 이상함..
+                APText.fontSize = 10;  
             }
             
             ActiveBorder(unit, portrait, isFirst);
            
             count ++;
         }
+    }
+    
+    void ApplyCurrentAPText(GameObject unit, GameObject portrait)
+    {
+        int currentPhaseAP = unit.GetComponent<Unit>().GetCurrentActivityPoint();
+        
+        portrait.transform.Find("APText").GetComponent<Text>().text = currentPhaseAP.ToString();
     }
     
     void ActiveBorder(GameObject unit, GameObject portrait, bool isFirst)

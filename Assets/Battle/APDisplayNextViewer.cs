@@ -22,6 +22,8 @@ public class APDisplayNextViewer : MonoBehaviour {
             string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetUnitName().ToString();
             portrait.GetComponent<Image>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
             
+            ApplyNextAPText(unit, portrait);
+            
             portraits.Add(portrait);
             
             portrait.transform.SetParent(GameObject.Find("APDisplayNextPanel").transform);
@@ -35,16 +37,25 @@ public class APDisplayNextViewer : MonoBehaviour {
         }
     }
     
+    void ApplyNextAPText(GameObject unit, GameObject portrait)
+    {
+        int nextPhaseAP = unit.GetComponent<Unit>().GetCurrentActivityPoint() +
+                          unit.GetComponent<Unit>().GetActualDexturity();  
+        
+        portrait.transform.Find("APText").GetComponent<Text>().text = nextPhaseAP.ToString();
+    }
+    
     void ActiveBorder(GameObject unit, GameObject portrait, bool isFirst)
     {
         int standardActionPoint = FindObjectOfType<UnitManager>().GetStandardActionPoint();
-        int unitActionPoint = unit.GetComponent<Unit>().GetCurrentActivityPoint();
+        int currentPhaseAP = unit.GetComponent<Unit>().GetCurrentActivityPoint();
+        int nextPhaseAP = currentPhaseAP + unit.GetComponent<Unit>().GetActualDexturity();
         
         if (isFirst)
         {
             portrait.transform.Find("GreenBorder").gameObject.SetActive(false);
         }
-        else if (unitActionPoint >= standardActionPoint)
+        else if (nextPhaseAP >= standardActionPoint)
         {
             portrait.transform.Find("RedBorder").gameObject.SetActive(false);
         }
