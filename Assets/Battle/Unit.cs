@@ -114,6 +114,11 @@ public class Unit : MonoBehaviour {
                debuffList.Any(k => k.GetName() == DebuffType.Silence);
     }
     
+    public int GetTrueDexturity()
+    {
+        return dexturity;
+    }
+    
     public int GetActualDexturity()
     {
         int actualDexturity = dexturity;

@@ -77,9 +77,24 @@ public class UnitManager : MonoBehaviour {
             if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
             else if (y.GetComponent<Unit>() == null) return -1;
             else if (x.GetComponent<Unit>() == null) return 1;
-            else return y.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(x.GetComponent<Unit>().GetCurrentActivityPoint());
+            else return CompareByActionPoint(x, y);
         });
 	}
+    
+    int CompareByActionPoint(GameObject unit, GameObject anotherUnit)
+    {
+        int compareResultByCurrentActionPoint = anotherUnit.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(unit.GetComponent<Unit>().GetCurrentActivityPoint());
+        if (compareResultByCurrentActionPoint == 0)
+        {
+            int compareResultByTrueDexturity = anotherUnit.GetComponent<Unit>().GetTrueDexturity().CompareTo(unit.GetComponent<Unit>().GetTrueDexturity());
+            if (compareResultByTrueDexturity == 0)
+                return anotherUnit.GetInstanceID().CompareTo(unit.GetInstanceID());
+            else
+                return compareResultByTrueDexturity;
+        }
+        else
+            return compareResultByCurrentActionPoint;
+    }
 
 	// Use this for initialization
 	void Start () {
@@ -94,7 +109,7 @@ public class UnitManager : MonoBehaviour {
             if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
             else if (y.GetComponent<Unit>() == null) return -1;
             else if (x.GetComponent<Unit>() == null) return 1;
-            else return y.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(x.GetComponent<Unit>().GetCurrentActivityPoint());
+            else return CompareByActionPoint(x, y);
         });
 	}
 }
