@@ -27,7 +27,7 @@ public class ChainList : MonoBehaviour {
     public static List<ChainInfo> GetAllChainInfoToTargetArea(List<GameObject> targetArea)
     {
         List<ChainInfo> chainList = FindObjectOfType<GameManager>().GetChainList();        
-        
+
         List<ChainInfo> allChainInfoToTargetArea = new List<ChainInfo>(); 
         foreach (var chainInfo in chainList)
         {
@@ -36,6 +36,7 @@ public class ChainList : MonoBehaviour {
                 allChainInfoToTargetArea.Add(chainInfo);
             }
         }
+
         return allChainInfoToTargetArea;
     }
     

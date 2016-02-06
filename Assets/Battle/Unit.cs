@@ -223,6 +223,13 @@ public class Unit : MonoBehaviour {
     public void SetDebuff(Debuff debuff)
     {
         debuffList.Add(debuff);
+        // 침묵이나 기절상태가 될 경우 체인 해제.
+        // FIXME : 행동불능 / 넉백 추가할 것. (넉백은 디버프가 아니라서 다른 곳에서 적용할 듯?)
+        if (debuff.GetName() == DebuffType.Faint ||
+            debuff.GetName() == DebuffType.Silence)
+        {
+            ChainList.RemoveChainsFromUnit(gameObject);
+        }
     }
     
     public void RemainDebuff()

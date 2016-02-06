@@ -465,7 +465,8 @@ public class GameManager : MonoBehaviour
             skillCheckUI.SetActive(true);
             CheckChainPossible();
 
-            int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
+            Skill selectedSkill = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
+            int requireAP = selectedSkill.GetRequireAP();
             string newAPText = "소모 AP : " + requireAP + "\n" +
                                "잔여 AP : " + (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP);
             skillCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
@@ -490,13 +491,36 @@ public class GameManager : MonoBehaviour
             if (skillApplyCommand == SkillApplyCommand.Apply)
             {
                 skillApplyCommand = SkillApplyCommand.Waiting;
-                currentState = CurrentState.ApplySkill;
-                yield return StartCoroutine(ApplySkill(selectedTiles));
+                // 체인이 가능한 스킬일 경우. 체인 발동. 
+                if (selectedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+                {
+                    // 자기 자신을 체인 리스트에 추가.
+                    ChainList.AddChains(selectedUnit, selectedTiles, indexOfSeletedSkillByUser);
+                    // 체인 체크, 순서대로 공격.
+                    List<ChainInfo> allVaildChainInfo = ChainList.GetAllChainInfoToTargetArea(selectedTiles);
+                    int chainCombo = allVaildChainInfo.Count;
+                    currentState = CurrentState.ApplySkill;
+                    
+                    foreach (var chainInfo in allVaildChainInfo)
+                    {
+                        GameObject focusedTile = chainInfo.GetTargetArea()[0];
+                        Camera.main.transform.position = new Vector3(focusedTile.transform.position.x, focusedTile.transform.position.y, -10);
+                        yield return StartCoroutine(ApplySkill(chainInfo.GetUnit(), chainCombo)); 
+                    }
+                    
+                    Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+                    currentState = CurrentState.FocusToUnit;
+                    yield return StartCoroutine(FocusToUnit());
+                }
+                // 체인이 불가능한 스킬일 경우, 그냥 발동.
+                else
+                {
+                    currentState = CurrentState.ApplySkill;
+                    yield return StartCoroutine(ApplySkill(selectedTiles));
+                }
             }
             else if (skillApplyCommand == SkillApplyCommand.Chain)
             {
-                // FIXME : 체인 대기. 체인 정보를 리스트에 추가. - 아직 미구현 
-                
                 skillApplyCommand = SkillApplyCommand.Waiting;
                 currentState = CurrentState.ChainAndStandby;
                 yield return StartCoroutine(ChainAndStandby(selectedTiles));
@@ -519,13 +543,64 @@ public class GameManager : MonoBehaviour
         skillApplyCommand = SkillApplyCommand.Chain;
     }
 
+    // 체인 가능 스킬일 경우의 스킬 시전 코루틴. 공격 유닛을 받고, 유닛으로 체인 정보를 받아오는 방식으로 수정.
+    IEnumerator ApplySkill(GameObject unit, int chainCombo)
+    {
+        // FIXME : 이펙트는 따로 들어가야 할 듯.
+
+        ChainInfo chainInfoOfUnit = chainList.Find(k => k.GetUnit() == unit);
+        Unit selectedUnitInfo = chainInfoOfUnit.GetUnit().GetComponent<Unit>();
+        Skill appliedSkill = selectedUnitInfo.GetSkillList()[chainInfoOfUnit.GetSkillIndex() - 1];
+        List<GameObject> selectedTiles = chainInfoOfUnit.GetTargetArea();
+
+        foreach (var tile in selectedTiles)
+        {
+            GameObject target = tile.GetComponent<Tile>().GetUnitOnTile();
+            if (target != null)
+            {
+                if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+                {
+                    target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(),
+                                                        (int)((chainCombo * chainDamageFactor) * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()));
+                    Debug.Log("Apply " + (int)(chainCombo * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().name + "\n" + 
+                              "ChainCombo : " + chainCombo);
+                }
+                else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+                {
+                    target.GetComponent<Unit>().RecoverHealth(
+                                                        (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()));
+                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().name);
+                }
+                else
+                {
+                    Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
+                }
+
+                // FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것. 
+            }
+        }
+
+        // 자신의 체인 정보 삭제.
+        ChainList.RemoveChainsFromUnit(unit);
+        tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+
+        int requireAP = appliedSkill.GetRequireAP();
+        selectedUnitInfo.UseActionPoint(requireAP);
+        indexOfSeletedSkillByUser = 0; // return to init value.
+
+        yield return new WaitForSeconds(1f);
+
+        alreadyMoved = false;
+    }
+    
+    // 체인 불가능 스킬일 경우의 스킬 시전 코루틴. 스킬 적용 범위만 받는다.
     IEnumerator ApplySkill(List<GameObject> selectedTiles)
     {
         // FIXME : 이펙트는 따로 들어가야 할 듯.
 
         Unit selectedUnitInfo = selectedUnit.GetComponent<Unit>();
         Skill appliedSkill = selectedUnitInfo.GetSkillList()[indexOfSeletedSkillByUser - 1];
-
+        
         foreach (var tile in selectedTiles)
         {
             GameObject target = tile.GetComponent<Tile>().GetUnitOnTile();
@@ -558,7 +633,7 @@ public class GameManager : MonoBehaviour
         selectedUnitInfo.UseActionPoint(requireAP);
         indexOfSeletedSkillByUser = 0; // return to init value.
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
 
         Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
         currentState = CurrentState.FocusToUnit;
@@ -574,7 +649,7 @@ public class GameManager : MonoBehaviour
         // 스킬 시전에 필요한 ap만큼 선 차감. 
         int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
         selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);
-        // FIXME : 체인 목록에 추가. 
+        // 체인 목록에 추가. 
         ChainList.AddChains(selectedUnit, selectedTiles, indexOfSeletedSkillByUser);
         indexOfSeletedSkillByUser = 0; // return to init value.
         yield return new WaitForSeconds(0.5f);
@@ -715,7 +790,6 @@ public class GameManager : MonoBehaviour
         {
             isSelectedTileByUser = true;
             selectedTilePosition = position;
-            Debug.Log("Clicked " + position + " tile");
         }
     }
 
