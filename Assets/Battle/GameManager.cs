@@ -710,7 +710,6 @@ public class GameManager : MonoBehaviour
             tileManager.ChangeTilesFromSeletedColorToDefaultColor(nearbyTiles);
             currentState = CurrentState.CheckDestination;
             yield return StartCoroutine(CheckDestination(nearbyTiles, destTile, totalUseActionPoint, distance));
-            // yield return StartCoroutine(MoveToTile(destTile, totalUseActionPoint));
 
             yield return new WaitForSeconds(0.5f);
         }
