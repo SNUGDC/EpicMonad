@@ -3,8 +3,6 @@ using System.Collections;
 
 namespace Enums {
     
-    
-    
     public enum TileColor // highlighting selected tile
     {
         blue,

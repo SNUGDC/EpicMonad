@@ -14,7 +14,6 @@ public class Unit : MonoBehaviour {
     List<Skill> skillList = new List<Skill>();
     
     // FIXME : temp values
-    // public int[] requireAPOfSkills;
     public Vector2 initPosition;
     
     // Base stats. FIXME : 지금은 수동으로 셋팅.
@@ -81,6 +80,11 @@ public class Unit : MonoBehaviour {
         }
 
         return actualPower;
+    }
+    
+    public Vector2 GetInitPosition()
+    {
+        return initPosition;
     }
 
     public List<Skill> GetSkillList()
@@ -426,6 +430,23 @@ public class Unit : MonoBehaviour {
 		Debug.Log(name + " use " + amount + "AP. Current AP : " + activityPoint);
 	}
 
+    public void ApplyUnitInfo (UnitInfo unitInfo)
+    {
+        this.name = unitInfo.name;
+        this.nameInCode = unitInfo.nameInCode;
+        this.initPosition = unitInfo.initPosition;
+        this.baseHealth = unitInfo.baseHealth;
+        this.basePower = unitInfo.basePower;
+        this.baseDefense = unitInfo.baseDefense;
+        this.baseResistence = unitInfo.baseResistence;
+        this.baseDexturity = unitInfo.baseDexturity;
+        this.baseReach = unitInfo.baseReach;
+        this.baseRange = unitInfo.baseRange;
+		this.unitClass = unitInfo.unitClass;
+		this.element = unitInfo.element;
+		this.celestial = unitInfo.celestial;
+    }
+
     void ApplyStats()
     {
         maxHealth = (int)baseHealth;
@@ -439,6 +460,10 @@ public class Unit : MonoBehaviour {
 
     void Initialize()
     {
+        GetComponent<SpriteRenderer>().sprite = Resources.Load("UnitImage/" + nameInCode, typeof(Sprite)) as Sprite;
+        gameObject.name = nameInCode;
+        
+        position = initPosition;
         currentHealth = maxHealth;
         activityPoint = (int)(dexturity * 1.5f);
         skillList = SkillLoader.MakeSkillList();

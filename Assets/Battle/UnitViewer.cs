@@ -39,7 +39,7 @@ public class UnitViewer : MonoBehaviour {
     
     void UpdateAp(Unit unitInfo)
     {
-                apText.text = unitInfo.GetCurrentActivityPoint() + " (+" + unitInfo.GetActualDexturity() + ")";
+        apText.text = unitInfo.GetCurrentActivityPoint() + " (+" + unitInfo.GetActualDexturity() + ")";
     }
 
     void SetClassImage(UnitClass unitClass)
