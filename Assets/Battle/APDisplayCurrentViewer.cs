@@ -83,7 +83,7 @@ public class APDisplayCurrentViewer : MonoBehaviour {
     }
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 	   portraits = new List<GameObject>();
 	}
 	

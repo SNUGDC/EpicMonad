@@ -162,19 +162,22 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
-            FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+            readiedUnits = unitManager.GetUpdatedReadiedUnits();
             
-            foreach (var readiedUnit in readiedUnits)
+            while (readiedUnits.Count != 0)
             {
-                yield return StartCoroutine(ActionAtTurn(readiedUnit));
+                FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+                FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+                
+                yield return StartCoroutine(ActionAtTurn(readiedUnits[0]));
                 selectedUnit = null;
-            }
-            readiedUnits.Clear();
-            yield return null;
 
-            yield return StartCoroutine(EndPhase());
-            readiedUnits = unitManager.readiedUnits;
+                readiedUnits = unitManager.GetUpdatedReadiedUnits();
+                yield return null;
+            }
+
+            yield return StartCoroutine(EndPhaseOnGameManager());
+            // readiedUnits = unitManager.readiedUnits;
         }
     }
 
@@ -878,7 +881,7 @@ public class GameManager : MonoBehaviour
         yield return null;
     }
 
-    IEnumerator EndPhase()
+    IEnumerator EndPhaseOnGameManager()
     {
         Debug.Log("Phase End.");
 

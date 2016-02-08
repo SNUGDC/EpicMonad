@@ -35,6 +35,7 @@ public class UnitManager : MonoBehaviour {
 		{
 			int x, y;
 			GameObject unit = Instantiate(unitPrefab) as GameObject;
+            unit.name = unit.GetComponent<Unit>().GetNameInCode();
 			
             x = (int)unit.GetComponent<Unit>().initPosition.x;
             y = (int)unit.GetComponent<Unit>().initPosition.y;
@@ -51,25 +52,19 @@ public class UnitManager : MonoBehaviour {
 		
 		Debug.Log("Generate units complete");
 	}
-
-	public void EndPhase()
-	{
-		// check each unit and enqueue all readied units.
+    
+    public List<GameObject> GetUpdatedReadiedUnits()
+    {
+        readiedUnits.Clear();
+        // check each unit and add all readied units.
 		foreach (var unit in units)
 		{
-			unit.GetComponent<Unit>().RegenerateActionPoint();
 			if (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= standardActionPoint)
 			{
 				readiedUnits.Add(unit);
 				Debug.Log(unit.GetComponent<Unit>().name + " is readied");
 			}
 		}
-        
-        // Decrease each buff & debuff phase
-        foreach (var unit in units)
-        {
-            unit.GetComponent<Unit>().DecreaseRemainPhaseBuffAndDebuff();
-        }
         
         // AP가 큰 순서대로 소팅.
         readiedUnits.Sort(delegate(GameObject x, GameObject y)
@@ -79,6 +74,28 @@ public class UnitManager : MonoBehaviour {
             else if (x.GetComponent<Unit>() == null) return 1;
             else return CompareByActionPoint(x, y);
         });
+        
+        return readiedUnits;
+    }
+
+	public void EndPhase()
+	{
+		// check each unit and enqueue all readied units.
+		// foreach (var unit in units)
+		// {
+		// 	unit.GetComponent<Unit>().RegenerateActionPoint();
+		// 	if (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= standardActionPoint)
+		// 	{
+		// 		readiedUnits.Add(unit);
+		// 		Debug.Log(unit.GetComponent<Unit>().name + " is readied");
+		// 	}
+		// }
+        foreach (var unit in units)
+            unit.GetComponent<Unit>().RegenerateActionPoint();
+        
+        // Decrease each buff & debuff phase
+        foreach (var unit in units)
+            unit.GetComponent<Unit>().DecreaseRemainPhaseBuffAndDebuff();
 	}
     
     int CompareByActionPoint(GameObject unit, GameObject anotherUnit)
