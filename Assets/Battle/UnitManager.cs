@@ -80,22 +80,12 @@ public class UnitManager : MonoBehaviour {
 
 	public void EndPhase()
 	{
-		// check each unit and enqueue all readied units.
-		// foreach (var unit in units)
-		// {
-		// 	unit.GetComponent<Unit>().RegenerateActionPoint();
-		// 	if (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= standardActionPoint)
-		// 	{
-		// 		readiedUnits.Add(unit);
-		// 		Debug.Log(unit.GetComponent<Unit>().name + " is readied");
-		// 	}
-		// }
-        foreach (var unit in units)
-            unit.GetComponent<Unit>().RegenerateActionPoint();
-        
         // Decrease each buff & debuff phase
         foreach (var unit in units)
             unit.GetComponent<Unit>().DecreaseRemainPhaseBuffAndDebuff();
+        
+        foreach (var unit in units)
+            unit.GetComponent<Unit>().RegenerateActionPoint();
 	}
     
     int CompareByActionPoint(GameObject unit, GameObject anotherUnit)

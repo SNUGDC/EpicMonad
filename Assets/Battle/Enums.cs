@@ -43,10 +43,10 @@ namespace Enums {
     
     public enum Direction
     {
-        up,
-        down,
-        left,
-        right
+        LeftUp,
+        LeftDown,
+        RightUp,
+        RightDown
     }
     
     public enum SkillType

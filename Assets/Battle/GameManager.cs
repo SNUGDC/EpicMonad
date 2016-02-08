@@ -52,10 +52,12 @@ public class GameManager : MonoBehaviour
     GameObject destCheckUI;
     GameObject unitViewerUI;
     GameObject tileViewerUI;
+    GameObject selectDirectionUI;
 
     CurrentState currentState = CurrentState.None;
 
     bool isSelectedTileByUser = false;
+    bool isSelectedDirectionByUser = false;
     int indexOfSeletedSkillByUser = 0;
     bool isWaitingUserInput = false;
 
@@ -67,6 +69,7 @@ public class GameManager : MonoBehaviour
     int moveCount;
     bool alreadyMoved;
     Vector2 selectedTilePosition;
+    Direction selectedDirection;
     GameObject selectedUnit;
     List<GameObject> readiedUnits = new List<GameObject>();
 
@@ -108,6 +111,7 @@ public class GameManager : MonoBehaviour
         destCheckUI = GameObject.Find("DestCheckPanel");
         unitViewerUI = GameObject.Find("UnitViewerPanel");
         tileViewerUI = GameObject.Find("TileViewerPanel");
+        selectDirectionUI = GameObject.Find("SelectDirectionUI");
     }
 
     // Use this for initialization
@@ -122,6 +126,7 @@ public class GameManager : MonoBehaviour
         destCheckUI.SetActive(false);
         unitViewerUI.SetActive(false);
         tileViewerUI.SetActive(false);
+        selectDirectionUI.SetActive(false);
        
         selectedUnit = null;
 
@@ -728,6 +733,7 @@ public class GameManager : MonoBehaviour
             destTileList.Add(destTile);
             tileManager.ChangeTilesToSeletedColor(destTileList, TileColor.blue);
             // UI를 띄우고
+            selectDirectionUI.SetActive(true);
             destCheckUI.SetActive(true);
             string newAPText = "소모 AP : " + totalUseActionPoint + "\n" +
                                "잔여 AP : " + (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - totalUseActionPoint);
@@ -739,8 +745,8 @@ public class GameManager : MonoBehaviour
             rightClicked = false;
 
             isWaitingUserInput = true;
-            isSelectedTileByUser = false;
-            while (!isSelectedTileByUser)
+            isSelectedDirectionByUser = false;
+            while (!isSelectedDirectionByUser)
             {
                 // 클릭 중 취소하면 돌아감
                 // moveCount 되돌리기 
@@ -753,28 +759,47 @@ public class GameManager : MonoBehaviour
                     moveCount -= distance;
                     Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
                     tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.blue);
+                    selectDirectionUI.SetActive(false);
                     destCheckUI.SetActive(false);
                     currentState = CurrentState.SelectMovingPoint;
                     yield break;
                 }
                 yield return null;
             }
-            isSelectedTileByUser = false;
+            isSelectedDirectionByUser = false;
             isWaitingUserInput = false;
 
-            // '일치하는 위치를' 클릭하면 그 자리로 이동. MoveToTile 호출 
+            // 방향을 클릭하면 그 자리로 이동. MoveToTile 호출 
             if (tileManager.GetTile(selectedTilePosition) == destTile)
             {
                 tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
                 currentState = CurrentState.MoveToTile;
                 destCheckUI.SetActive(false);
-                yield return StartCoroutine(MoveToTile(destTile, totalUseActionPoint));
+                yield return StartCoroutine(MoveToTile(destTile, selectedDirection, totalUseActionPoint));
             }
             // 아니면 아무 반응 없음.
             else
                 yield return null;
         }
         yield return null;
+    }
+    
+    public void CallbackDirection(String directionString)
+    {
+        if (!isWaitingUserInput)
+            return;
+        
+        if (directionString == "LeftUp")
+            selectedDirection = Direction.LeftUp;
+        else if (directionString == "LeftDown")
+            selectedDirection = Direction.LeftDown;
+        else if (directionString == "RightUp")
+            selectedDirection = Direction.RightUp;
+        else if (directionString == "RightDown")
+            selectedDirection = Direction.RightDown;
+            
+        isSelectedDirectionByUser = true;
+        selectDirectionUI.SetActive(false);
     }
 
     // Update is called once per frame
@@ -864,12 +889,13 @@ public class GameManager : MonoBehaviour
         return nearbyTiles;
     }
 
-    IEnumerator MoveToTile(GameObject destTile, int totalUseActionPoint)
+    IEnumerator MoveToTile(GameObject destTile, Direction directionAtDest, int totalUseActionPoint)
     {
         GameObject currentTile = tileManager.GetTile(selectedUnit.GetComponent<Unit>().GetPosition());
         currentTile.GetComponent<Tile>().SetUnitOnTile(null);
         selectedUnit.transform.position = destTile.transform.position + new Vector3(0, 0, -0.01f);
         selectedUnit.GetComponent<Unit>().SetPosition(destTile.GetComponent<Tile>().GetTilePos());
+        selectedUnit.GetComponent<Unit>().SetDirection(directionAtDest);
         destTile.GetComponent<Tile>().SetUnitOnTile(selectedUnit);
 
         selectedUnit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);

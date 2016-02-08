@@ -54,7 +54,7 @@ public class Unit : MonoBehaviour {
     {
         int actualPower = power;
         
-        // 방어력 감소 효과 적용.
+        // 공격력 감소 효과 적용.
         if (debuffList.Any(k => k.GetName() == DebuffType.PowerDecrease))
         {
             // 상대치 곱연산 
@@ -195,6 +195,16 @@ public class Unit : MonoBehaviour {
 		this.name = name;
 	}
 	
+    public void SetDirection(Direction direction)
+    {
+        this.direction = direction;
+    }
+    
+    public Direction GetDirection()
+    {
+        return direction;
+    }
+    
 	public void SetPosition(Vector2 position)
 	{
 		this.position = position;
