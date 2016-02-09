@@ -30,10 +30,8 @@ public class UnitInfo {
         this.baseDefense = Int32.Parse(stringList[6]);
         this.baseResistence = Int32.Parse(stringList[7]);
         this.baseDexturity = Int32.Parse(stringList[8]);
-        this.baseReach = Int32.Parse(stringList[9]);
-        this.baseRange = Int32.Parse(stringList[10]);
-		this.unitClass = (UnitClass)Enum.Parse(typeof(UnitClass), stringList[11]);
-		this.element = (Element)Enum.Parse(typeof(Element), stringList[12]);
-		this.celestial = (Celestial)Enum.Parse(typeof(Celestial), stringList[13]);
+		this.unitClass = (UnitClass)Enum.Parse(typeof(UnitClass), stringList[9]);
+		this.element = (Element)Enum.Parse(typeof(Element), stringList[10]);
+		this.celestial = (Celestial)Enum.Parse(typeof(Celestial), stringList[11]);
 	}
 }
