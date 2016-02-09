@@ -6,22 +6,26 @@ using System.Linq;
 
 public class Unit : MonoBehaviour {
 
-	// FIXME : public -> private
-	public new string name; // 한글이름
-    public string nameInCode; // 영어이름 
+    GameObject damageTextObject;
+    GameObject recoverTextObject;
+
+	new string name; // 한글이름
+    string nameInCode; // 영어이름 
     
     // 하드코딩된 기본 스킬리스트를 받아옴.
     List<Skill> skillList = new List<Skill>();
     
     // FIXME : temp values
-    public Vector2 initPosition;
+    Vector2 initPosition;
     
     // Base stats. FIXME : 지금은 수동으로 셋팅.
-    public float baseHealth; //체력 
-    public float basePower; //공격력
-    public float baseDefense; //방어력
-    public float baseResistence; //저항력
-    public float baseDexturity; //행동력
+    float baseHealth; //체력 
+    float basePower; //공격력
+    float baseDefense; //방어력
+    float baseResistence; //저항력
+    float baseDexturity; //행동력
+    
+    // FIXME : 삭제 예정...?
     public float baseReach; //거리
     public float baseRange; //범위
     
@@ -34,10 +38,10 @@ public class Unit : MonoBehaviour {
     int reach;
     int range;
     
-    // type. FIXME : 지금은 수동으로 셋팅
-    public UnitClass unitClass;
-    public Element element;
-    public Celestial celestial;
+    // type.
+    UnitClass unitClass;
+    Element element;
+    Celestial celestial;
     
     // Variable values.
 	public Vector2 position;
@@ -347,7 +351,7 @@ public class Unit : MonoBehaviour {
         return actualResistance;
     }
 
-    public void Damaged(UnitClass unitClass, int amount)
+    public IEnumerator Damaged(UnitClass unitClass, int amount)
     {
         int actualDamage = 0;
         // 공격이 물리인지 마법인지 체크
@@ -373,6 +377,13 @@ public class Unit : MonoBehaviour {
         currentHealth -= actualDamage;
         if (currentHealth < 0)
             currentHealth = 0;
+
+        damageTextObject.SetActive(true);
+        damageTextObject.GetComponent<TextMesh>().text = actualDamage.ToString();
+        
+        // 데미지 표시되는 시간.
+        yield return new WaitForSeconds(1);
+        damageTextObject.SetActive(false);        
     }
 
     public void ApplyDamageOverPhase()
@@ -394,7 +405,7 @@ public class Unit : MonoBehaviour {
         }
     }
 
-    public void RecoverHealth(int amount)
+    public IEnumerator RecoverHealth(int amount)
     {
         // FIXME : 치유량 증가 효과
          
@@ -416,6 +427,13 @@ public class Unit : MonoBehaviour {
         currentHealth += amount;
         if (currentHealth > maxHealth)
             currentHealth = maxHealth;
+
+        recoverTextObject.SetActive(true);
+        recoverTextObject.GetComponent<TextMesh>().text = amount.ToString();
+        
+        // 데미지 표시되는 시간.
+        yield return new WaitForSeconds(1);
+        recoverTextObject.SetActive(false);   
     }
 
 	public void RegenerateActionPoint()
@@ -476,6 +494,14 @@ public class Unit : MonoBehaviour {
         ApplyStats();
         Initialize();
 	}
+    
+    void Awake ()
+    {
+        damageTextObject = transform.Find("DamageText").gameObject;
+        recoverTextObject = transform.Find("RecoverText").gameObject;
+        damageTextObject.SetActive(false);
+        recoverTextObject.SetActive(false);
+    }
 	
 	// Update is called once per frame
 	void Update () {

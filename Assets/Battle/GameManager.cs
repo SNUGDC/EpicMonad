@@ -191,7 +191,7 @@ public class GameManager : MonoBehaviour
         FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
         FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
         
-        Debug.Log(unit.GetComponent<Unit>().name + "'s turn");
+        Debug.Log(unit.GetComponent<Unit>().GetName() + "'s turn");
         selectedUnit = unit;
         moveCount = 0; // 누적 이동 수 
         alreadyMoved = false; // 연속 이동 불가를 위한 변수.  
@@ -244,7 +244,7 @@ public class GameManager : MonoBehaviour
             Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
 
             commandUI.SetActive(true);
-            commandUI.transform.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().name;
+            commandUI.transform.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().GetName();
             CheckStandbyPossible();
             CheckMovePossible();
             CheckSkillPossible();
@@ -568,16 +568,17 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
-                    target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(),
-                                                        (int)((chainCombo * chainDamageFactor) * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()));
-                    Debug.Log("Apply " + (int)(chainCombo * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().name + "\n" + 
+                    yield return StartCoroutine(target.GetComponent<Unit>().
+                                                Damaged(selectedUnitInfo.GetUnitClass(),
+                                                        (int)((chainCombo * chainDamageFactor) * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor())));
+                    Debug.Log("Apply " + (int)(chainCombo * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().GetName() + "\n" + 
                               "ChainCombo : " + chainCombo);
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
-                    target.GetComponent<Unit>().RecoverHealth(
-                                                        (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()));
-                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().name);
+                    yield return StartCoroutine(target.GetComponent<Unit>().
+                                                RecoverHealth((int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor())));
+                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().GetName());
                 }
                 else
                 {
@@ -616,19 +617,20 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
-                    target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(),
-                                                        (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()));
-                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().name);
+                    yield return StartCoroutine(target.GetComponent<Unit>().
+                                                Damaged(selectedUnitInfo.GetUnitClass(),
+                                                        (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor())));
+                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().GetName());
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
-                    target.GetComponent<Unit>().RecoverHealth(
-                                                        (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()));
-                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().name);
+                    yield return StartCoroutine(target.GetComponent<Unit>().
+                                                RecoverHealth((int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor())));
+                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().GetName());
                 }
                 else
                 {
-                    Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
+                    Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().GetName());
                 }
 
                 // FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것. 

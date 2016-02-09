@@ -51,25 +51,6 @@ public class UnitManager : MonoBehaviour {
 			
 			units.Add(unit);
         }
-        
-		// foreach (var unitPrefab in unitPrefabs)
-		// {
-		// 	int x, y;
-		// 	GameObject unit = Instantiate(unitPrefab) as GameObject;
-        //     unit.name = unit.GetComponent<Unit>().GetNameInCode();
-			
-        //     x = (int)unit.GetComponent<Unit>().initPosition.x;
-        //     y = (int)unit.GetComponent<Unit>().initPosition.y;
-			
-		// 	Vector3 respawnPos = new Vector3(tileWidth * (y + x) * 0.5f, tileHeight * (y - x) * 0.5f, (y - x) * 0.1f - 0.01f);
-		// 	unit.transform.position = respawnPos;
-		// 	unit.GetComponent<Unit>().SetPosition(new Vector2(x, y));
-			
-		// 	GameObject tileUnderUnit = FindObjectOfType<TileManager>().GetTile(x, y);
-		// 	tileUnderUnit.GetComponent<Tile>().SetUnitOnTile(unit);
-			
-		// 	units.Add(unit);
-		// }
 		
 		Debug.Log("Generate units complete");
 	}
@@ -83,7 +64,7 @@ public class UnitManager : MonoBehaviour {
 			if (unit.GetComponent<Unit>().GetCurrentActivityPoint() >= standardActionPoint)
 			{
 				readiedUnits.Add(unit);
-				Debug.Log(unit.GetComponent<Unit>().name + " is readied");
+				Debug.Log(unit.GetComponent<Unit>().GetName() + " is readied");
 			}
 		}
         
