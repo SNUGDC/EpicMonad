@@ -568,17 +568,18 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
-                    yield return StartCoroutine(target.GetComponent<Unit>().
-                                                Damaged(selectedUnitInfo.GetUnitClass(),
-                                                        (int)((chainCombo * chainDamageFactor) * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor())));
-                    Debug.Log("Apply " + (int)(chainCombo * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().GetName() + "\n" + 
+                    var damageAmount = (int)((chainCombo * chainDamageFactor) * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                    var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(), damageAmount);
+                    yield return StartCoroutine(damageCoroutine);
+                    Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName() + "\n" + 
                               "ChainCombo : " + chainCombo);
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
-                    yield return StartCoroutine(target.GetComponent<Unit>().
-                                                RecoverHealth((int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor())));
-                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().GetName());
+                    var recoverAmount = (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                    var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
+                    yield return StartCoroutine(recoverHealthCoroutine);
+                    Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
                 }
                 else
                 {
@@ -617,16 +618,17 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
-                    yield return StartCoroutine(target.GetComponent<Unit>().
-                                                Damaged(selectedUnitInfo.GetUnitClass(),
-                                                        (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor())));
-                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " damage to " + target.GetComponent<Unit>().GetName());
+                    var damageAmount = (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                    var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(), damageAmount);
+                    yield return StartCoroutine(damageCoroutine);
+                    Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName());
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
-                    yield return StartCoroutine(target.GetComponent<Unit>().
-                                                RecoverHealth((int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor())));
-                    Debug.Log("Apply " + (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor()) + " heal to " + target.GetComponent<Unit>().GetName());
+                    var recoverAmount = (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                    var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
+                    yield return StartCoroutine(recoverHealthCoroutine);
+                    Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
                 }
                 else
                 {
