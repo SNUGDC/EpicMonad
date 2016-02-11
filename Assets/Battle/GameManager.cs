@@ -95,6 +95,11 @@ public class GameManager : MonoBehaviour
         return levelData.level;
     }
     
+    public int GetPartyLevel()
+    {
+        return partyLevel;
+    }
+    
     public List<ChainInfo> GetChainList()
     {
         return chainList;

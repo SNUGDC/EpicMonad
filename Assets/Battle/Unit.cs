@@ -29,6 +29,38 @@ public class Unit : MonoBehaviour {
     public float baseReach; //거리
     public float baseRange; //범위
     
+    // 계산 관련 값들
+    float healthAcceleration = 0.91f;
+    float healthAccelerationInterval = 0.09f;
+    float healthInitialGrowth = 31.4f;
+    float healthInitialGrowthInterval = 2f;
+    float healthStandardValue = 400f;
+    float healthStandardValueInterval = 25f;
+    float powerAcceleration = 0.14f;
+    float powerAccelerationInterval = 0.025f;
+    float powerInitialGrowth = 4.9f;
+    float powerInitialGrowthInterval = 0.4f;
+    float powerStandardValue = 69f;
+    float powerStandardValueInterval = 4.25f;
+    float defenseAcceleration = 0f;
+    float defenseAccelerationInterval = 0f;
+    float defenseInitialGrowth = 4.4f;
+    float defenseInitialGrowthInterval = 0.75f;
+    float defenseStandardValue = 40f;
+    float defenseStandardValueInterval = 10f;
+    float resistenceAcceleration = 0f;
+    float resistenceAccelerationInterval = 0f;
+    float resistenceInitialGrowth = 4.4f;
+    float resistenceInitialGrowthInterval = 0.75f;
+    float resistenceStandardValue = 40f;
+    float resistenceStandardValueInterval = 10f;
+    float dexturityAcceleration = 0f;
+    float dexturityAccelerationInterval = 0f;
+    float dexturityInitialGrowth = 0.8f;
+    float dexturityInitialGrowthInterval = 0.05f;
+    float dexturityStandardValue = 50f;
+    float dexturityStandardValueInterval = 2.5f;
+    
     // Applied stats.
     int maxHealth;
     int power;
@@ -467,11 +499,33 @@ public class Unit : MonoBehaviour {
 
     void ApplyStats()
     {
-        maxHealth = (int)baseHealth;
-        power = (int)basePower;
-        defense = (int)baseDefense;
-        resistence = (int)baseResistence;
-        dexturity = (int)baseDexturity;
+        float partyLevel = (float)FindObjectOfType<GameManager>().GetPartyLevel();
+        
+        float actualHealthAcceleration = healthAcceleration + (healthAccelerationInterval * baseHealth);
+        float actualHealthInitialGrowth = healthInitialGrowth + (healthInitialGrowthInterval * baseHealth);
+        float actualHealthStandardValue = healthStandardValue + (healthStandardValueInterval * baseHealth);
+        maxHealth = (int)((actualHealthAcceleration * partyLevel * (partyLevel - 1f) / 2f) 
+                           + (actualHealthInitialGrowth * partyLevel) + actualHealthStandardValue);
+        float actualPowerAcceleration = powerAcceleration + (powerAccelerationInterval * basePower);
+        float actualPowerInitialGrowth = powerInitialGrowth + (powerInitialGrowthInterval * basePower);
+        float actualPowerStandardValue = powerStandardValue + (powerStandardValueInterval * basePower);
+        power = (int)((actualPowerAcceleration * partyLevel * (partyLevel - 1f) / 2f) 
+                           + (actualPowerInitialGrowth * partyLevel) + actualPowerStandardValue);
+        float actualDefenseAcceleration = defenseAcceleration + (defenseAccelerationInterval * baseDefense);
+        float actualDefenseInitialGrowth = defenseInitialGrowth + (defenseInitialGrowthInterval * baseDefense);
+        float actualDefenseStandardValue = defenseStandardValue + (defenseStandardValueInterval * baseDefense);
+        defense = (int)((actualDefenseAcceleration * partyLevel * (partyLevel - 1f) / 2f) 
+                           + (actualDefenseInitialGrowth * partyLevel) + actualDefenseStandardValue);
+        float actualResistenceAcceleration = resistenceAcceleration + (resistenceAccelerationInterval * baseResistence);
+        float actualResistenceInitialGrowth = resistenceInitialGrowth + (resistenceInitialGrowthInterval * baseResistence);
+        float actualResistenceStandardValue = resistenceStandardValue + (resistenceStandardValueInterval * baseResistence);
+        resistence = (int)((actualResistenceAcceleration * partyLevel * (partyLevel - 1f) / 2f) 
+                           + (actualResistenceInitialGrowth * partyLevel) + actualResistenceStandardValue);
+        float actualDexturityAcceleration = dexturityAcceleration + (dexturityAccelerationInterval * baseDexturity);
+        float actualDexturityInitialGrowth = dexturityInitialGrowth + (dexturityInitialGrowthInterval * baseDexturity);
+        float actualDexturityStandardValue = dexturityStandardValue + (dexturityStandardValueInterval * baseDexturity);
+        dexturity = (int)((actualDexturityAcceleration * partyLevel * (partyLevel - 1f) / 2f) 
+                           + (actualDexturityInitialGrowth * partyLevel) + actualDexturityStandardValue);
         reach = (int)baseReach;
         range = (int)baseRange;
     }
