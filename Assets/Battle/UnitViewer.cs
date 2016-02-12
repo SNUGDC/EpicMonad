@@ -19,27 +19,27 @@ public class UnitViewer : MonoBehaviour {
     
     // FIXME : 버프/디버프는 아직 미구현.
 
-    public void UpdateUnitViewer(GameObject unit)
+    public void UpdateUnitViewer(GameObject unitObject)
     {
-        Unit unitInfo = unit.GetComponent<Unit>();
-        unitImage.sprite = unit.GetComponent<SpriteRenderer>().sprite;
-        nameText.text = unitInfo.GetName();
-        SetClassImage(unitInfo.GetUnitClass());
-        SetElementImage(unitInfo.GetElement());
-        SetCelestialImage(unitInfo.GetCelestial());
-        UpdateHp(unitInfo);
-        UpdateAp(unitInfo);
+        Unit unit = unitObject.GetComponent<Unit>();
+        unitImage.sprite = unitObject.GetComponent<SpriteRenderer>().sprite;
+        nameText.text = unit.GetName();
+        SetClassImage(unit.GetUnitClass());
+        SetElementImage(unit.GetElement());
+        SetCelestialImage(unit.GetCelestial());
+        UpdateHp(unit);
+        UpdateAp(unit);
     }
 
-    void UpdateHp(Unit unitInfo)
+    void UpdateHp(Unit unit)
     {
-        hpText.text = unitInfo.GetCurrentHealth() + " / " + unitInfo.GetMaxHealth();
-        hpBarImage.transform.localScale = new Vector3(((float)unitInfo.GetCurrentHealth())/((float)unitInfo.GetMaxHealth()), 1, 1);
+        hpText.text = unit.GetCurrentHealth() + " / " + unit.GetMaxHealth();
+        hpBarImage.transform.localScale = new Vector3(((float)unit.GetCurrentHealth())/((float)unit.GetMaxHealth()), 1, 1);
     }
     
-    void UpdateAp(Unit unitInfo)
+    void UpdateAp(Unit unit)
     {
-        apText.text = unitInfo.GetCurrentActivityPoint() + " (+" + unitInfo.GetActualDexturity() + ")";
+        apText.text = unit.GetCurrentActivityPoint() + " (+" + unit.GetActualDexturity() + ")";
     }
 
     void SetClassImage(UnitClass unitClass)

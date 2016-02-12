@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
     bool alreadyMoved;
     Vector2 selectedTilePosition;
     Direction selectedDirection;
-    GameObject selectedUnit;
+    GameObject selectedUnitObject;
     List<GameObject> readiedUnits = new List<GameObject>();
 
     List<ChainInfo> chainList = new List<ChainInfo>();
@@ -136,7 +136,7 @@ public class GameManager : MonoBehaviour
         tileViewerUI.SetActive(false);
         selectDirectionUI.SetActive(false);
        
-        selectedUnit = null;
+        selectedUnitObject = null;
 
         currentPhase = 1;
 
@@ -162,7 +162,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject GetSelectedUnit()
     {
-        return selectedUnit;
+        return selectedUnitObject;
     }
 
     void InitCameraPosition(Vector2 initTilePosition)
@@ -183,7 +183,7 @@ public class GameManager : MonoBehaviour
                 FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
                 
                 yield return StartCoroutine(ActionAtTurn(readiedUnits[0]));
-                selectedUnit = null;
+                selectedUnitObject = null;
 
                 readiedUnits = unitManager.GetUpdatedReadiedUnits();
                 yield return null;
@@ -200,18 +200,20 @@ public class GameManager : MonoBehaviour
         FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
         
         Debug.Log(unit.GetComponent<Unit>().GetName() + "'s turn");
-        selectedUnit = unit;
+        selectedUnitObject = unit;
         moveCount = 0; // 누적 이동 수 
         alreadyMoved = false; // 연속 이동 불가를 위한 변수.  
-        ChainList.RemoveChainsFromUnit(selectedUnit); // 턴이 돌아오면 자신이 건 체인 삭제.     
+        ChainList.RemoveChainsFromUnit(selectedUnitObject); // 턴이 돌아오면 자신이 건 체인 삭제.     
         currentState = CurrentState.FocusToUnit;
+        
         selectedUnitViewerUI.SetActive(true);
-        selectedUnitViewerUI.GetComponent<SelectedUnitViewer>().UpdateUnitViewer(selectedUnit);
-        selectedUnit.GetComponent<Unit>().SetActive();
+        selectedUnitViewerUI.GetComponent<SelectedUnitViewer>().UpdateUnitViewer(selectedUnitObject);
+        selectedUnitObject.GetComponent<Unit>().SetActive();
+        
         yield return StartCoroutine(FocusToUnit());
 
         selectedUnitViewerUI.SetActive(false);
-        selectedUnit.GetComponent<Unit>().SetInactive();
+        selectedUnitObject.GetComponent<Unit>().SetInactive();
     }
 
     void CheckStandbyPossible()
@@ -220,8 +222,8 @@ public class GameManager : MonoBehaviour
 
         foreach (var unit in unitManager.GetAllUnits())
         {
-            if ((unit != selectedUnit) &&
-            (unit.GetComponent<Unit>().GetCurrentActivityPoint() > selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint()))
+            if ((unit != selectedUnitObject) &&
+            (unit.GetComponent<Unit>().GetCurrentActivityPoint() > selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint()))
             {
                 isPossible = true;
             }
@@ -234,8 +236,8 @@ public class GameManager : MonoBehaviour
     {
         bool isPossible = false;
 
-        isPossible = !(selectedUnit.GetComponent<Unit>().IsSilenced() ||
-                     selectedUnit.GetComponent<Unit>().IsFainted());
+        isPossible = !(selectedUnitObject.GetComponent<Unit>().IsSilenced() ||
+                     selectedUnitObject.GetComponent<Unit>().IsFainted());
 
         GameObject.Find("SkillButton").GetComponent<Button>().interactable = isPossible;   
     }
@@ -244,8 +246,8 @@ public class GameManager : MonoBehaviour
     {
         bool isPossible = false;
 
-        isPossible = !(selectedUnit.GetComponent<Unit>().IsBound() ||
-                     selectedUnit.GetComponent<Unit>().IsFainted() ||
+        isPossible = !(selectedUnitObject.GetComponent<Unit>().IsBound() ||
+                     selectedUnitObject.GetComponent<Unit>().IsFainted() ||
                      alreadyMoved);
 
         GameObject.Find("MoveButton").GetComponent<Button>().interactable = isPossible;        
@@ -255,10 +257,10 @@ public class GameManager : MonoBehaviour
     {
         while (currentState == CurrentState.FocusToUnit)
         {
-            Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+            Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
 
             commandUI.SetActive(true);
-            commandUI.transform.Find("NameText").GetComponent<Text>().text = selectedUnit.GetComponent<Unit>().GetName();
+            commandUI.transform.Find("NameText").GetComponent<Text>().text = selectedUnitObject.GetComponent<Unit>().GetName();
             CheckStandbyPossible();
             CheckMovePossible();
             CheckSkillPossible();
@@ -328,10 +330,10 @@ public class GameManager : MonoBehaviour
 
     IEnumerator RestAndRecover()
     {
-        int usingActivityPointToRest = (int)(selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() * 0.9f);
-        int recoverHealthDuringRest = (int)(selectedUnit.GetComponent<Unit>().GetMaxHealth() * (usingActivityPointToRest / 100f));
-        selectedUnit.GetComponent<Unit>().UseActionPoint(usingActivityPointToRest);
-        selectedUnit.GetComponent<Unit>().RecoverHealth(recoverHealthDuringRest);
+        int usingActivityPointToRest = (int)(selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() * 0.9f);
+        int recoverHealthDuringRest = (int)(selectedUnitObject.GetComponent<Unit>().GetMaxHealth() * (usingActivityPointToRest / 100f));
+        selectedUnitObject.GetComponent<Unit>().UseActionPoint(usingActivityPointToRest);
+        selectedUnitObject.GetComponent<Unit>().RecoverHealth(recoverHealthDuringRest);
 
         Debug.Log("Rest. Using " + usingActivityPointToRest + "AP and recover " + recoverHealthDuringRest + " HP");
 
@@ -346,7 +348,7 @@ public class GameManager : MonoBehaviour
 
     void UpdateSkillInfo()
     {
-        List<Skill> skillList = selectedUnit.GetComponent<Unit>().GetSkillList();
+        List<Skill> skillList = selectedUnitObject.GetComponent<Unit>().GetSkillList();
         for (int i = 0; i < skillList.Count; i++)
         {
             GameObject skillButton = GameObject.Find((i + 1).ToString() + "SkillButton"); //?? skillUI.transform.Find(i + "SkillButton")
@@ -358,11 +360,11 @@ public class GameManager : MonoBehaviour
 
     void CheckUsableSkill()
     {
-        List<Skill> skillList = selectedUnit.GetComponent<Unit>().GetSkillList();
+        List<Skill> skillList = selectedUnitObject.GetComponent<Unit>().GetSkillList();
         for (int i = 0; i < skillList.Count; i++)
         {
             GameObject.Find((i + 1).ToString() + "SkillButton").GetComponent<Button>().interactable = true;
-            if (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() < skillList[i].GetRequireAP())
+            if (selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() < skillList[i].GetRequireAP())
             {
                 GameObject.Find((i + 1).ToString() + "SkillButton").GetComponent<Button>().interactable = false;
             }
@@ -408,10 +410,10 @@ public class GameManager : MonoBehaviour
     {
         while (currentState == CurrentState.SelectSkillApplyPoint)
         {
-            Vector2 selectedUnitPos = selectedUnit.GetComponent<Unit>().GetPosition();
+            Vector2 selectedUnitPos = selectedUnitObject.GetComponent<Unit>().GetPosition();
 
             List<GameObject> activeRange = new List<GameObject>();
-            Skill selectedSkill = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
+            Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
             activeRange = tileManager.GetTilesInRange(selectedSkill.GetFirstRangeForm(),
                                                       selectedUnitPos,
                                                       selectedSkill.GetFirstMinReach(),
@@ -453,12 +455,12 @@ public class GameManager : MonoBehaviour
         bool isPossible = false;
         
         // ap 조건으로 체크.
-        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();        
-        int remainAPAfterChain = selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP;
+        int requireAP = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();        
+        int remainAPAfterChain = selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP;
 
         foreach (var unit in unitManager.GetAllUnits())
         {
-            if ((unit != selectedUnit) &&
+            if ((unit != selectedUnitObject) &&
             (unit.GetComponent<Unit>().GetCurrentActivityPoint() > remainAPAfterChain))
             {
                 isPossible = true;
@@ -466,7 +468,7 @@ public class GameManager : MonoBehaviour
         }
         
         // 스킬 타입으로 체크. 공격스킬만 체인을 걸 수 있음.
-        if (selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetSkillApplyType() 
+        if (selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetSkillApplyType() 
             != SkillApplyType.Damage)
         {
             isPossible = false;
@@ -487,10 +489,10 @@ public class GameManager : MonoBehaviour
             skillCheckUI.SetActive(true);
             CheckChainPossible();
 
-            Skill selectedSkill = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
+            Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
             int requireAP = selectedSkill.GetRequireAP();
             string newAPText = "소모 AP : " + requireAP + "\n" +
-                               "잔여 AP : " + (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP);
+                               "잔여 AP : " + (selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP);
             skillCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
 
             rightClicked = false;
@@ -502,7 +504,7 @@ public class GameManager : MonoBehaviour
                 {
                     rightClicked = false;
 
-                    Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+                    Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
                     skillCheckUI.SetActive(false);
                     currentState = CurrentState.SelectSkillApplyPoint;
                     yield break;
@@ -517,7 +519,7 @@ public class GameManager : MonoBehaviour
                 if (selectedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
                     // 자기 자신을 체인 리스트에 추가.
-                    ChainList.AddChains(selectedUnit, selectedTiles, indexOfSeletedSkillByUser);
+                    ChainList.AddChains(selectedUnitObject, selectedTiles, indexOfSeletedSkillByUser);
                     // 체인 체크, 순서대로 공격.
                     List<ChainInfo> allVaildChainInfo = ChainList.GetAllChainInfoToTargetArea(selectedTiles);
                     int chainCombo = allVaildChainInfo.Count;
@@ -530,7 +532,7 @@ public class GameManager : MonoBehaviour
                         yield return StartCoroutine(ApplySkill(chainInfo.GetUnit(), chainCombo)); 
                     }
                     
-                    Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+                    Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
                     currentState = CurrentState.FocusToUnit;
                     yield return StartCoroutine(FocusToUnit());
                 }
@@ -566,13 +568,13 @@ public class GameManager : MonoBehaviour
     }
 
     // 체인 가능 스킬일 경우의 스킬 시전 코루틴. 공격 유닛을 받고, 유닛으로 체인 정보를 받아오는 방식으로 수정.
-    IEnumerator ApplySkill(GameObject unit, int chainCombo)
+    IEnumerator ApplySkill(GameObject unitObject, int chainCombo)
     {
         // FIXME : 이펙트는 따로 들어가야 할 듯.
 
-        ChainInfo chainInfoOfUnit = chainList.Find(k => k.GetUnit() == unit);
-        Unit selectedUnitInfo = chainInfoOfUnit.GetUnit().GetComponent<Unit>();
-        Skill appliedSkill = selectedUnitInfo.GetSkillList()[chainInfoOfUnit.GetSkillIndex() - 1];
+        ChainInfo chainInfoOfUnit = chainList.Find(k => k.GetUnit() == unitObject);
+        Unit unitInChainInfo = chainInfoOfUnit.GetUnit().GetComponent<Unit>();
+        Skill appliedSkill = unitInChainInfo.GetSkillList()[chainInfoOfUnit.GetSkillIndex() - 1];
         List<GameObject> selectedTiles = chainInfoOfUnit.GetTargetArea();
 
         foreach (var tile in selectedTiles)
@@ -582,15 +584,15 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
-                    var damageAmount = (int)((chainCombo * chainDamageFactor) * selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor());
-                    var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(), damageAmount);
+                    var damageAmount = (int)((chainCombo * chainDamageFactor) * unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                    var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChainInfo.GetUnitClass(), damageAmount);
                     yield return StartCoroutine(damageCoroutine);
                     Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName() + "\n" + 
                               "ChainCombo : " + chainCombo);
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
-                    var recoverAmount = (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                    var recoverAmount = (int)(unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
                     var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
                     yield return StartCoroutine(recoverHealthCoroutine);
                     Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
@@ -605,11 +607,11 @@ public class GameManager : MonoBehaviour
         }
 
         // 자신의 체인 정보 삭제.
-        ChainList.RemoveChainsFromUnit(unit);
+        ChainList.RemoveChainsFromUnit(unitObject);
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
         int requireAP = appliedSkill.GetRequireAP();
-        selectedUnitInfo.UseActionPoint(requireAP);
+        unitInChainInfo.UseActionPoint(requireAP);
         indexOfSeletedSkillByUser = 0; // return to init value.
 
         yield return new WaitForSeconds(1f);
@@ -622,8 +624,8 @@ public class GameManager : MonoBehaviour
     {
         // FIXME : 이펙트는 따로 들어가야 할 듯.
 
-        Unit selectedUnitInfo = selectedUnit.GetComponent<Unit>();
-        Skill appliedSkill = selectedUnitInfo.GetSkillList()[indexOfSeletedSkillByUser - 1];
+        Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
+        Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
         
         foreach (var tile in selectedTiles)
         {
@@ -632,14 +634,14 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
-                    var damageAmount = (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor());
-                    var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnitInfo.GetUnitClass(), damageAmount);
+                    var damageAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
+                    var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount);
                     yield return StartCoroutine(damageCoroutine);
                     Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName());
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
-                    var recoverAmount = (int)(selectedUnitInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                    var recoverAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
                     var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
                     yield return StartCoroutine(recoverHealthCoroutine);
                     Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
@@ -656,12 +658,12 @@ public class GameManager : MonoBehaviour
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
         int requireAP = appliedSkill.GetRequireAP();
-        selectedUnitInfo.UseActionPoint(requireAP);
+        selectedUnit.UseActionPoint(requireAP);
         indexOfSeletedSkillByUser = 0; // return to init value.
 
         yield return new WaitForSeconds(1f);
 
-        Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+        Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
         currentState = CurrentState.FocusToUnit;
         alreadyMoved = false;
         yield return StartCoroutine(FocusToUnit());
@@ -673,14 +675,14 @@ public class GameManager : MonoBehaviour
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
         
         // 스킬 시전에 필요한 ap만큼 선 차감. 
-        int requireAP = selectedUnit.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
-        selectedUnit.GetComponent<Unit>().UseActionPoint(requireAP);
+        int requireAP = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
+        selectedUnitObject.GetComponent<Unit>().UseActionPoint(requireAP);
         // 체인 목록에 추가. 
-        ChainList.AddChains(selectedUnit, selectedTiles, indexOfSeletedSkillByUser);
+        ChainList.AddChains(selectedUnitObject, selectedTiles, indexOfSeletedSkillByUser);
         indexOfSeletedSkillByUser = 0; // return to init value.
         yield return new WaitForSeconds(0.5f);
 
-        Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+        Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
         currentState = CurrentState.Standby;
         alreadyMoved = false;
         yield return StartCoroutine(Standby()); // 이후 대기.
@@ -695,7 +697,7 @@ public class GameManager : MonoBehaviour
     {
         while (currentState == CurrentState.SelectMovingPoint)
         {
-            List<GameObject> nearbyTiles = CheckMovableTiles(selectedUnit);
+            List<GameObject> nearbyTiles = CheckMovableTiles(selectedUnitObject);
             tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.blue);
 
             rightClicked = false;
@@ -722,7 +724,7 @@ public class GameManager : MonoBehaviour
 
             // FIXME : 어딘가로 옮겨야 할 텐데...        
             GameObject destTile = tileManager.GetTile(selectedTilePosition);
-            Vector2 currentTilePos = selectedUnit.GetComponent<Unit>().GetPosition();
+            Vector2 currentTilePos = selectedUnitObject.GetComponent<Unit>().GetPosition();
             Vector2 distanceVector = selectedTilePosition - currentTilePos;
             int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
             int totalUseActionPoint = 0;
@@ -754,7 +756,7 @@ public class GameManager : MonoBehaviour
             selectDirectionUI.SetActive(true);
             destCheckUI.SetActive(true);
             string newAPText = "소모 AP : " + totalUseActionPoint + "\n" +
-                               "잔여 AP : " + (selectedUnit.GetComponent<Unit>().GetCurrentActivityPoint() - totalUseActionPoint);
+                               "잔여 AP : " + (selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - totalUseActionPoint);
             destCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
 
             // 카메라를 옮기고
@@ -775,7 +777,7 @@ public class GameManager : MonoBehaviour
                 {
                     rightClicked = false;
                     moveCount -= distance;
-                    Camera.main.transform.position = new Vector3(selectedUnit.transform.position.x, selectedUnit.transform.position.y, -10);
+                    Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
                     tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.blue);
                     selectDirectionUI.SetActive(false);
                     destCheckUI.SetActive(false);
@@ -909,14 +911,14 @@ public class GameManager : MonoBehaviour
 
     IEnumerator MoveToTile(GameObject destTile, Direction directionAtDest, int totalUseActionPoint)
     {
-        GameObject currentTile = tileManager.GetTile(selectedUnit.GetComponent<Unit>().GetPosition());
+        GameObject currentTile = tileManager.GetTile(selectedUnitObject.GetComponent<Unit>().GetPosition());
         currentTile.GetComponent<Tile>().SetUnitOnTile(null);
-        selectedUnit.transform.position = destTile.transform.position + new Vector3(0, 0, -0.01f);
-        selectedUnit.GetComponent<Unit>().SetPosition(destTile.GetComponent<Tile>().GetTilePos());
-        selectedUnit.GetComponent<Unit>().SetDirection(directionAtDest);
-        destTile.GetComponent<Tile>().SetUnitOnTile(selectedUnit);
+        selectedUnitObject.transform.position = destTile.transform.position + new Vector3(0, 0, -0.01f);
+        selectedUnitObject.GetComponent<Unit>().SetPosition(destTile.GetComponent<Tile>().GetTilePos());
+        selectedUnitObject.GetComponent<Unit>().SetDirection(directionAtDest);
+        destTile.GetComponent<Tile>().SetUnitOnTile(selectedUnitObject);
 
-        selectedUnit.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
+        selectedUnitObject.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
 
         currentState = CurrentState.FocusToUnit;
         alreadyMoved = true;
