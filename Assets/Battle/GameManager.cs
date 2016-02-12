@@ -62,7 +62,8 @@ public class GameManager : MonoBehaviour
     int indexOfSeletedSkillByUser = 0;
     bool isWaitingUserInput = false;
 
-    bool rightClicked = false;
+    bool rightClicked = false; // 우클릭 : 취소 
+    bool leftClicked = false; // 좌클릭 : 유닛뷰어 고정
 
     ActionCommand command = ActionCommand.Waiting;
     SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
@@ -391,6 +392,7 @@ public class GameManager : MonoBehaviour
 
                     skillUI.SetActive(false);
                     currentState = CurrentState.FocusToUnit;
+                    isWaitingUserInput = false;
                     yield break;
                 }
                 yield return null;
@@ -433,6 +435,7 @@ public class GameManager : MonoBehaviour
 
                     tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
                     currentState = CurrentState.SelectSkill;
+                    isWaitingUserInput = false;
                     yield break;
                 }
                 yield return null;
@@ -714,6 +717,7 @@ public class GameManager : MonoBehaviour
                     tileManager.ChangeTilesFromSeletedColorToDefaultColor(nearbyTiles);
 
                     currentState = CurrentState.FocusToUnit;
+                    isWaitingUserInput = false;
                     yield break;
                 }
                 yield return null;
@@ -777,11 +781,12 @@ public class GameManager : MonoBehaviour
                 {
                     rightClicked = false;
                     moveCount -= distance;
-                    Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
+                    Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x,selectedUnitObject.transform.position.y, -10);
                     tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.blue);
                     selectDirectionUI.SetActive(false);
                     destCheckUI.SetActive(false);
                     currentState = CurrentState.SelectMovingPoint;
+                    isWaitingUserInput = false;
                     yield break;
                 }
                 yield return null;
@@ -827,8 +832,23 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-            CallbackRightClick(); // 우클릭 취소를 받기 위한 핸들러. 
+            if (leftClicked)
+                leftClicked = false; // 유닛 고정이 되어있을 경우, 고정 해제가 우선으로 된다.
+            else
+                CallbackRightClick(); // 우클릭 취소를 받기 위한 핸들러. 
         }
+        
+        if (Input.GetMouseButtonDown(0))
+        {
+            // 유닛 뷰어가 뜬 상태에서 좌클릭하면, 유닛 뷰어가 고정된다. 단, 유저 인풋을 기다릴 때는 불가능.
+            if ((!isWaitingUserInput) && (unitViewerUI.activeInHierarchy))
+                leftClicked = true;
+        }
+    }
+    
+    public bool IsLeftClicked()
+    {
+        return leftClicked;
     }
 
     public void OnMouseDownHandlerFromTile(Vector2 position)

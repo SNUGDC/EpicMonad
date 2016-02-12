@@ -110,6 +110,8 @@ public class Tile : MonoBehaviour {
         
         if (IsUnitOnTile())
         {
+            if (FindObjectOfType<GameManager>().IsLeftClicked()) return;
+
             FindObjectOfType<GameManager>().GetUnitViewerUI().SetActive(true);
             FindObjectOfType<UnitViewer>().UpdateUnitViewer(unitOnTile);
         }
@@ -121,9 +123,10 @@ public class Tile : MonoBehaviour {
     void OnMouseExit()
     {
         // GetComponent<SpriteRenderer>().color += new Color(0.3f, 0.3f, 0.3f, 0);
-        
-        FindObjectOfType<GameManager>().GetUnitViewerUI().SetActive(false);
         FindObjectOfType<GameManager>().GetTileViewerUI().SetActive(false);
+        
+        if (FindObjectOfType<GameManager>().IsLeftClicked()) return;
+        FindObjectOfType<GameManager>().GetUnitViewerUI().SetActive(false);
     }
 
 	void OnMouseDown()
