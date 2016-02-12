@@ -8,6 +8,7 @@ public class Unit : MonoBehaviour {
 
     GameObject damageTextObject;
     GameObject recoverTextObject;
+    GameObject activeArrowIcon;
 
 	new string name; // 한글이름
     string nameInCode; // 영어이름 
@@ -116,6 +117,16 @@ public class Unit : MonoBehaviour {
         }
 
         return actualPower;
+    }
+    
+    public void SetActive()
+    {
+        activeArrowIcon.SetActive(true);
+    }
+    
+    public void SetInactive()
+    {
+        activeArrowIcon.SetActive(false);
     }
     
     public Vector2 GetInitPosition()
@@ -553,8 +564,10 @@ public class Unit : MonoBehaviour {
     {
         damageTextObject = transform.Find("DamageText").gameObject;
         recoverTextObject = transform.Find("RecoverText").gameObject;
+        activeArrowIcon = transform.Find("ActiveArrowIcon").gameObject;
         damageTextObject.SetActive(false);
         recoverTextObject.SetActive(false);
+        activeArrowIcon.SetActive(false);
     }
 	
 	// Update is called once per frame

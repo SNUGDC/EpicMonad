@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     GameObject skillCheckUI;
     GameObject destCheckUI;
     GameObject unitViewerUI;
+    GameObject selectedUnitViewerUI;
     GameObject tileViewerUI;
     GameObject selectDirectionUI;
 
@@ -115,6 +116,7 @@ public class GameManager : MonoBehaviour
         skillCheckUI = GameObject.Find("SkillCheckPanel");
         destCheckUI = GameObject.Find("DestCheckPanel");
         unitViewerUI = GameObject.Find("UnitViewerPanel");
+        selectedUnitViewerUI = GameObject.Find("SelectedUnitViewerPanel");
         tileViewerUI = GameObject.Find("TileViewerPanel");
         selectDirectionUI = GameObject.Find("SelectDirectionUI");
     }
@@ -130,6 +132,7 @@ public class GameManager : MonoBehaviour
         skillCheckUI.SetActive(false);
         destCheckUI.SetActive(false);
         unitViewerUI.SetActive(false);
+        selectedUnitViewerUI.SetActive(false);
         tileViewerUI.SetActive(false);
         selectDirectionUI.SetActive(false);
        
@@ -202,7 +205,13 @@ public class GameManager : MonoBehaviour
         alreadyMoved = false; // 연속 이동 불가를 위한 변수.  
         ChainList.RemoveChainsFromUnit(selectedUnit); // 턴이 돌아오면 자신이 건 체인 삭제.     
         currentState = CurrentState.FocusToUnit;
+        selectedUnitViewerUI.SetActive(true);
+        selectedUnitViewerUI.GetComponent<SelectedUnitViewer>().UpdateUnitViewer(selectedUnit);
+        selectedUnit.GetComponent<Unit>().SetActive();
         yield return StartCoroutine(FocusToUnit());
+
+        selectedUnitViewerUI.SetActive(false);
+        selectedUnit.GetComponent<Unit>().SetInactive();
     }
 
     void CheckStandbyPossible()
