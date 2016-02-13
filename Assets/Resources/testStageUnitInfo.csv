@@ -1,4 +1,4 @@
-Name,NameInCode,InitPosotionX,InitPositionY,BaseHealth,BasePower,BaseDefense,BaseResistence,BaseDexturity,UnitClass,Element,Celestial
+Name,NameInCode,InitPosotionX,InitPositionY,InitDirection,BaseHealth,BasePower,BaseDefense,BaseResistence,BaseDexturity,UnitClass,Element,Celestial
 ???,temp01,5,3,LeftUp,-3,0,3,3,-1,Melee,Fire,Sun
 민트 디 셀레스트,temp02,9,1,LeftDown,4,-3,3,-1,-4,Magic,Water,Earth
 엘프 궁수 시안,temp03,7,6,LeftUp,0,0,2,-2,3,Melee,Plant,Moon
