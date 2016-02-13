@@ -29,8 +29,8 @@ public class UnitManager : MonoBehaviour {
 
 	void GenerateUnits ()
 	{
-		float tileWidth = 0.7f*200/100;
-		float tileHeight = 0.7f*100/100;
+		float tileWidth = 0.5f*200/100;
+		float tileHeight = 0.5f*100/100;
 		
         List<UnitInfo> unitInfoList = Parser.GetParsedUnitInfo();
         
