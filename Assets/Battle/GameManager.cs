@@ -487,7 +487,7 @@ public class GameManager : MonoBehaviour
             GameObject selectedTile = tileManager.GetTile(selectedTilePosition);
             Camera.main.transform.position = new Vector3(selectedTile.transform.position.x, selectedTile.transform.position.y, -10);
 
-            List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, 0, true);
+            List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, 1, true);
             tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
             skillCheckUI.SetActive(true);
             CheckChainPossible();
