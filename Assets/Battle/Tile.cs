@@ -8,6 +8,22 @@ public class Tile : MonoBehaviour {
     public Element element;
 	Vector2 position;
 	GameObject unitOnTile = null;
+    
+    class TileColor
+    {
+        public SpriteRenderer sprite;
+        public Color originalColor;
+        public bool isHighlight;
+        
+        public TileColor(GameObject tile)
+        {
+            sprite = tile.GetComponent<SpriteRenderer>();
+            originalColor = Color.white;
+            isHighlight = false;
+        }
+    }
+    
+    TileColor tileColor;
 
     bool isPreSeleted = false;
 	
@@ -67,6 +83,11 @@ public class Tile : MonoBehaviour {
 	{
 		unitOnTile = unit;
 	}
+    
+    public void SetTileColor(Color color)
+    {
+        tileColor.originalColor = color;
+    }
 	
 	public GameObject GetUnitOnTile ()
 	{
@@ -106,7 +127,7 @@ public class Tile : MonoBehaviour {
 
     void OnMouseEnter()
     {
-        // GetComponent<SpriteRenderer>().color -= new Color(0.3f, 0.3f, 0.3f, 0);
+        tileColor.isHighlight = true;
         
         if (IsUnitOnTile())
         {
@@ -122,7 +143,8 @@ public class Tile : MonoBehaviour {
     
     void OnMouseExit()
     {
-        // GetComponent<SpriteRenderer>().color += new Color(0.3f, 0.3f, 0.3f, 0);
+        tileColor.isHighlight = false;
+        
         FindObjectOfType<GameManager>().GetTileViewerUI().SetActive(false);
         
         if (FindObjectOfType<GameManager>().IsLeftClicked()) return;
@@ -138,6 +160,11 @@ public class Tile : MonoBehaviour {
 		}
 	}
 
+    void Awake ()
+    {
+        tileColor = new TileColor(gameObject);
+    }
+
 	// Use this for initialization
 	void Start () {
 
@@ -145,6 +172,9 @@ public class Tile : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+        if (tileColor.isHighlight)
+            tileColor.sprite.color = tileColor.originalColor - new Color(0.3f, 0.3f, 0.3f, 0);
+        else
+            tileColor.sprite.color = tileColor.originalColor;
 	}
 }

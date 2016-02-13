@@ -73,9 +73,11 @@ public class TileManager : MonoBehaviour {
         foreach(var tile in tiles)
         {
             if (color == TileColor.red)
-                tile.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f, 1);
+                tile.GetComponent<Tile>().SetTileColor(new Color(1, 0.5f, 0.5f, 1));
+                // tile.GetComponent<SpriteRenderer>().color = new Color(1, 0.5f, 0.5f, 1);
             else if (color == TileColor.blue)
-                tile.GetComponent<SpriteRenderer>().color = new Color(0.6f, 0.6f, 1, 1);
+                tile.GetComponent<Tile>().SetTileColor(new Color(0.6f, 0.6f, 1, 1));
+                // tile.GetComponent<SpriteRenderer>().color = new Color(0.6f, 0.6f, 1, 1);
             tile.GetComponent<Tile>().SetPreSelected(true);
         }
     }
@@ -84,7 +86,8 @@ public class TileManager : MonoBehaviour {
     {
         foreach(var tile in tiles)
         {
-            tile.GetComponent<SpriteRenderer>().color = Color.white;
+            tile.GetComponent<Tile>().SetTileColor(Color.white);
+            // tile.GetComponent<SpriteRenderer>().color = Color.white;
             tile.GetComponent<Tile>().SetPreSelected(false);
         }
     }
