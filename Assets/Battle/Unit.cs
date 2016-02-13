@@ -84,6 +84,21 @@ public class Unit : MonoBehaviour {
 
     List<Buff> buffList;
     List<Debuff> debuffList;
+    
+    Sprite spriteLeftUp;
+    Sprite spriteLeftDown;
+    Sprite spriteRightUp;
+    Sprite spriteRightDown;
+
+    public Sprite GetCurrentSprite()
+    {
+        return GetComponent<SpriteRenderer>().sprite;
+    }
+    
+    public Sprite GetDefaultSprite()
+    {
+        return spriteLeftDown;
+    }
 
     // FIXME : 임시로 공격력만 외부에서 참조.
     public int GetActualPower()
@@ -249,6 +264,7 @@ public class Unit : MonoBehaviour {
     public void SetDirection(Direction direction)
     {
         this.direction = direction;
+        UpdateSpriteByDirection();
     }
     
     public Direction GetDirection()
@@ -490,6 +506,18 @@ public class Unit : MonoBehaviour {
 		activityPoint -= amount;
 		Debug.Log(name + " use " + amount + "AP. Current AP : " + activityPoint);
 	}
+    
+    public void UpdateSpriteByDirection()
+    {
+        if (direction == Direction.LeftUp)
+            GetComponent<SpriteRenderer>().sprite = spriteLeftUp;
+        if (direction == Direction.LeftDown)
+            GetComponent<SpriteRenderer>().sprite = spriteLeftDown;
+        if (direction == Direction.RightUp)
+            GetComponent<SpriteRenderer>().sprite = spriteRightUp;
+        if (direction == Direction.RightDown)
+            GetComponent<SpriteRenderer>().sprite = spriteRightDown;
+    }
 
     public void ApplyUnitInfo (UnitInfo unitInfo)
     {
@@ -543,7 +571,6 @@ public class Unit : MonoBehaviour {
 
     void Initialize()
     {
-        GetComponent<SpriteRenderer>().sprite = Resources.Load("UnitImage/" + nameInCode, typeof(Sprite)) as Sprite;
         gameObject.name = nameInCode;
         
         position = initPosition;
@@ -554,9 +581,19 @@ public class Unit : MonoBehaviour {
         debuffList = new List<Debuff>();
     }
 
+    void LoadSprite()
+    {
+        spriteLeftUp = Resources.Load("UnitImage/" + nameInCode + "_LeftUp", typeof(Sprite)) as Sprite;
+        spriteLeftDown = Resources.Load("UnitImage/" + nameInCode + "_LeftDown", typeof(Sprite)) as Sprite;
+        spriteRightUp = Resources.Load("UnitImage/" + nameInCode + "_RightUp", typeof(Sprite)) as Sprite;
+        spriteRightDown = Resources.Load("UnitImage/" + nameInCode + "_RightDown", typeof(Sprite)) as Sprite;
+        GetComponent<SpriteRenderer>().sprite = spriteLeftUp; // FIXME : 초기 방향에 따라 스프라이트 지정되도록 기능 추가.
+    }
+
 	// Use this for initialization
 	void Start () {
         ApplyStats();
+        LoadSprite();
         Initialize();
 	}
     

@@ -22,7 +22,7 @@ public class SelectedUnitViewer : MonoBehaviour {
     public void UpdateUnitViewer(GameObject unitObject)
     {
         Unit unit = unitObject.GetComponent<Unit>();
-        unitImage.sprite = unitObject.GetComponent<SpriteRenderer>().sprite;
+        unitImage.sprite = unit.GetDefaultSprite();
         nameText.text = unit.GetName();
         SetClassImage(unit.GetUnitClass());
         SetElementImage(unit.GetElement());
