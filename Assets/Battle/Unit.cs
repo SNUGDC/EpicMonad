@@ -25,11 +25,7 @@ public class Unit : MonoBehaviour {
     float baseDefense; //방어력
     float baseResistence; //저항력
     float baseDexturity; //행동력
-    
-    // FIXME : 삭제 예정...?
-    public float baseReach; //거리
-    public float baseRange; //범위
-    
+        
     // 계산 관련 값들
     float healthAcceleration = 0.91f;
     float healthAccelerationInterval = 0.09f;
@@ -524,14 +520,13 @@ public class Unit : MonoBehaviour {
         this.name = unitInfo.name;
         this.nameInCode = unitInfo.nameInCode;
         this.initPosition = unitInfo.initPosition;
+        this.direction = unitInfo.initDirection;
         this.baseHealth = unitInfo.baseHealth;
         this.basePower = unitInfo.basePower;
         this.baseDefense = unitInfo.baseDefense;
         this.baseResistence = unitInfo.baseResistence;
         this.baseDexturity = unitInfo.baseDexturity;
-        this.baseReach = unitInfo.baseReach;
-        this.baseRange = unitInfo.baseRange;
-		this.unitClass = unitInfo.unitClass;
+ 		this.unitClass = unitInfo.unitClass;
 		this.element = unitInfo.element;
 		this.celestial = unitInfo.celestial;
     }
@@ -565,8 +560,6 @@ public class Unit : MonoBehaviour {
         float actualDexturityStandardValue = dexturityStandardValue + (dexturityStandardValueInterval * baseDexturity);
         dexturity = (int)((actualDexturityAcceleration * partyLevel * (partyLevel - 1f) / 2f) 
                            + (actualDexturityInitialGrowth * partyLevel) + actualDexturityStandardValue);
-        reach = (int)baseReach;
-        range = (int)baseRange;
     }
 
     void Initialize()
@@ -574,6 +567,7 @@ public class Unit : MonoBehaviour {
         gameObject.name = nameInCode;
         
         position = initPosition;
+        UpdateSpriteByDirection();
         currentHealth = maxHealth;
         activityPoint = (int)(dexturity * 1.5f);
         skillList = SkillLoader.MakeSkillList();
