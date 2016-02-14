@@ -700,8 +700,15 @@ public class GameManager : MonoBehaviour
     {
         while (currentState == CurrentState.SelectMovingPoint)
         {
-            List<GameObject> nearbyTiles = CheckMovableTiles(selectedUnitObject);
-            tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.blue);
+            // List<GameObject> movableTiles = CheckMovableTiles(selectedUnitObject);
+            Dictionary<Vector2, TileWithPath> movableTilesWithPath = PathFinder.CalculatePath(selectedUnitObject);
+            List<GameObject> movableTiles = new List<GameObject>();
+            foreach (KeyValuePair<Vector2, TileWithPath> movableTileWithPath in movableTilesWithPath)
+            {
+                movableTiles.Add(movableTileWithPath.Value.tile);
+            }
+            
+            tileManager.ChangeTilesToSeletedColor(movableTiles, TileColor.blue);
 
             rightClicked = false;
 
@@ -714,7 +721,7 @@ public class GameManager : MonoBehaviour
                 {
                     rightClicked = false;
 
-                    tileManager.ChangeTilesFromSeletedColorToDefaultColor(nearbyTiles);
+                    tileManager.ChangeTilesFromSeletedColorToDefaultColor(movableTiles);
 
                     currentState = CurrentState.FocusToUnit;
                     isWaitingUserInput = false;
@@ -728,32 +735,36 @@ public class GameManager : MonoBehaviour
 
             // FIXME : 어딘가로 옮겨야 할 텐데...        
             GameObject destTile = tileManager.GetTile(selectedTilePosition);
+            List<GameObject> destPath = movableTilesWithPath[selectedTilePosition].path;
             Vector2 currentTilePos = selectedUnitObject.GetComponent<Unit>().GetPosition();
             Vector2 distanceVector = selectedTilePosition - currentTilePos;
             int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
-            int totalUseActionPoint = 0;
-            for (int i = 0; i < distance; i++)
-            {
-                totalUseActionPoint += requireActionPoint[i + moveCount];
-            }
+            int totalUseActionPoint = movableTilesWithPath[selectedTilePosition].requireActivityPoint;
+            // int totalUseActionPoint = 0;
+            // for (int i = 0; i < distance; i++)
+            // {
+            //     totalUseActionPoint += requireActionPoint[i + moveCount];
+            // }
 
             moveCount += distance;
 
-            tileManager.ChangeTilesFromSeletedColorToDefaultColor(nearbyTiles);
+            tileManager.ChangeTilesFromSeletedColorToDefaultColor(movableTiles);
             currentState = CurrentState.CheckDestination;
-            yield return StartCoroutine(CheckDestination(nearbyTiles, destTile, totalUseActionPoint, distance));
+            yield return StartCoroutine(CheckDestination(movableTiles, destTile, destPath, totalUseActionPoint, distance));
 
             yield return new WaitForSeconds(0.5f);
         }
         yield return null;
     }
 
-    IEnumerator CheckDestination(List<GameObject> nearbyTiles, GameObject destTile, int totalUseActionPoint, int distance)
+    IEnumerator CheckDestination(List<GameObject> nearbyTiles, GameObject destTile, List<GameObject> destPath, int totalUseActionPoint, int distance)
     {
         while (currentState == CurrentState.CheckDestination)
         {
             // 목표지점만 푸른색으로 표시
-            List<GameObject> destTileList = new List<GameObject>();
+            // List<GameObject> destTileList = new List<GameObject>();
+            // destTileList.Add(destTile);
+            List<GameObject> destTileList = destPath;
             destTileList.Add(destTile);
             tileManager.ChangeTilesToSeletedColor(destTileList, TileColor.blue);
             // UI를 띄우고
