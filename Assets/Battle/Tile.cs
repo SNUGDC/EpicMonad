@@ -42,11 +42,6 @@ public class Tile : MonoBehaviour {
 		return position;
 	}
 
-    public void SetTileImage(TileForm form, Element element)
-    {
-        
-    }
-
     public void SetTileForm(TileForm form)
     {
         string imagePath = "TileImage/" + form.ToString();
@@ -91,10 +86,6 @@ public class Tile : MonoBehaviour {
 	
 	public GameObject GetUnitOnTile ()
 	{
-		// if (unitOnTile == null)
-		// {
-		// 	Debug.Log("(" + position.x + ", " + position.y + ") is empty.");
-		// }
 		return unitOnTile;
 	}
     
@@ -112,11 +103,15 @@ public class Tile : MonoBehaviour {
     {
         if (type == TileForm.flatland)
         {
-            return 3;
+            // USING ONLY TEST
+            return EditInfo.RequireApAtFlatland;
+            // return 3;
         }
         else if (type == TileForm.hill)
         {
-            return 5;
+            // USING ONLY TEST
+            return EditInfo.RequireApAtHill;
+            // return 5;
         }
         else
         {
