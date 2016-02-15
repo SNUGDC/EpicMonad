@@ -34,9 +34,23 @@ public class ChainInfo {
     
     public bool Overlapped(List<GameObject> anotherTargetArea)
     {
-        foreach (var anotherTargetPoint in anotherTargetArea)
+        List<GameObject> anotherTargets = new List<GameObject>();
+        foreach (var anotherTargetTile in anotherTargetArea)
         {
-            if (targetArea.Contains(anotherTargetPoint))
+            if (anotherTargetTile.GetComponent<Tile>().IsUnitOnTile())
+                anotherTargets.Add(anotherTargetTile.GetComponent<Tile>().GetUnitOnTile());
+        }
+        
+        List<GameObject> targets = new List<GameObject>();
+        foreach (var targetTile in targetArea)
+        {
+            if (targetTile.GetComponent<Tile>().IsUnitOnTile())
+                targets.Add(targetTile.GetComponent<Tile>().GetUnitOnTile());
+        }
+
+        foreach (var anotherTarget in anotherTargets)
+        {
+            if (targets.Contains(anotherTarget))
                 return true;
         }
         
