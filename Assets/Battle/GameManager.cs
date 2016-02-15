@@ -615,7 +615,8 @@ public class GameManager : MonoBehaviour
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
         int requireAP = appliedSkill.GetRequireAP();
-        unitInChainInfo.UseActionPoint(requireAP);
+        if (unitInChainInfo.gameObject == selectedUnitObject)
+            unitInChainInfo.UseActionPoint(requireAP); // 즉시시전 대상만 ap를 차감. 나머지는 선차감되었으므로 패스.
         indexOfSeletedSkillByUser = 0; // return to init value.
 
         yield return new WaitForSeconds(1f);
