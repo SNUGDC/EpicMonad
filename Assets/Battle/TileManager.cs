@@ -152,10 +152,14 @@ public class TileManager : MonoBehaviour {
 		Debug.Log("Generate tiles complete");
 	}
 
+    void Awake () {
+        // FIXME : num of tiles is temp constant.
+		GenerateTiles(10, 10);
+    }
+
 	// Use this for initialization
 	void Start () {
-		// FIXME : num of tiles is temp constant.
-		GenerateTiles(10, 10);
+		
 	}
 	
 	// Update is called once per frame
