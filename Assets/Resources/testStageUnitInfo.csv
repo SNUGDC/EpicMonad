@@ -1,8 +1,8 @@
 Name,NameInCode,InitPosotionX,InitPositionY,InitDirection,BaseHealth,BasePower,BaseDefense,BaseResistence,BaseDexturity,UnitClass,Element,Celestial
-???,temp01,5,3,LeftUp,-3,0,3,3,-1,Melee,Fire,Sun
-민트 디 셀레스트,temp02,9,1,LeftDown,4,-3,3,-1,-4,Magic,Water,Earth
-엘프 궁수 시안,temp03,7,6,LeftUp,0,0,2,-2,3,Melee,Plant,Moon
-카야 나르딕,temp04,2,5,RightDown,-2,4,-2,4,2,Melee,Metal,Moon
-소녀,temp05,7,7,RightDown,-3,0,-2,1,3,Magic,Plant,Sun
-초록의 신비술사,temp06,5,8,LeftDown,-2,-4,4,1,2,Magic,Water,Earth
-제국군 마법사,temp07,2,8,RightUp,4,-1,2,0,3,Magic,Plant,Moon
+???,temp01,15,13,LeftUp,-3,0,3,3,-1,Melee,Fire,Sun
+민트 디 셀레스트,temp02,19,11,LeftDown,4,-3,3,-1,-4,Magic,Water,Earth
+엘프 궁수 시안,temp03,17,16,LeftUp,0,0,2,-2,3,Melee,Plant,Moon
+카야 나르딕,temp04,12,15,RightDown,-2,4,-2,4,2,Melee,Metal,Moon
+소녀,temp05,17,17,RightDown,-3,0,-2,1,3,Magic,Plant,Sun
+초록의 신비술사,temp06,15,18,LeftDown,-2,-4,4,1,2,Magic,Water,Earth
+제국군 마법사,temp07,12,18,RightUp,4,-1,2,0,3,Magic,Plant,Moon

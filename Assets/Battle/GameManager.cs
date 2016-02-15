@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour
 
         currentPhase = 1;
 
-        InitCameraPosition(new Vector2(5, 5)); // temp init position;
+        InitCameraPosition(new Vector2(15, 15)); // temp init position;
 
         StartCoroutine(InstantiateTurnManager());
     }

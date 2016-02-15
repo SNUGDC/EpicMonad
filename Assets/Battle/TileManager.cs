@@ -154,7 +154,7 @@ public class TileManager : MonoBehaviour {
 
     void Awake () {
         // FIXME : num of tiles is temp constant.
-		GenerateTiles(10, 10);
+		GenerateTiles(30, 30);
     }
 
 	// Use this for initialization
