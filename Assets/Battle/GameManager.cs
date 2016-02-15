@@ -81,7 +81,6 @@ public class GameManager : MonoBehaviour
 
     // temp values.
     int chainDamageFactor = 1;
-    int[] requireActionPoint = { 4, 10, 18, 28, 40, 54, 70, 88 };
 
     // Load from json.
     int partyLevel;
@@ -89,9 +88,11 @@ public class GameManager : MonoBehaviour
     class LevelData {
         public int level;
     }
+
     int GetLevelInfoFromJson()
     {
-        string jsonString = File.ReadAllText(Application.dataPath + "/Data/PartyInfo.json");
+        TextAsset jsonTextAsset = Resources.Load("Data/PartyInfo") as TextAsset;
+        string jsonString = jsonTextAsset.text;
         LevelData levelData = JsonMapper.ToObject<LevelData>(jsonString);
         
         return levelData.level;
