@@ -9,6 +9,7 @@ public class Unit : MonoBehaviour {
     GameObject damageTextObject;
     GameObject recoverTextObject;
     GameObject activeArrowIcon;
+    GameObject bounsTextObject;
 
 	new string name; // 한글이름
     string nameInCode; // 영어이름 
@@ -596,9 +597,11 @@ public class Unit : MonoBehaviour {
         damageTextObject = transform.Find("DamageText").gameObject;
         recoverTextObject = transform.Find("RecoverText").gameObject;
         activeArrowIcon = transform.Find("ActiveArrowIcon").gameObject;
+        bounsTextObject = transform.Find("BounsText").gameObject;
         damageTextObject.SetActive(false);
         recoverTextObject.SetActive(false);
         activeArrowIcon.SetActive(false);
+        bounsTextObject.SetActive(false);
     }
 	
 	// Update is called once per frame
