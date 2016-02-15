@@ -298,7 +298,7 @@ public class Unit : MonoBehaviour {
     {
         debuffList.Add(debuff);
         // 침묵이나 기절상태가 될 경우 체인 해제.
-        // FIXME : 행동불능 / 넉백 추가할 것. (넉백은 디버프가 아니라서 다른 곳에서 적용할 듯?)
+        // FIXME : 넉백 추가할 것. (넉백은 디버프가 아니라서 다른 곳에서 적용할 듯?)
         if (debuff.GetName() == DebuffType.Faint ||
             debuff.GetName() == DebuffType.Silence)
         {
@@ -407,13 +407,14 @@ public class Unit : MonoBehaviour {
         return actualResistance;
     }
 
-    public IEnumerator Damaged(UnitClass unitClass, int amount)
+    public IEnumerator Damaged(UnitClass unitClass, int amount, bool isDot)
     {
         int actualDamage = 0;
         // 공격이 물리인지 마법인지 체크
         // 방어력 / 저항력 중 맞는 값을 적용
         // 방어 증가/감소 / 저항 증가/감소 적용             // FIXME : 증가분 미적용 
         // 체력 깎임 
+        // 체인 해제
         if (unitClass == UnitClass.Melee)
         {
             // 실제 피해 = 원래 피해 x 200/(200+방어력)
@@ -437,6 +438,9 @@ public class Unit : MonoBehaviour {
         damageTextObject.SetActive(true);
         damageTextObject.GetComponent<TextMesh>().text = actualDamage.ToString();
         
+        if (!isDot) // 도트데미지가 아니면 체인이 해제됨.
+            ChainList.RemoveChainsFromUnit(gameObject);
+        
         // 데미지 표시되는 시간.
         yield return new WaitForSeconds(1);
         damageTextObject.SetActive(false);        
@@ -457,7 +461,7 @@ public class Unit : MonoBehaviour {
             }
             
             // FIXME : 도트데미지는 물뎀인가 마뎀인가? 현재는 트루뎀.
-            Damaged(UnitClass.None, totalAmount);
+            Damaged(UnitClass.None, totalAmount, true);
         }
     }
 

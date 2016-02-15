@@ -589,7 +589,7 @@ public class GameManager : MonoBehaviour
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
                     var damageAmount = (int)((chainCombo * chainDamageFactor) * unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
-                    var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChainInfo.GetUnitClass(), damageAmount);
+                    var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChainInfo.GetUnitClass(), damageAmount, false);
                     yield return StartCoroutine(damageCoroutine);
                     Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName() + "\n" + 
                               "ChainCombo : " + chainCombo);
@@ -640,7 +640,7 @@ public class GameManager : MonoBehaviour
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
                     var damageAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
-                    var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount);
+                    var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
                     yield return StartCoroutine(damageCoroutine);
                     Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName());
                 }
