@@ -192,7 +192,6 @@ public class GameManager : MonoBehaviour
             }
 
             yield return StartCoroutine(EndPhaseOnGameManager());
-            // readiedUnits = unitManager.readiedUnits;
         }
     }
 
@@ -422,7 +421,7 @@ public class GameManager : MonoBehaviour
                                                       selectedSkill.GetFirstMinReach(),
                                                       selectedSkill.GetFirstMaxReach(),
                                                       selectedSkill.GetIncludeMyself());
-            tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.red);
+            tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.Red);
 
             rightClicked = false;
 
@@ -488,8 +487,8 @@ public class GameManager : MonoBehaviour
             GameObject selectedTile = tileManager.GetTile(selectedTilePosition);
             Camera.main.transform.position = new Vector3(selectedTile.transform.position.x, selectedTile.transform.position.y, -10);
 
-            List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.square, selectedTilePosition, 0, 1, true);
-            tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.red);
+            List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.Square, selectedTilePosition, 0, 1, true);
+            tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
             skillCheckUI.SetActive(true);
             CheckChainPossible();
 
@@ -710,7 +709,7 @@ public class GameManager : MonoBehaviour
                 movableTiles.Add(movableTileWithPath.Value.tile);
             }
             
-            tileManager.ChangeTilesToSeletedColor(movableTiles, TileColor.blue);
+            tileManager.ChangeTilesToSeletedColor(movableTiles, TileColor.Blue);
 
             rightClicked = false;
 
@@ -768,7 +767,7 @@ public class GameManager : MonoBehaviour
             // destTileList.Add(destTile);
             List<GameObject> destTileList = destPath;
             destTileList.Add(destTile);
-            tileManager.ChangeTilesToSeletedColor(destTileList, TileColor.blue);
+            tileManager.ChangeTilesToSeletedColor(destTileList, TileColor.Blue);
             // UI를 띄우고
             selectDirectionUI.SetActive(true);
             destCheckUI.SetActive(true);
@@ -795,7 +794,7 @@ public class GameManager : MonoBehaviour
                     rightClicked = false;
                     moveCount -= distance;
                     Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x,selectedUnitObject.transform.position.y, -10);
-                    tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.blue);
+                    tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.Blue);
                     selectDirectionUI.SetActive(false);
                     destCheckUI.SetActive(false);
                     currentState = CurrentState.SelectMovingPoint;

@@ -14,6 +14,8 @@ public class Unit : MonoBehaviour {
 	new string name; // 한글이름
     string nameInCode; // 영어이름 
     
+    Camp camp;
+    
     // 하드코딩된 기본 스킬리스트를 받아옴.
     List<Skill> skillList = new List<Skill>();
     
@@ -257,6 +259,11 @@ public class Unit : MonoBehaviour {
 	{
 		this.name = name;
 	}
+    
+    public Camp GetCamp()
+    {
+        return camp;
+    }
 	
     public void SetDirection(Direction direction)
     {
@@ -524,6 +531,7 @@ public class Unit : MonoBehaviour {
     {
         this.name = unitInfo.name;
         this.nameInCode = unitInfo.nameInCode;
+        this.camp = unitInfo.camp;
         this.initPosition = unitInfo.initPosition;
         this.direction = unitInfo.initDirection;
         this.baseHealth = unitInfo.baseHealth;

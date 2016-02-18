@@ -13,23 +13,23 @@ public class SkillLoader {
         //  SkillApplyType skillApplyType
         List<Skill> skillList = new List<Skill>();
         Skill skill1 = new Skill("암흑 폭발", 40, 0, 1.0f, 
-                                 RangeForm.square, 0, 4, 0, 
+                                 RangeForm.Square, 0, 4, 0, 
                                  false,
                                  SkillApplyType.Damage);
         Skill skill2 = new Skill("태초의 빛", 35, 0, 1.0f, 
-                                 RangeForm.square, 0, 4, 0, 
+                                 RangeForm.Square, 0, 4, 0, 
                                  true,
                                  SkillApplyType.Heal);
         Skill skill3 = new Skill("사념 포박", 100, 0, 1.5f, 
-                                 RangeForm.square, 0, 2, 0, 
+                                 RangeForm.Square, 0, 2, 0, 
                                  false,
                                  SkillApplyType.Damage);
         Skill skill4 = new Skill("마력 보호막", 80, 0, 1.3f, 
-                                 RangeForm.square, 0, 0, 0, 
+                                 RangeForm.Square, 0, 0, 0, 
                                  true,
                                  SkillApplyType.Etc);
         Skill skill5 = new Skill("영혼의 불꽃", 130, 0, 2.0f, 
-                                 RangeForm.square, 0, 3, 0, 
+                                 RangeForm.Square, 0, 3, 0, 
                                  false,
                                  SkillApplyType.Damage);
         skillList.Add(skill1);

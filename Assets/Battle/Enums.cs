@@ -3,16 +3,22 @@ using System.Collections;
 
 namespace Enums {
     
+    public enum Camp
+    {
+        Ally,
+        Enemy
+    }
+    
     public enum TileColor // highlighting selected tile
     {
-        blue,
-        red
+        Blue,
+        Red
     }
     
     public enum TileForm
     {
-        flatland,
-        hill
+        Flatland,
+        Hill
     }
     
     public enum UnitClass
@@ -49,16 +55,16 @@ namespace Enums {
     
     public enum SkillType
     {
-        point,
-        area,
-        route
+        Point,
+        Area,
+        Route
     }
     
     public enum RangeForm
     {
-        square,
-        cross,
-        diagonal
+        Square,
+        Cross,
+        Diagonal
     }
     
     public enum SkillApplyType

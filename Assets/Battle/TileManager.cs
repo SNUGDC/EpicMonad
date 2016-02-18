@@ -43,7 +43,7 @@ public class TileManager : MonoBehaviour {
 
     public List<GameObject> GetTilesInRange(RangeForm form, Vector2 mid, int minReach, int maxReach, bool includeMyself)
     {
-        if (form == RangeForm.square)
+        if (form == RangeForm.Square)
         {
             return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself);
         }
@@ -72,9 +72,9 @@ public class TileManager : MonoBehaviour {
     {
         foreach(var tile in tiles)
         {
-            if (color == TileColor.red)
+            if (color == TileColor.Red)
                 tile.GetComponent<Tile>().SetTileColor(new Color(1, 0.5f, 0.5f, 1));
-            else if (color == TileColor.blue)
+            else if (color == TileColor.Blue)
                 tile.GetComponent<Tile>().SetTileColor(new Color(0.6f, 0.6f, 1, 1));
             tile.GetComponent<Tile>().SetPreSelected(true);
         }
@@ -137,12 +137,12 @@ public class TileManager : MonoBehaviour {
 				tile.GetComponent<Tile>().SetTilePos(i, j);
                 if (Random.Range(0, 3) > 0)
                 {
-                    tile.GetComponent<Tile>().SetTileForm(TileForm.flatland);
+                    tile.GetComponent<Tile>().SetTileForm(TileForm.Flatland);
                     tile.GetComponent<Tile>().SetTileElement(Element.Plant);
                 }
                 else
                 {
-                    tile.GetComponent<Tile>().SetTileForm(TileForm.hill);
+                    tile.GetComponent<Tile>().SetTileForm(TileForm.Hill);
                     tile.GetComponent<Tile>().SetTileElement(Element.None);
                 }
 				tiles.Add(new Vector2(i, j), tile);

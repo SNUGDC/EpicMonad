@@ -91,9 +91,9 @@ public class Tile : MonoBehaviour {
     
     public string GetTileName()
     {
-        if (form == TileForm.flatland)
+        if (form == TileForm.Flatland)
             return "평지";
-        else if (form == TileForm.hill)
+        else if (form == TileForm.Hill)
             return "언덕";
         else
             return "";
@@ -101,13 +101,13 @@ public class Tile : MonoBehaviour {
 
     int GetRequireAPFromTileType(TileForm type)
     {
-        if (type == TileForm.flatland)
+        if (type == TileForm.Flatland)
         {
             // USING ONLY TEST
             return EditInfo.RequireApAtFlatland;
             // return 3;
         }
-        else if (type == TileForm.hill)
+        else if (type == TileForm.Hill)
         {
             // USING ONLY TEST
             return EditInfo.RequireApAtHill;
