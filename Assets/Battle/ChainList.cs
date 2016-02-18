@@ -31,7 +31,7 @@ public class ChainList : MonoBehaviour {
         List<ChainInfo> allChainInfoToTargetArea = new List<ChainInfo>(); 
         foreach (var chainInfo in chainList)
         {
-            if ((unit.GetComponent<Unit>().GetCamp() == chainInfo.GetUnit().GetComponent<Unit>().GetCamp())
+            if ((unit.GetComponent<Unit>().GetSide() == chainInfo.GetUnit().GetComponent<Unit>().GetSide())
                  && (chainInfo.Overlapped(targetArea)))
             {
                 allChainInfoToTargetArea.Add(chainInfo);

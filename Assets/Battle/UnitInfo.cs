@@ -6,7 +6,7 @@ using Enums;
 public class UnitInfo {
 	public string name;
     public string nameInCode;
-    public Camp camp;
+    public Side side;
     public Vector2 initPosition;
     public Direction initDirection;
     public int baseHealth;
@@ -24,7 +24,7 @@ public class UnitInfo {
 
         this.name = stringList[0];
         this.nameInCode = stringList[1];
-        this.camp = (Camp)Enum.Parse(typeof(Camp), stringList[2]);
+        this.side = (Side)Enum.Parse(typeof(Side), stringList[2]);
         this.initPosition = new Vector2(Int32.Parse(stringList[3]), Int32.Parse(stringList[4]));
         this.initDirection = (Direction)Enum.Parse(typeof(Direction), stringList[5]);
         this.baseHealth = Int32.Parse(stringList[6]);

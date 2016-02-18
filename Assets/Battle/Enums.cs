@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Enums {
     
-    public enum Camp
+    public enum Side
     {
         Ally,
         Enemy
