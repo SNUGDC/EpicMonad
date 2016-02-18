@@ -524,7 +524,7 @@ public class GameManager : MonoBehaviour
                     // 자기 자신을 체인 리스트에 추가.
                     ChainList.AddChains(selectedUnitObject, selectedTiles, indexOfSeletedSkillByUser);
                     // 체인 체크, 순서대로 공격.
-                    List<ChainInfo> allVaildChainInfo = ChainList.GetAllChainInfoToTargetArea(selectedTiles);
+                    List<ChainInfo> allVaildChainInfo = ChainList.GetAllChainInfoToTargetArea(selectedUnitObject, selectedTiles);
                     int chainCombo = allVaildChainInfo.Count;
                     currentState = CurrentState.ApplySkill;
                     

@@ -23,15 +23,16 @@ public class ChainList : MonoBehaviour {
         chainList.Remove(deleteChainInfo);
     }
 
-    // 해당 영역에 체인을 대기중인 모든 정보 추출 
-    public static List<ChainInfo> GetAllChainInfoToTargetArea(List<GameObject> targetArea)
+    // 해당 영역에 체인을 대기중인 모든 정보 추출 (같은 진영만)
+    public static List<ChainInfo> GetAllChainInfoToTargetArea(GameObject unit, List<GameObject> targetArea)
     {
         List<ChainInfo> chainList = FindObjectOfType<GameManager>().GetChainList();        
 
         List<ChainInfo> allChainInfoToTargetArea = new List<ChainInfo>(); 
         foreach (var chainInfo in chainList)
         {
-            if (chainInfo.Overlapped(targetArea))
+            if ((unit.GetComponent<Unit>().GetCamp() == chainInfo.GetUnit().GetComponent<Unit>().GetCamp())
+                 && (chainInfo.Overlapped(targetArea)))
             {
                 allChainInfoToTargetArea.Add(chainInfo);
             }
