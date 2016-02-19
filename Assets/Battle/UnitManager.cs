@@ -29,6 +29,7 @@ public class UnitManager : MonoBehaviour {
 
 	void GenerateUnits ()
 	{
+        // TileManager tileManager = GetComponent<TileManager>(); 
 		float tileWidth = 0.5f*200/100;
 		float tileHeight = 0.5f*100/100;
 		
@@ -41,9 +42,11 @@ public class UnitManager : MonoBehaviour {
             unit.GetComponent<Unit>().ApplyUnitInfo(unitInfo);
             
             Vector2 initPosition = unit.GetComponent<Unit>().GetInitPosition();
+            // Vector3 tilePosition = tileManager.GetTilePos(initPosition);
+            // Vector3 respawnPos = tilePosition + new Vector3(0,0,5f);
             Vector3 respawnPos = new Vector3(tileWidth * (initPosition.y + initPosition.x) * 0.5f, 
                                              tileHeight * (initPosition.y - initPosition.x) * 0.5f, 
-                                             (initPosition.y - initPosition.x) * 0.1f - 0.01f);
+                                             (initPosition.y - initPosition.x) * 0.1f - 5f);
 			unit.transform.position = respawnPos;
 			
 			GameObject tileUnderUnit = FindObjectOfType<TileManager>().GetTile((int)initPosition.x, (int)initPosition.y);
