@@ -5,11 +5,17 @@ using Enums;
 
 public class UnitViewer : MonoBehaviour {
 
+    TileManager tileManager;    
+
     Image unitImage;
     Text nameText;
     Image classImage;
     Image elementImage;
+    GameObject elementBuffIcon;
+    GameObject elementDebuffIcon;
     Image celestialImage;
+    GameObject celestialBuffIcon;
+    GameObject celestialDebuffIcon;
     
     Text hpText;
     Image hpBarImage;
@@ -26,9 +32,21 @@ public class UnitViewer : MonoBehaviour {
         nameText.text = unit.GetName();
         SetClassImage(unit.GetUnitClass());
         SetElementImage(unit.GetElement());
+        CheckElementBuff(unit);
         SetCelestialImage(unit.GetCelestial());
         UpdateHp(unit);
         UpdateAp(unit);
+    }
+
+    void CheckElementBuff(Unit unit)
+    {
+        elementBuffIcon.SetActive(false);
+        elementDebuffIcon.SetActive(false);
+        
+        if (unit.GetElement() == tileManager.GetTile(unit.GetPosition()).GetComponent<Tile>().GetTileElement())
+        {
+            elementBuffIcon.SetActive(true);
+        }    
     }
 
     void UpdateHp(Unit unit)
@@ -79,11 +97,23 @@ public class UnitViewer : MonoBehaviour {
     }
     
     void Awake () {
+        tileManager = FindObjectOfType<TileManager>();
+        
         unitImage = transform.Find("UnitImage").GetComponent<Image>();
         nameText = transform.Find("NameText").GetComponent<Text>();
         classImage = transform.Find("ClassImage").GetComponent<Image>();
+        
         elementImage = transform.Find("ElementImage").GetComponent<Image>();
+        elementBuffIcon = transform.Find("ElementImage").Find("BuffImage").gameObject;
+        elementDebuffIcon = transform.Find("ElementImage").Find("DebuffImage").gameObject;
+        elementBuffIcon.SetActive(false);
+        elementDebuffIcon.SetActive(false);
+        
         celestialImage = transform.Find("CelestialImage").GetComponent<Image>();
+        celestialBuffIcon = transform.Find("CelestialImage").Find("BuffImage").gameObject;
+        celestialDebuffIcon = transform.Find("CelestialImage").Find("DebuffImage").gameObject;
+        celestialBuffIcon.SetActive(false);
+        celestialDebuffIcon.SetActive(false);
     
         hpText = transform.Find("HP").transform.Find("HPText").GetComponent<Text>();;
         hpBarImage = transform.Find("HP").transform.Find("HPBarImage").GetComponent<Image>();

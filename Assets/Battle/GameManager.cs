@@ -259,6 +259,8 @@ public class GameManager : MonoBehaviour
         while (currentState == CurrentState.FocusToUnit)
         {
             Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
+            
+            selectedUnitViewerUI.GetComponent<SelectedUnitViewer>().UpdateUnitViewer(selectedUnitObject);
 
             commandUI.SetActive(true);
             commandUI.transform.Find("NameText").GetComponent<Text>().text = selectedUnitObject.GetComponent<Unit>().GetName();

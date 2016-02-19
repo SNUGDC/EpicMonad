@@ -14,7 +14,7 @@ public class Unit : MonoBehaviour {
 	new string name; // 한글이름
     string nameInCode; // 영어이름 
     
-    Side side;
+    Side side; // 진영. 적/아군
     
     // 하드코딩된 기본 스킬리스트를 받아옴.
     List<Skill> skillList = new List<Skill>();
@@ -23,11 +23,11 @@ public class Unit : MonoBehaviour {
     Vector2 initPosition;
     
     // Base stats. FIXME : 지금은 수동으로 셋팅.
-    float baseHealth; //체력 
-    float basePower; //공격력
-    float baseDefense; //방어력
-    float baseResistence; //저항력
-    float baseDexturity; //행동력
+    float baseHealth; // 체력 
+    float basePower; // 공격력
+    float baseDefense; // 방어력
+    float baseResistence; // 저항력
+    float baseDexturity; // 행동력
         
     // 계산 관련 값들
     float healthAcceleration = 0.91f;
