@@ -589,6 +589,14 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
+                    // 데미지 이펙트.
+                    GameObject particle = Instantiate(Resources.Load("Particle/darkball")) as GameObject;
+                    particle.transform.position = unitObject.transform.position + (Vector3.up/2f)/* - new Vector3(0, 0, 0.01f)*/;
+                    yield return new WaitForSeconds(0.2f);
+                    iTween.MoveTo(particle, target.transform.position + (Vector3.up/2f)/* - new Vector3(0, 0, 0.01f)*/, 0.5f);
+                    yield return new WaitForSeconds(0.3f);
+                    Destroy(particle, 0.3f);
+                    
                     var damageAmount = (int)((chainCombo * chainDamageFactor) * unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
                     var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChainInfo.GetUnitClass(), damageAmount, false);
                     yield return StartCoroutine(damageCoroutine);
@@ -597,6 +605,12 @@ public class GameManager : MonoBehaviour
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
+                    // 회복 이펙트.
+                    GameObject particle = Instantiate(Resources.Load("Particle/lightheal")) as GameObject;
+                    particle.transform.position = target.transform.position + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
+                    yield return new WaitForSeconds(0.5f);
+                    Destroy(particle);
+
                     var recoverAmount = (int)(unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
                     var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
                     yield return StartCoroutine(recoverHealthCoroutine);
@@ -620,7 +634,7 @@ public class GameManager : MonoBehaviour
             unitInChainInfo.UseActionPoint(requireAP); // 즉시시전 대상만 ap를 차감. 나머지는 선차감되었으므로 패스.
         indexOfSeletedSkillByUser = 0; // return to init value.
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
         alreadyMoved = false;
     }
@@ -640,6 +654,14 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
+                    // 데미지 이펙트.
+                    GameObject particle = Instantiate(Resources.Load("Particle/darkball")) as GameObject;
+                    particle.transform.position = selectedUnitObject.transform.position + (Vector3.up/2f)/* - new Vector3(0, 0, 0.01f)*/;
+                    yield return new WaitForSeconds(0.2f);
+                    iTween.MoveTo(particle, target.transform.position + (Vector3.up/2f)/* - new Vector3(0, 0, 0.01f)*/, 0.5f);
+                    yield return new WaitForSeconds(0.3f);
+                    Destroy(particle, 0.3f);
+                    
                     var damageAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
                     var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
                     yield return StartCoroutine(damageCoroutine);
@@ -647,6 +669,12 @@ public class GameManager : MonoBehaviour
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
+                    // 회복 이펙트.
+                    GameObject particle = Instantiate(Resources.Load("Particle/lightheal")) as GameObject;
+                    particle.transform.position = target.transform.position + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
+                    yield return new WaitForSeconds(0.5f);
+                    Destroy(particle);
+                    
                     var recoverAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
                     var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
                     yield return StartCoroutine(recoverHealthCoroutine);
@@ -667,7 +695,7 @@ public class GameManager : MonoBehaviour
         selectedUnit.UseActionPoint(requireAP);
         indexOfSeletedSkillByUser = 0; // return to init value.
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
         Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
         currentState = CurrentState.FocusToUnit;
@@ -878,7 +906,7 @@ public class GameManager : MonoBehaviour
     {
         GameObject currentTile = tileManager.GetTile(selectedUnitObject.GetComponent<Unit>().GetPosition());
         currentTile.GetComponent<Tile>().SetUnitOnTile(null);
-        selectedUnitObject.transform.position = destTile.transform.position + new Vector3(0, 0, -0.01f);
+        selectedUnitObject.transform.position = destTile.transform.position + new Vector3(0, 0, -5f);
         selectedUnitObject.GetComponent<Unit>().SetPosition(destTile.GetComponent<Tile>().GetTilePos());
         selectedUnitObject.GetComponent<Unit>().SetDirection(directionAtDest);
         destTile.GetComponent<Tile>().SetUnitOnTile(selectedUnitObject);
