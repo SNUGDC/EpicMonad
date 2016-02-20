@@ -880,10 +880,15 @@ public class GameManager : MonoBehaviour
                 CallbackRightClick(); // 우클릭 취소를 받기 위한 핸들러. 
         }
         
+        if (currentState != CurrentState.FocusToUnit)
+        {
+            leftClicked = false; // 행동을 선택하면 홀드가 자동으로 풀림.
+        }
+        
         if (Input.GetMouseButtonDown(0))
         {
-            // 유닛 뷰어가 뜬 상태에서 좌클릭하면, 유닛 뷰어가 고정된다. 단, 유저 인풋을 기다릴 때는 불가능.
-            if ((!isWaitingUserInput) && (unitViewerUI.activeInHierarchy))
+            // 유닛 뷰어가 뜬 상태에서 좌클릭하면, 유닛 뷰어가 고정된다. 단, 행동 선택 상태(FocusToUnit)에서만 가능.
+            if ((currentState == CurrentState.FocusToUnit) && (unitViewerUI.activeInHierarchy))
                 leftClicked = true;
         }
     }
