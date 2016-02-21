@@ -571,16 +571,80 @@ public class GameManager : MonoBehaviour
         skillCheckUI.SetActive(false);
         skillApplyCommand = SkillApplyCommand.Chain;
     }
+    
+    enum EffectType
+    {
+        Individual,
+        Area
+    }
+
+    IEnumerator ApplySkillEffect(string effectName, GameObject unitObject, List<GameObject> selectedTiles, EffectType effectType)
+    {
+        if (effectType == EffectType.Area)
+        {
+            // 공격 이펙트. 투사체. 범위형.
+            Vector3 startPos = unitObject.transform.position;        
+            Vector3 endPos = new Vector3(0, 0, 0);
+            foreach (var tile in selectedTiles)
+            {
+                endPos += tile.transform.position;
+            }
+            endPos = endPos / (float)selectedTiles.Count;
+            
+            GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+            particle.transform.position = startPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
+            yield return new WaitForSeconds(0.2f);
+            iTween.MoveTo(particle, endPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f) - new Vector3(0, 0, 5f), 0.5f); // 타일 축 -> 유닛 축으로 옮기기 위해 z축으로 5만큼 앞으로 빼준다.
+            yield return new WaitForSeconds(0.3f);
+            Destroy(particle, 0.3f);
+            yield return null;
+        }
+        else if (effectType == EffectType.Individual)
+        {
+            // 회복 이펙트. 대상 효과. 지정형.
+            List<Vector3> targetPosList = new List<Vector3>(); 
+            foreach (var tileObject in selectedTiles)
+            {
+                Tile tile = tileObject.GetComponent<Tile>();
+                if (tile.IsUnitOnTile())
+                {
+                    targetPosList.Add(tile.GetUnitOnTile().transform.position);
+                }
+            }
+
+            foreach (var targetPos in targetPosList)
+            {
+                GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+                particle.transform.position = targetPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
+                Destroy(particle, 0.5f + 0.1f); // 아랫줄에서의 지연시간을 포함한 값이어야 함.   
+            }            
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
 
     // 체인 가능 스킬일 경우의 스킬 시전 코루틴. 공격 유닛을 받고, 유닛으로 체인 정보를 받아오는 방식으로 수정.
     IEnumerator ApplySkill(GameObject unitObject, int chainCombo)
     {
-        // FIXME : 이펙트는 따로 들어가야 할 듯.
-
         ChainInfo chainInfoOfUnit = chainList.Find(k => k.GetUnit() == unitObject);
-        Unit unitInChainInfo = chainInfoOfUnit.GetUnit().GetComponent<Unit>();
+        GameObject unitInChain = chainInfoOfUnit.GetUnit();
+        Unit unitInChainInfo = unitInChain.GetComponent<Unit>();
         Skill appliedSkill = unitInChainInfo.GetSkillList()[chainInfoOfUnit.GetSkillIndex() - 1];
         List<GameObject> selectedTiles = chainInfoOfUnit.GetTargetArea();
+        
+        if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+        {
+            // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
+            yield return StartCoroutine(ApplySkillEffect("darkball", unitInChainInfo.gameObject, selectedTiles, EffectType.Area));
+        }
+        else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+        {
+            // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
+            yield return StartCoroutine(ApplySkillEffect("lightheal", unitInChainInfo.gameObject, selectedTiles, EffectType.Individual));            
+        }
+        else
+        {
+            //
+        }
 
         foreach (var tile in selectedTiles)
         {
@@ -589,14 +653,6 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
-                    // 데미지 이펙트.
-                    GameObject particle = Instantiate(Resources.Load("Particle/darkball")) as GameObject;
-                    particle.transform.position = unitObject.transform.position + (Vector3.up/2f)/* - new Vector3(0, 0, 0.01f)*/;
-                    yield return new WaitForSeconds(0.2f);
-                    iTween.MoveTo(particle, target.transform.position + (Vector3.up/2f)/* - new Vector3(0, 0, 0.01f)*/, 0.5f);
-                    yield return new WaitForSeconds(0.3f);
-                    Destroy(particle, 0.3f);
-                    
                     var damageAmount = (int)((chainCombo * chainDamageFactor) * unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
                     var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChainInfo.GetUnitClass(), damageAmount, false);
                     yield return StartCoroutine(damageCoroutine);
@@ -605,12 +661,6 @@ public class GameManager : MonoBehaviour
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
-                    // 회복 이펙트.
-                    GameObject particle = Instantiate(Resources.Load("Particle/lightheal")) as GameObject;
-                    particle.transform.position = target.transform.position + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
-                    yield return new WaitForSeconds(0.5f);
-                    Destroy(particle);
-
                     var recoverAmount = (int)(unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
                     var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
                     yield return StartCoroutine(recoverHealthCoroutine);
@@ -642,10 +692,23 @@ public class GameManager : MonoBehaviour
     // 체인 불가능 스킬일 경우의 스킬 시전 코루틴. 스킬 적용 범위만 받는다.
     IEnumerator ApplySkill(List<GameObject> selectedTiles)
     {
-        // FIXME : 이펙트는 따로 들어가야 할 듯.
-
         Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
         Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
+        
+        if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+        {
+            // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
+            yield return StartCoroutine(ApplySkillEffect("darkball", selectedUnitObject, selectedTiles, EffectType.Area));
+        }
+        else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+        {
+            // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
+            yield return StartCoroutine(ApplySkillEffect("lightheal", selectedUnitObject, selectedTiles, EffectType.Individual));            
+        }
+        else
+        {
+            //
+        }
         
         foreach (var tile in selectedTiles)
         {
@@ -654,14 +717,6 @@ public class GameManager : MonoBehaviour
             {
                 if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
                 {
-                    // 데미지 이펙트.
-                    GameObject particle = Instantiate(Resources.Load("Particle/darkball")) as GameObject;
-                    particle.transform.position = selectedUnitObject.transform.position + (Vector3.up/2f)/* - new Vector3(0, 0, 0.01f)*/;
-                    yield return new WaitForSeconds(0.2f);
-                    iTween.MoveTo(particle, target.transform.position + (Vector3.up/2f)/* - new Vector3(0, 0, 0.01f)*/, 0.5f);
-                    yield return new WaitForSeconds(0.3f);
-                    Destroy(particle, 0.3f);
-                    
                     var damageAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
                     var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
                     yield return StartCoroutine(damageCoroutine);
@@ -669,12 +724,6 @@ public class GameManager : MonoBehaviour
                 }
                 else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
                 {
-                    // 회복 이펙트.
-                    GameObject particle = Instantiate(Resources.Load("Particle/lightheal")) as GameObject;
-                    particle.transform.position = target.transform.position + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
-                    yield return new WaitForSeconds(0.5f);
-                    Destroy(particle);
-                    
                     var recoverAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
                     var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
                     yield return StartCoroutine(recoverHealthCoroutine);
