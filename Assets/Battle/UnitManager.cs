@@ -6,11 +6,9 @@ public class UnitManager : MonoBehaviour {
 
 	int standardActionPoint;
 
-	// FIXME : unit is only one. - 현재는 해당하는 유닛의 프리펩을 직접 넣어줘야 하지만, 추후 데이터에서 읽어와서 유닛을 띄워야 함. 
-	public GameObject[] unitPrefabs;
-    public GameObject unitPrefab;
-	public List<GameObject> units = new List<GameObject>();
-	public List<GameObject> readiedUnits = new List<GameObject>();
+	public GameObject unitPrefab;
+	List<GameObject> units = new List<GameObject>();
+	List<GameObject> readiedUnits = new List<GameObject>();
 
     public List<GameObject> GetAllUnits()
     {
