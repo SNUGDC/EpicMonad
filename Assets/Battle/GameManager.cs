@@ -646,15 +646,18 @@ public class GameManager : MonoBehaviour
         Skill appliedSkill = unitInChainInfo.GetSkillList()[chainInfoOfUnit.GetSkillIndex() - 1];
         List<GameObject> selectedTiles = chainInfoOfUnit.GetTargetArea();
         
+        // 자신의 체인 정보 삭제.
+        ChainList.RemoveChainsFromUnit(unitObject);
+        
         if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
         {
             // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("darkball", unitInChainInfo.gameObject, selectedTiles, EffectType.Area));
+            yield return StartCoroutine(ApplySkillEffect("darkBall", unitInChainInfo.gameObject, selectedTiles, EffectType.Area));
         }
         else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
         {
             // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("lightheal", unitInChainInfo.gameObject, selectedTiles, EffectType.Individual));            
+            yield return StartCoroutine(ApplySkillEffect("lightHeal", unitInChainInfo.gameObject, selectedTiles, EffectType.Individual));            
         }
         else
         {
@@ -714,8 +717,6 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // 자신의 체인 정보 삭제.
-        ChainList.RemoveChainsFromUnit(unitObject);
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
         int requireAP = appliedSkill.GetRequireAP();
@@ -737,12 +738,12 @@ public class GameManager : MonoBehaviour
         if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
         {
             // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("darkball", selectedUnitObject, selectedTiles, EffectType.Area));
+            yield return StartCoroutine(ApplySkillEffect("darkBall", selectedUnitObject, selectedTiles, EffectType.Area));
         }
         else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
         {
             // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("lightheal", selectedUnitObject, selectedTiles, EffectType.Individual));            
+            yield return StartCoroutine(ApplySkillEffect("lightHeal", selectedUnitObject, selectedTiles, EffectType.Individual));            
         }
         else
         {

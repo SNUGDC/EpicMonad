@@ -128,7 +128,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (3)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &5290454 stripped
@@ -194,8 +195,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -216,7 +217,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 57546705}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -264,7 +265,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (5)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &65329197 stripped
@@ -314,7 +316,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (23)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &150178154 stripped
@@ -364,7 +367,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (7)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &159179466 stripped
@@ -414,7 +418,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (2)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &347194346 stripped
@@ -464,7 +469,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (1)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &442801342 stripped
@@ -514,7 +520,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (12)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &593322028 stripped
@@ -564,7 +571,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (9)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &730524395 stripped
@@ -614,7 +622,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (16)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &988648093 stripped
@@ -664,7 +673,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (15)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1010574301 stripped
@@ -710,7 +720,8 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1071911526 stripped
@@ -760,7 +771,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (18)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1160787008 stripped
@@ -810,7 +822,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (19)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1180172797 stripped
@@ -860,7 +873,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (17)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1266208220 stripped
@@ -910,7 +924,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (10)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1295353627 stripped
@@ -960,7 +975,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (22)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1314498143 stripped
@@ -1004,15 +1020,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 22440280, guid: fa2ee4f44b516443d8f2b2288c1f8e3b, type: 2}
       propertyPath: m_RootOrder
-      value: 26
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 22440280, guid: fa2ee4f44b516443d8f2b2288c1f8e3b, type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22440280, guid: fa2ee4f44b516443d8f2b2288c1f8e3b, type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0.75
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22440280, guid: fa2ee4f44b516443d8f2b2288c1f8e3b, type: 2}
       propertyPath: m_SizeDelta.x
@@ -1108,7 +1124,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (20)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1391751691 stripped
@@ -1137,7 +1154,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1471357355}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.75, z: 0.3}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1071911526}
@@ -1166,7 +1183,7 @@ Transform:
   - {fileID: 150178154}
   - {fileID: 1882724385}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
 --- !u!1001 &1648205685
 Prefab:
   m_ObjectHideFlags: 0
@@ -1210,7 +1227,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (21)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1648205686 stripped
@@ -1260,7 +1278,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (8)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1662950281 stripped
@@ -1310,7 +1329,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (6)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1754315180 stripped
@@ -1360,7 +1380,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (4)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1835010100 stripped
@@ -1410,7 +1431,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (24)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1882724385 stripped
@@ -1460,7 +1482,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (13)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1970431340 stripped
@@ -1510,7 +1533,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (14)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &2020174249 stripped
@@ -1560,7 +1584,8 @@ Prefab:
       propertyPath: m_Name
       value: tile (11)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11429016, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &2116191584 stripped

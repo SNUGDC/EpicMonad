@@ -85,6 +85,8 @@ public class Unit : MonoBehaviour {
     List<Buff> buffList;
     List<Debuff> debuffList;
     
+    GameObject chargeEffect;
+    
     Sprite spriteLeftUp;
     Sprite spriteLeftDown;
     Sprite spriteRightUp;
@@ -98,6 +100,18 @@ public class Unit : MonoBehaviour {
     public Sprite GetDefaultSprite()
     {
         return spriteLeftDown;
+    }
+    
+    public void SetChargeEffect(GameObject effect)
+    {
+        if (chargeEffect != null) RemoveChargeEffect();
+        chargeEffect = effect;
+        effect.transform.position = gameObject.transform.position + new Vector3(0, 0.5f, 0) - new Vector3(0, 0, 0.01f);
+    }
+    
+    public void RemoveChargeEffect()
+    {
+        Destroy(chargeEffect);
     }
 
     // FIXME : 임시로 공격력만 외부에서 참조.

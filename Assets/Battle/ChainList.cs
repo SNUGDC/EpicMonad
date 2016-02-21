@@ -12,6 +12,14 @@ public class ChainList : MonoBehaviour {
         
         ChainInfo newChainInfo = new ChainInfo(unit, targetArea, skillIndex);
         chainList.Add(newChainInfo);
+        
+        SetChargeEffectToUnit(unit, "darkCharge");
+    }
+    
+    static void SetChargeEffectToUnit(GameObject unit, string effectName)
+    {
+        GameObject effect = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+        unit.GetComponent<Unit>().SetChargeEffect(effect);
     }
     
     // 자신이 건 체인 삭제.
@@ -21,6 +29,13 @@ public class ChainList : MonoBehaviour {
         
         ChainInfo deleteChainInfo = chainList.Find(x => x.GetUnit() == unit);
         chainList.Remove(deleteChainInfo);
+        
+        RemoveChargeEffectToUnit(unit);
+    }
+    
+    static void RemoveChargeEffectToUnit(GameObject unit)
+    {
+        unit.GetComponent<Unit>().RemoveChargeEffect();
     }
 
     // 해당 영역에 체인을 대기중인 모든 정보 추출 (같은 진영만)
