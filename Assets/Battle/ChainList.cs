@@ -31,13 +31,15 @@ public class ChainList : MonoBehaviour {
         List<ChainInfo> allChainInfoToTargetArea = new List<ChainInfo>(); 
         foreach (var chainInfo in chainList)
         {
-            if ((unit.GetComponent<Unit>().GetSide() == chainInfo.GetUnit().GetComponent<Unit>().GetSide())
-                 && (chainInfo.Overlapped(targetArea)))
+            // 공격범위 안의 유닛이 서로 겹치거나, 체인을 건 본인일 경우 추가.
+            if (((unit.GetComponent<Unit>().GetSide() == chainInfo.GetUnit().GetComponent<Unit>().GetSide())
+                 && (chainInfo.Overlapped(targetArea))) 
+                 || (chainInfo.GetUnit() == unit))
             {
                 allChainInfoToTargetArea.Add(chainInfo);
             }
         }
-
+        
         return allChainInfoToTargetArea;
     }
     

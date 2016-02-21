@@ -596,7 +596,7 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
             iTween.MoveTo(particle, endPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f) - new Vector3(0, 0, 5f), 0.5f); // 타일 축 -> 유닛 축으로 옮기기 위해 z축으로 5만큼 앞으로 빼준다.
             yield return new WaitForSeconds(0.3f);
-            Destroy(particle, 0.3f);
+            Destroy(particle, 0.5f);
             yield return null;
         }
         else if (effectType == EffectType.Individual)
@@ -616,8 +616,22 @@ public class GameManager : MonoBehaviour
             {
                 GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
                 particle.transform.position = targetPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
-                Destroy(particle, 0.5f + 0.1f); // 아랫줄에서의 지연시간을 포함한 값이어야 함.   
-            }            
+                Destroy(particle, 0.5f + 0.1f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.   
+            }
+            if (targetPosList.Count == 0) // 대상이 없을 경우. 일단 가운데 이펙트를 띄운다.
+            {
+                Vector3 midPos = new Vector3(0, 0, 0);
+                foreach (var tile in selectedTiles)
+                {
+                    midPos += tile.transform.position;
+                }
+                midPos = midPos / (float)selectedTiles.Count;
+                
+                GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+                particle.transform.position = midPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
+                Destroy(particle, 0.5f + 0.1f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.
+            }
+                        
             yield return new WaitForSeconds(0.5f);
         }
     }
@@ -646,32 +660,56 @@ public class GameManager : MonoBehaviour
             //
         }
 
-        foreach (var tile in selectedTiles)
+        List<GameObject> targets = new List<GameObject>();
+
+        foreach (var tileObject in selectedTiles)
         {
-            GameObject target = tile.GetComponent<Tile>().GetUnitOnTile();
-            if (target != null)
+            Tile tile = tileObject.GetComponent<Tile>();
+            if (tile.IsUnitOnTile())
             {
-                if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+                targets.Add(tile.GetUnitOnTile());
+            }
+        }
+
+        foreach (var target in targets)
+        {
+            if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+            {
+                var damageAmount = (int)((chainCombo * chainDamageFactor) * unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChainInfo.GetUnitClass(), damageAmount, false);
+                
+                if (target == targets[targets.Count-1])
                 {
-                    var damageAmount = (int)((chainCombo * chainDamageFactor) * unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
-                    var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChainInfo.GetUnitClass(), damageAmount, false);
-                    yield return StartCoroutine(damageCoroutine);
-                    Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName() + "\n" + 
-                              "ChainCombo : " + chainCombo);
-                }
-                else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
-                {
-                    var recoverAmount = (int)(unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
-                    var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
-                    yield return StartCoroutine(recoverHealthCoroutine);
-                    Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
+                    yield return StartCoroutine(damageCoroutine);    
                 }
                 else
                 {
-                    Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
+                    StartCoroutine(damageCoroutine);
+                }
+                Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName() + "\n" + 
+                            "ChainCombo : " + chainCombo);
+            }
+            else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+            {
+                var recoverAmount = (int)(unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
+
+                if (target == targets[targets.Count-1])
+                {
+                    yield return StartCoroutine(recoverHealthCoroutine);
+                }
+                else
+                {
+                    StartCoroutine(recoverHealthCoroutine);
                 }
 
-                // FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것. 
+                Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
+            }
+            
+            // FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것.
+            else
+            {
+                Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
             }
         }
 
@@ -710,34 +748,58 @@ public class GameManager : MonoBehaviour
             //
         }
         
-        foreach (var tile in selectedTiles)
-        {
-            GameObject target = tile.GetComponent<Tile>().GetUnitOnTile();
-            if (target != null)
-            {
-                if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
-                {
-                    var damageAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
-                    var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
-                    yield return StartCoroutine(damageCoroutine);
-                    Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName());
-                }
-                else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
-                {
-                    var recoverAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
-                    var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
-                    yield return StartCoroutine(recoverHealthCoroutine);
-                    Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
-                }
-                else
-                {
-                    Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().GetName());
-                }
+        List<GameObject> targets = new List<GameObject>();
 
-                // FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것. 
+        foreach (var tileObject in selectedTiles)
+        {
+            Tile tile = tileObject.GetComponent<Tile>();
+            if (tile.IsUnitOnTile())
+            {
+                targets.Add(tile.GetUnitOnTile());
             }
         }
 
+        foreach (var target in targets)
+        {
+            if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+            {
+                var damageAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
+                var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
+                
+                if (target == targets[targets.Count-1])
+                {
+                    yield return StartCoroutine(damageCoroutine);    
+                }
+                else
+                {
+                    StartCoroutine(damageCoroutine);
+                }
+                Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName());
+            }
+            else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+            {
+                var recoverAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
+                var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
+
+                if (target == targets[targets.Count-1])
+                {
+                    yield return StartCoroutine(recoverHealthCoroutine);
+                }
+                else
+                {
+                    StartCoroutine(recoverHealthCoroutine);
+                }
+
+                Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
+            }
+            
+            // FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것.
+            else
+            {
+                Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
+            }
+        }
+        
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
         int requireAP = appliedSkill.GetRequireAP();
@@ -820,11 +882,6 @@ public class GameManager : MonoBehaviour
             Vector2 distanceVector = selectedTilePosition - currentTilePos;
             int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
             int totalUseActionPoint = movableTilesWithPath[selectedTilePosition].requireActivityPoint;
-            // int totalUseActionPoint = 0;
-            // for (int i = 0; i < distance; i++)
-            // {
-            //     totalUseActionPoint += requireActionPoint[i + moveCount];
-            // }
 
             moveCount += distance;
 
