@@ -328,7 +328,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator Standby()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
     }
 
     IEnumerator RestAndRecover()
@@ -336,11 +336,12 @@ public class GameManager : MonoBehaviour
         int usingActivityPointToRest = (int)(selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() * 0.9f);
         int recoverHealthDuringRest = (int)(selectedUnitObject.GetComponent<Unit>().GetMaxHealth() * (usingActivityPointToRest / 100f));
         selectedUnitObject.GetComponent<Unit>().UseActionPoint(usingActivityPointToRest);
-        selectedUnitObject.GetComponent<Unit>().RecoverHealth(recoverHealthDuringRest);
+        IEnumerator recoverHealthCoroutine = selectedUnitObject.GetComponent<Unit>().RecoverHealth(recoverHealthDuringRest);
+        yield return StartCoroutine(recoverHealthCoroutine);
 
         Debug.Log("Rest. Using " + usingActivityPointToRest + "AP and recover " + recoverHealthDuringRest + " HP");
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.5f);
     }
 
     public void CallbackSkillIndex(int index)

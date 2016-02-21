@@ -10,6 +10,7 @@ public class Unit : MonoBehaviour {
     GameObject recoverTextObject;
     GameObject activeArrowIcon;
     GameObject bounsTextObject;
+    HealthViewer healthViewer; 
 
 	new string name; // 한글이름
     string nameInCode; // 영어이름 
@@ -445,6 +446,8 @@ public class Unit : MonoBehaviour {
         damageTextObject.SetActive(true);
         damageTextObject.GetComponent<TextMesh>().text = actualDamage.ToString();
         
+        healthViewer.UpdateCurrentHealth(currentHealth, maxHealth);
+        
         if (!isDot) // 도트데미지가 아니면 체인이 해제됨.
             ChainList.RemoveChainsFromUnit(gameObject);
         
@@ -497,6 +500,8 @@ public class Unit : MonoBehaviour {
 
         recoverTextObject.SetActive(true);
         recoverTextObject.GetComponent<TextMesh>().text = amount.ToString();
+        
+        healthViewer.UpdateCurrentHealth(currentHealth, maxHealth);
         
         // 데미지 표시되는 시간.
         yield return new WaitForSeconds(1);
@@ -586,6 +591,8 @@ public class Unit : MonoBehaviour {
         skillList = SkillLoader.MakeSkillList();
         buffList = new List<Buff>();
         debuffList = new List<Debuff>();
+        
+        healthViewer.SetInitHealth(maxHealth);
     }
 
     void LoadSprite()
@@ -614,6 +621,8 @@ public class Unit : MonoBehaviour {
         recoverTextObject.SetActive(false);
         activeArrowIcon.SetActive(false);
         bounsTextObject.SetActive(false);
+
+        healthViewer = transform.Find("HealthBar").GetComponent<HealthViewer>();
     }
 	
 	// Update is called once per frame
