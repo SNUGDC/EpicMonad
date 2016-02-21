@@ -18,10 +18,8 @@ public class SelectedUnitViewer : MonoBehaviour {
     GameObject celestialDebuffIcon;
     
     Text hpText;
-    Image hpBarImage;
-
+    
     Text apText;
-    Image apBarImage;
     
     // FIXME : 버프/디버프는 아직 미구현.
 
@@ -52,7 +50,6 @@ public class SelectedUnitViewer : MonoBehaviour {
     void UpdateHp(Unit unit)
     {
         hpText.text = unit.GetCurrentHealth() + " / " + unit.GetMaxHealth();
-        hpBarImage.transform.localScale = new Vector3(((float)unit.GetCurrentHealth())/((float)unit.GetMaxHealth()), 1, 1);
     }
     
     void UpdateAp(Unit unit)
@@ -116,10 +113,7 @@ public class SelectedUnitViewer : MonoBehaviour {
         celestialDebuffIcon.SetActive(false);
     
         hpText = transform.Find("HP").Find("HPText").GetComponent<Text>();;
-        hpBarImage = transform.Find("HP").Find("HPBarImage").GetComponent<Image>();
-
         apText = transform.Find("AP").Find("APText").GetComponent<Text>();;
-        apBarImage = transform.Find("AP").Find("APBarImage").GetComponent<Image>();
     }
 
 	// Use this for initialization
