@@ -6,4 +6,4 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Battle/scene_1.unity
+    path: Assets/Battle/BattleTest.unity
