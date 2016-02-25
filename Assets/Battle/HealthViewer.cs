@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Enums;
 
 public class HealthViewer : MonoBehaviour {
 
@@ -45,7 +46,7 @@ public class HealthViewer : MonoBehaviour {
         this.maxHealth = maxHealth;
     }
     
-    public void SetInitHealth(int maxHealth)
+    public void SetInitHealth(int maxHealth, Side side)
     {
         this.currentHealth = maxHealth;
         this.maxHealth = maxHealth;
@@ -54,6 +55,15 @@ public class HealthViewer : MonoBehaviour {
         currentHealthBar.transform.localScale = initHealthScale;
         recoverBar.transform.localScale = initHealthScale;
         damageBar.transform.localScale = initHealthScale;
+        
+        if (side == Side.Ally)
+        {
+            currentHealthBar.GetComponent<SpriteRenderer>().color = Color.cyan;    
+        }
+        else
+        {
+            currentHealthBar.GetComponent<SpriteRenderer>().color = Color.yellow;
+        }
     }
 
     void Awake () {

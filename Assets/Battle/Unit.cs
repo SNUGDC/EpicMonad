@@ -606,7 +606,7 @@ public class Unit : MonoBehaviour {
         buffList = new List<Buff>();
         debuffList = new List<Debuff>();
         
-        healthViewer.SetInitHealth(maxHealth);
+        healthViewer.SetInitHealth(maxHealth, side);
     }
 
     void LoadSprite()

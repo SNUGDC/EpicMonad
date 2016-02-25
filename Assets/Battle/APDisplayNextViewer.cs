@@ -17,7 +17,7 @@ public class APDisplayNextViewer : MonoBehaviour {
         
         int count = 1;
         foreach (var unit in sortedUnits)
-        {
+        {   
             GameObject portrait = Instantiate(portraitPrefab) as GameObject;
             string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetNameInCode().ToString();
             portrait.GetComponent<Image>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
@@ -81,7 +81,7 @@ public class APDisplayNextViewer : MonoBehaviour {
             if (x.GetComponent<Unit>() == null && y.GetComponent<Unit>() == null) return 0;
             else if (y.GetComponent<Unit>() == null) return -1;
             else if (x.GetComponent<Unit>() == null) return 1;
-            else return GetNextPhaseAP(y).CompareTo(GetNextPhaseAP(x));
+            else return CompareByActionPoint(x, y);
         });
         
         return sortedUnits;
@@ -99,6 +99,21 @@ public class APDisplayNextViewer : MonoBehaviour {
             nextPhaseAP = unitInfo.GetCurrentActivityPoint() + unitInfo.GetActualDexturity();
 
         return nextPhaseAP;   
+    }
+    
+    int CompareByActionPoint(GameObject unit, GameObject anotherUnit)
+    {
+        int compareResultByCurrentActionPoint = anotherUnit.GetComponent<Unit>().GetCurrentActivityPoint().CompareTo(unit.GetComponent<Unit>().GetCurrentActivityPoint());
+        if (compareResultByCurrentActionPoint == 0)
+        {
+            int compareResultByTrueDexturity = anotherUnit.GetComponent<Unit>().GetTrueDexturity().CompareTo(unit.GetComponent<Unit>().GetTrueDexturity());
+            if (compareResultByTrueDexturity == 0)
+                return anotherUnit.GetInstanceID().CompareTo(unit.GetInstanceID());
+            else
+                return compareResultByTrueDexturity;
+        }
+        else
+            return compareResultByCurrentActionPoint;
     }
     
     void ClearViewer()

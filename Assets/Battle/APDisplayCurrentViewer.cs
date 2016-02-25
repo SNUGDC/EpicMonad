@@ -10,12 +10,12 @@ public class APDisplayCurrentViewer : MonoBehaviour {
     List<GameObject> portraits;
 
     public void UpdateAPDisplay(List<GameObject> units)
-    {
+    {       
         ClearViewer();
         
         int count = 0;
         foreach (var unit in units)
-        {
+        {   
             bool isFirst = (count == 0);
             GameObject portrait = Instantiate(portraitPrefab) as GameObject;
             string imagePath = "UnitImage/portrait_" + unit.GetComponent<Unit>().GetNameInCode().ToString();

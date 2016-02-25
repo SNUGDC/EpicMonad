@@ -535,7 +535,7 @@ public class GameManager : MonoBehaviour
                     {
                         GameObject focusedTile = chainInfo.GetTargetArea()[0];
                         Camera.main.transform.position = new Vector3(focusedTile.transform.position.x, focusedTile.transform.position.y, -10);
-                        yield return StartCoroutine(ApplySkill(chainInfo.GetUnit(), chainCombo)); 
+                        yield return StartCoroutine(ApplySkill(chainInfo, chainCombo)); 
                     }
                     
                     Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
@@ -637,17 +637,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // 체인 가능 스킬일 경우의 스킬 시전 코루틴. 공격 유닛을 받고, 유닛으로 체인 정보를 받아오는 방식으로 수정.
-    IEnumerator ApplySkill(GameObject unitObject, int chainCombo)
+    // 체인 가능 스킬일 경우의 스킬 시전 코루틴. 체인 정보와 배수를 받는다.
+    IEnumerator ApplySkill(ChainInfo chainInfo, int chainCombo)
     {
-        ChainInfo chainInfoOfUnit = chainList.Find(k => k.GetUnit() == unitObject);
-        GameObject unitInChain = chainInfoOfUnit.GetUnit();
+        GameObject unitInChain = chainInfo.GetUnit();
         Unit unitInChainInfo = unitInChain.GetComponent<Unit>();
-        Skill appliedSkill = unitInChainInfo.GetSkillList()[chainInfoOfUnit.GetSkillIndex() - 1];
-        List<GameObject> selectedTiles = chainInfoOfUnit.GetTargetArea();
+        Skill appliedSkill = unitInChainInfo.GetSkillList()[chainInfo.GetSkillIndex() - 1];
+        List<GameObject> selectedTiles = chainInfo.GetTargetArea();
         
         // 자신의 체인 정보 삭제.
-        ChainList.RemoveChainsFromUnit(unitObject);
+        ChainList.RemoveChainsFromUnit(unitInChain);
         
         if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
         {
@@ -944,17 +943,13 @@ public class GameManager : MonoBehaviour
             isSelectedDirectionByUser = false;
             isWaitingUserInput = false;
 
+            Debug.Log("Dest tile : " + destTile.GetComponent<Tile>().GetTilePos());
+
             // 방향을 클릭하면 그 자리로 이동. MoveToTile 호출 
-            if (tileManager.GetTile(selectedTilePosition) == destTile)
-            {
-                tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
-                currentState = CurrentState.MoveToTile;
-                destCheckUI.SetActive(false);
-                yield return StartCoroutine(MoveToTile(destTile, selectedDirection, totalUseActionPoint));
-            }
-            // 아니면 아무 반응 없음.
-            else
-                yield return null;
+            tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
+            currentState = CurrentState.MoveToTile;
+            destCheckUI.SetActive(false);
+            yield return StartCoroutine(MoveToTile(destTile, selectedDirection, totalUseActionPoint));
         }
         yield return null;
     }
@@ -972,6 +967,9 @@ public class GameManager : MonoBehaviour
             selectedDirection = Direction.RightUp;
         else if (directionString == "RightDown")
             selectedDirection = Direction.RightDown;
+            
+        Debug.Log("Select direction");
+        Debug.Log("Selected tile : " + selectedTilePosition);
             
         isSelectedDirectionByUser = true;
         selectDirectionUI.SetActive(false);

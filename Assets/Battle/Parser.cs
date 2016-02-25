@@ -16,7 +16,6 @@ public class Parser : MonoBehaviour {
         
         for (int i = 1; i < unparsedUnitInfoStrings.Length; i++)
 		{
-			Debug.Log(unparsedUnitInfoStrings[i]);
 			UnitInfo unitInfo = new UnitInfo(unparsedUnitInfoStrings[i]);
 			unitInfoList.Add(unitInfo);
 		}
