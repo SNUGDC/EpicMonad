@@ -943,8 +943,6 @@ public class GameManager : MonoBehaviour
             isSelectedDirectionByUser = false;
             isWaitingUserInput = false;
 
-            Debug.Log("Dest tile : " + destTile.GetComponent<Tile>().GetTilePos());
-
             // 방향을 클릭하면 그 자리로 이동. MoveToTile 호출 
             tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
             currentState = CurrentState.MoveToTile;
@@ -967,9 +965,6 @@ public class GameManager : MonoBehaviour
             selectedDirection = Direction.RightUp;
         else if (directionString == "RightDown")
             selectedDirection = Direction.RightDown;
-            
-        Debug.Log("Select direction");
-        Debug.Log("Selected tile : " + selectedTilePosition);
             
         isSelectedDirectionByUser = true;
         selectDirectionUI.SetActive(false);
