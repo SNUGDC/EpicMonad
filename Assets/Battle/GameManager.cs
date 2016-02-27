@@ -9,35 +9,19 @@ using System;
 
 enum CurrentState
 {
-    None,
-    FocusToUnit,
-    SelectMovingPoint,
-    CheckDestination,
-    MoveToTile,
-    SelectSkill,
-    SelectSkillApplyPoint,
-    CheckApplyOrChain,
-    ApplySkill,
-    ChainAndStandby,
-    RestAndRecover,
-    Standby
+    None, FocusToUnit, SelectMovingPoint, CheckDestination,
+    MoveToTile, SelectSkill, SelectSkillApplyPoint, CheckApplyOrChain,
+    ApplySkill, ChainAndStandby, RestAndRecover, Standby
 }
 
 enum ActionCommand
 {
-    Waiting,
-    Move,
-    Attack,
-    Rest,
-    Standby,
-    Cancel
+    Waiting, Move, Attack, Rest, Standby, Cancel
 }
 
 enum SkillApplyCommand
 {
-    Waiting,
-    Apply,
-    Chain
+    Waiting, Apply, Chain
 }
 
 public class GameManager : MonoBehaviour
