@@ -497,11 +497,14 @@ public class GameManager : MonoBehaviour
 
                     Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
                     skillCheckUI.SetActive(false);
+                    tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
                     currentState = CurrentState.SelectSkillApplyPoint;
                     yield break;
                 }
                 yield return null;
             }
+
+            tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
             if (skillApplyCommand == SkillApplyCommand.Apply)
             {
@@ -558,8 +561,12 @@ public class GameManager : MonoBehaviour
         skillApplyCommand = SkillApplyCommand.Chain;
     }
 
-    IEnumerator ApplySkillEffect(string effectName, GameObject unitObject, List<GameObject> selectedTiles, EffectVisualType effectVisualType, EffectMoveType effectMoveType)
+    IEnumerator ApplySkillEffect(Skill appliedSkill, GameObject unitObject, List<GameObject> selectedTiles)
     {
+        string effectName = appliedSkill.GetEffectName();
+        EffectVisualType effectVisualType = appliedSkill.GetEffectVisualType();
+        EffectMoveType effectMoveType = appliedSkill.GetEffectMoveType();
+        
         if ((effectVisualType == EffectVisualType.Area) && (effectMoveType == EffectMoveType.Move))
         {
             // 투사체, 범위형 이펙트.
@@ -644,21 +651,23 @@ public class GameManager : MonoBehaviour
         // 자신의 체인 정보 삭제.
         ChainList.RemoveChainsFromUnit(unitInChain);
         
-        if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
-        {
-            // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("darkExplosion", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Area, EffectMoveType.NonMove));
-            // yield return StartCoroutine(ApplySkillEffect("darkBall", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Area, EffectMoveType.Move));
-        }
-        else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
-        {
-            // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("lightHeal", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Individual, EffectMoveType.NonMove));            
-        }
-        else
-        {
-            //
-        }
+        yield return StartCoroutine(ApplySkillEffect(appliedSkill, unitInChainInfo.gameObject, selectedTiles));
+        
+        // if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+        // {
+        //     // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
+        //     yield return StartCoroutine(ApplySkillEffect("darkExplosion", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Area, EffectMoveType.NonMove));
+        //     // yield return StartCoroutine(ApplySkillEffect("darkBall", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Area, EffectMoveType.Move));
+        // }
+        // else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+        // {
+        //     // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
+        //     yield return StartCoroutine(ApplySkillEffect("lightHeal", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Individual, EffectMoveType.NonMove));            
+        // }
+        // else
+        // {
+        //     //
+        // }
 
         List<GameObject> targets = new List<GameObject>();
 
@@ -713,7 +722,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+        // tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
         int requireAP = appliedSkill.GetRequireAP();
         if (unitInChainInfo.gameObject == selectedUnitObject)
@@ -731,20 +740,22 @@ public class GameManager : MonoBehaviour
         Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
         Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
         
-        if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
-        {
-            // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("darkBall", selectedUnitObject, selectedTiles, EffectVisualType.Area, EffectMoveType.Move));
-        }
-        else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
-        {
-            // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("lightHeal", selectedUnitObject, selectedTiles, EffectVisualType.Individual, EffectMoveType.NonMove));            
-        }
-        else
-        {
-            //
-        }
+        yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
+        
+        // if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+        // {
+        //     // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
+        //     yield return StartCoroutine(ApplySkillEffect("darkBall", selectedUnitObject, selectedTiles, EffectVisualType.Area, EffectMoveType.Move));
+        // }
+        // else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+        // {
+        //     // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
+        //     yield return StartCoroutine(ApplySkillEffect("lightHeal", selectedUnitObject, selectedTiles, EffectVisualType.Individual, EffectMoveType.NonMove));            
+        // }
+        // else
+        // {
+        //     //
+        // }
         
         List<GameObject> targets = new List<GameObject>();
 

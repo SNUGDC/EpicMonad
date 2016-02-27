@@ -42,7 +42,7 @@ public class SkillLoader {
                                  true,
                                  RangeForm.Square, 0, 0, 0,
                                  SkillApplyType.Etc,
-                                 "lightHeal", EffectVisualType.Individual, EffectMoveType.NonMove);
+                                 "lightShield", EffectVisualType.Individual, EffectMoveType.NonMove);
         Skill skill5 = new Skill("사념 포박", 160, 0, 
                                  2.0f, 
                                  RangeForm.Square, 0, 3, 0, 
