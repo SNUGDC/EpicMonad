@@ -430,7 +430,7 @@ public class GameManager : MonoBehaviour
             isSelectedTileByUser = false;
             isWaitingUserInput = false;
 
-            // 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요
+            // 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요 - 대부분의 스킬은 논타겟팅. 추후 보강.
 
             tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
             skillUI.SetActive(false);
@@ -474,12 +474,13 @@ public class GameManager : MonoBehaviour
             GameObject selectedTile = tileManager.GetTile(selectedTilePosition);
             Camera.main.transform.position = new Vector3(selectedTile.transform.position.x, selectedTile.transform.position.y, -10);
 
-            List<GameObject> selectedTiles = tileManager.GetTilesInRange(RangeForm.Square, selectedTilePosition, 0, 1, true);
+            Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
+
+            List<GameObject> selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), selectedTilePosition, selectedSkill.GetSecondMinReach(), selectedSkill.GetSecondMaxReach(), true);
             tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
             skillCheckUI.SetActive(true);
             CheckChainPossible();
 
-            Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
             int requireAP = selectedSkill.GetRequireAP();
             string newAPText = "소모 AP : " + requireAP + "\n" +
                                "잔여 AP : " + (selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP);

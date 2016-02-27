@@ -20,19 +20,26 @@ public class Skill {
     int firstMaxReach;
     int firstWidth;
     bool includeMyself;
-    // FIXME : 대상 포함 여부 넣기
-    // 2차범위. 지금은 안 씀.
-    // RangeForm secondRangeForm;
-    // int secondMinReach;
-    // int secondMaxReach;
-    // int secondWidth;
+    // 2차범위.
+    RangeForm secondRangeForm;
+    int secondMinReach;
+    int secondMaxReach;
+    int secondWidth;
     
     SkillApplyType skillApplyType; // 데미지인지 힐인지 아니면 상태이상만 주는지
     
-    public Skill(string name, int requireAP, int cooldown, float powerFactor,
+    // 이펙트 관련 정보
+    string effectName;
+    EffectVisualType effectVisualType;
+    EffectMoveType effectMoveType;
+    
+    public Skill(string name, int requireAP, int cooldown, 
+                 float powerFactor,
                  RangeForm firstRangeForm, int firstMinReach, int firstMaxReach, int firstWidth,
                  bool includeMyself,
-                 SkillApplyType skillApplyType)
+                 RangeForm secondRangeForm, int secondMinReach, int secondMaxReach, int secondWidth,
+                 SkillApplyType skillApplyType,
+                 string effectName, EffectVisualType effectVisualType, EffectMoveType effectMoveType)
     {
         this.name = name;
         this.requireAP = requireAP;
@@ -43,56 +50,31 @@ public class Skill {
         this.firstMaxReach = firstMaxReach;
         this.firstWidth = firstWidth;
         this.includeMyself = includeMyself;
+        this.secondRangeForm = secondRangeForm;
+        this.secondMinReach = secondMinReach;
+        this.secondMaxReach = secondMaxReach;
+        this.secondWidth = secondWidth;
         this.skillApplyType = skillApplyType;
+        this.effectName = effectName;
+        this.effectVisualType = effectVisualType;
+        this.effectMoveType = effectMoveType;
     }  
     
-    public string GetName()
-    {
-        return name;
-    }
-    
-    public int GetRequireAP()
-    {
-        return requireAP;
-    }
-    
-    public int GetCooldown()
-    {
-        return cooldown;
-    }
-    
-    public float GetPowerFactor()
-    {
-        return powerFactor;
-    }
-
-    public RangeForm GetFirstRangeForm()
-    {
-        return firstRangeForm;
-    }
-    
-    public int GetFirstMinReach()
-    {
-        return firstMinReach;
-    }
-    
-    public int GetFirstMaxReach()
-    {
-        return firstMaxReach;
-    }
-    
-    public int GetFirstWidth()
-    {
-        return firstWidth;
-    }
-    
-    public bool GetIncludeMyself()
-    {
-        return includeMyself;
-    }
-    
-    public SkillApplyType GetSkillApplyType()
-    {
-        return skillApplyType;
-    }
+    public string GetName() {return name;}
+    public int GetRequireAP() {return requireAP;}
+    public int GetCooldown() {return cooldown;}    
+    public float GetPowerFactor() {return powerFactor;}
+    public RangeForm GetFirstRangeForm() {return firstRangeForm;}
+    public int GetFirstMinReach() {return firstMinReach;}
+    public int GetFirstMaxReach() {return firstMaxReach;}
+    public int GetFirstWidth() {return firstWidth;}
+    public bool GetIncludeMyself() {return includeMyself;}
+    public RangeForm GetSecondRangeForm() {return secondRangeForm;}
+    public int GetSecondMinReach() {return secondMinReach;}
+    public int GetSecondMaxReach() {return secondMaxReach;}
+    public int GetSecondWidth() {return secondWidth;}
+    public SkillApplyType GetSkillApplyType() {return skillApplyType;}
+    public string GetEffectName() {return effectName;}
+    public EffectVisualType GetEffectVisualType() {return effectVisualType;}
+    public EffectMoveType GetEffectMoveType() {return effectMoveType;}
 }
