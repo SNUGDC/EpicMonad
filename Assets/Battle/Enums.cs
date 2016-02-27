@@ -3,61 +3,55 @@ using System.Collections;
 
 namespace Enums {
     
+    public enum EffectVisualType
+    {
+        Individual, Area
+    }
+    
+    public enum EffectMoveType
+    {
+        Move, NonMove
+    }
+    
     public enum Side
     {
-        Ally,
-        Enemy
+        Ally, Enemy
     }
     
     public enum TileColor // highlighting selected tile
     {
-        Blue,
-        Red
+        Blue, Red
     }
     
     public enum TileForm
     {
-        Flatland,
-        Hill
+        Flatland, Hill
     }
     
     public enum UnitClass
     {
-        None,
-        Melee,
-        Magic
+        None, Melee, Magic
     }
     
     public enum Celestial
     {
-        None,
-        Sun,
-        Moon,
-        Earth
+        None, Sun, Moon, Earth
     }
     
     public enum Element
     {
-        None,
-        Fire,
-        Water,
-        Plant,
-        Metal    
+        None, Fire, Water, Plant, Metal    
     }
     
     public enum Direction
     {
-        LeftUp,
-        LeftDown,
-        RightUp,
-        RightDown
+        LeftUp, LeftDown, RightUp, RightDown
     }
     
     public enum SkillType
     {
-        Point,
-        Area,
-        Route
+        // 지정형, 범위형, 경로형.
+        Point, Area, Route
     }
     
     public enum RangeForm
@@ -69,9 +63,7 @@ namespace Enums {
     
     public enum SkillApplyType
     {
-        Damage,
-        Heal,
-        Etc
+        Damage, Heal, Etc
     }
     
     public enum BuffType

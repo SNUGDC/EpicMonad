@@ -106,7 +106,7 @@ public class Unit : MonoBehaviour {
     {
         if (chargeEffect != null) RemoveChargeEffect();
         chargeEffect = effect;
-        effect.transform.position = gameObject.transform.position + new Vector3(0, 0.5f, 0) - new Vector3(0, 0, 0.01f);
+        effect.transform.position = gameObject.transform.position - new Vector3(0, 0, 0.01f);
     }
     
     public void RemoveChargeEffect()
@@ -484,7 +484,7 @@ public class Unit : MonoBehaviour {
                 }
             }
             
-            // FIXME : 도트데미지는 물뎀인가 마뎀인가? 현재는 트루뎀.
+            // FIXME : 도트데미지는 물뎀인가 마뎀인가? 기획서대로 적용할 것. 언제? 일단 보류중.
             Damaged(UnitClass.None, totalAmount, true);
         }
     }

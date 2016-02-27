@@ -556,18 +556,12 @@ public class GameManager : MonoBehaviour
         skillCheckUI.SetActive(false);
         skillApplyCommand = SkillApplyCommand.Chain;
     }
-    
-    enum EffectType
-    {
-        Individual,
-        Area
-    }
 
-    IEnumerator ApplySkillEffect(string effectName, GameObject unitObject, List<GameObject> selectedTiles, EffectType effectType)
+    IEnumerator ApplySkillEffect(string effectName, GameObject unitObject, List<GameObject> selectedTiles, EffectVisualType effectVisualType, EffectMoveType effectMoveType)
     {
-        if (effectType == EffectType.Area)
+        if ((effectVisualType == EffectVisualType.Area) && (effectMoveType == EffectMoveType.Move))
         {
-            // 공격 이펙트. 투사체. 범위형.
+            // 투사체, 범위형 이펙트.
             Vector3 startPos = unitObject.transform.position;        
             Vector3 endPos = new Vector3(0, 0, 0);
             foreach (var tile in selectedTiles)
@@ -577,16 +571,33 @@ public class GameManager : MonoBehaviour
             endPos = endPos / (float)selectedTiles.Count;
             
             GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
-            particle.transform.position = startPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
+            particle.transform.position = startPos - new Vector3(0, 0, 0.01f);
             yield return new WaitForSeconds(0.2f);
-            iTween.MoveTo(particle, endPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f) - new Vector3(0, 0, 5f), 0.5f); // 타일 축 -> 유닛 축으로 옮기기 위해 z축으로 5만큼 앞으로 빼준다.
+            iTween.MoveTo(particle, endPos - new Vector3(0, 0, 0.01f) - new Vector3(0, 0, 5f), 0.5f); // 타일 축 -> 유닛 축으로 옮기기 위해 z축으로 5만큼 앞으로 빼준다.
             yield return new WaitForSeconds(0.3f);
             Destroy(particle, 0.5f);
             yield return null;
         }
-        else if (effectType == EffectType.Individual)
+        else if ((effectVisualType == EffectVisualType.Area) && (effectMoveType == EffectMoveType.NonMove))
         {
-            // 회복 이펙트. 대상 효과. 지정형.
+            // 고정형, 범위형 이펙트.
+            Vector3 targetPos = new Vector3(0, 0, 0);  
+            foreach (var tile in selectedTiles)
+            {
+                targetPos += tile.transform.position;
+            }
+            targetPos = targetPos / (float)selectedTiles.Count;
+            targetPos = targetPos - new Vector3(0, 0, 5f); // 타일 축 -> 유닛 축으로 옮기기 위해 z축으로 5만큼 앞으로 빼준다.
+        
+            GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+            particle.transform.position = targetPos - new Vector3(0, 0, 0.01f);
+            yield return new WaitForSeconds(0.5f);
+            Destroy(particle, 0.5f);
+            yield return null;
+        }
+        else if ((effectVisualType == EffectVisualType.Individual) && (effectMoveType == EffectMoveType.NonMove))
+        {
+            // 고정형, 개별 대상 이펙트. 
             List<Vector3> targetPosList = new List<Vector3>(); 
             foreach (var tileObject in selectedTiles)
             {
@@ -600,7 +611,7 @@ public class GameManager : MonoBehaviour
             foreach (var targetPos in targetPosList)
             {
                 GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
-                particle.transform.position = targetPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
+                particle.transform.position = targetPos - new Vector3(0, 0, 0.01f);
                 Destroy(particle, 0.5f + 0.1f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.   
             }
             if (targetPosList.Count == 0) // 대상이 없을 경우. 일단 가운데 이펙트를 띄운다.
@@ -613,7 +624,7 @@ public class GameManager : MonoBehaviour
                 midPos = midPos / (float)selectedTiles.Count;
                 
                 GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
-                particle.transform.position = midPos + (Vector3.up/2f) - new Vector3(0, 0, 0.01f);
+                particle.transform.position = midPos - new Vector3(0, 0, 0.01f);
                 Destroy(particle, 0.5f + 0.1f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.
             }
                         
@@ -635,12 +646,13 @@ public class GameManager : MonoBehaviour
         if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
         {
             // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("darkBall", unitInChainInfo.gameObject, selectedTiles, EffectType.Area));
+            yield return StartCoroutine(ApplySkillEffect("darkExplosion", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Area, EffectMoveType.NonMove));
+            // yield return StartCoroutine(ApplySkillEffect("darkBall", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Area, EffectMoveType.Move));
         }
         else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
         {
             // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("lightHeal", unitInChainInfo.gameObject, selectedTiles, EffectType.Individual));            
+            yield return StartCoroutine(ApplySkillEffect("lightHeal", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Individual, EffectMoveType.NonMove));            
         }
         else
         {
@@ -721,12 +733,12 @@ public class GameManager : MonoBehaviour
         if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
         {
             // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("darkBall", selectedUnitObject, selectedTiles, EffectType.Area));
+            yield return StartCoroutine(ApplySkillEffect("darkBall", selectedUnitObject, selectedTiles, EffectVisualType.Area, EffectMoveType.Move));
         }
         else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
         {
             // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
-            yield return StartCoroutine(ApplySkillEffect("lightHeal", selectedUnitObject, selectedTiles, EffectType.Individual));            
+            yield return StartCoroutine(ApplySkillEffect("lightHeal", selectedUnitObject, selectedTiles, EffectVisualType.Individual, EffectMoveType.NonMove));            
         }
         else
         {

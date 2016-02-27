@@ -306,7 +306,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 138366}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.7
   startDelay:
     scalar: 0.1
     maxCurve:
@@ -353,7 +353,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -647,7 +647,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -1755,7 +1755,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 101122}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.8
   startDelay:
     scalar: 0.05
     maxCurve:
@@ -1802,7 +1802,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -2096,7 +2096,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -3204,7 +3204,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 132520}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.8
   startDelay:
     scalar: 0.2
     maxCurve:
@@ -3251,7 +3251,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -3545,7 +3545,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -6152,7 +6152,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 117340}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.7
   startDelay:
     scalar: 0.2
     maxCurve:
@@ -6199,7 +6199,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -6493,7 +6493,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -7601,7 +7601,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 187028}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.8
   startDelay:
     scalar: 0.2
     maxCurve:
@@ -7648,7 +7648,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -7942,7 +7942,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -9050,7 +9050,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 170486}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.7
   startDelay:
     scalar: 0
     maxCurve:
@@ -9097,7 +9097,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -9391,7 +9391,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -10499,7 +10499,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 125088}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.8
   startDelay:
     scalar: 0.1
     maxCurve:
@@ -10546,7 +10546,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -10840,7 +10840,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -11948,7 +11948,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 123642}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.8
   startDelay:
     scalar: 0
     maxCurve:
@@ -11995,7 +11995,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -12289,7 +12289,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -13397,7 +13397,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 113108}
   serializedVersion: 2
-  lengthInSec: 1
+  lengthInSec: 0.7
   startDelay:
     scalar: 0.2
     maxCurve:
@@ -13444,7 +13444,7 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 0.5
+      scalar: 0.3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -13738,7 +13738,7 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     randomizeRotationDirection: 0
-    gravityModifier: -1
+    gravityModifier: -3
     maxNumParticles: 100
     rotation3D: 0
   ShapeModule:
@@ -15255,7 +15255,15 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_LocalPosition.y
+      value: 0.1490002
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_LocalPosition.z
+      value: -0.55
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 109616}
