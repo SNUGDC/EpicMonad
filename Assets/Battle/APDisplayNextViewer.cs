@@ -27,7 +27,7 @@ public class APDisplayNextViewer : MonoBehaviour {
             portraits.Add(portrait);
             
             portrait.transform.SetParent(GameObject.Find("APDisplayNextPanel").transform);
-            portrait.transform.localPosition = new Vector3 (120 + 40 * count, -20, 0); // ?? 왜 y좌표 반영이 이상하게 되는것인가..
+            portrait.GetComponent<RectTransform>().anchoredPosition = new Vector3 (120 + 40 * count, 5, 0);
             portrait.transform.localScale = new Vector3 (1, 1, 1);
             
             bool isFirst = (count == 0);

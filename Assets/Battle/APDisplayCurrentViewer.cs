@@ -26,7 +26,7 @@ public class APDisplayCurrentViewer : MonoBehaviour {
             portraits.Add(portrait);
             
             portrait.transform.SetParent(GameObject.Find("APDisplayCurrentPanel").transform);
-            portrait.transform.localPosition = new Vector3 (120 + 40 * count, -20, 0); // ?? 왜 y좌표 반영이 이상하게 되는것인가..
+            portrait.GetComponent<RectTransform>().anchoredPosition = new Vector3 (120 + 40 * count, 5, 0);
             portrait.transform.localScale = new Vector3 (1, 1, 1);
             
             // 첫번째 아이콘 크게. 폰트 위치 
@@ -36,7 +36,7 @@ public class APDisplayCurrentViewer : MonoBehaviour {
                 portrait.transform.localScale = new Vector3 (1.5f, 1.5f, 1); 
                 
                 Text APText = portrait.transform.Find("APText").GetComponent<Text>(); 
-                APText.transform.localPosition = new Vector3(17.5f, -24, 0); // 이번엔 x좌표 반영이 이상함..
+                APText.GetComponent<RectTransform>().anchoredPosition = new Vector3 (0, -24, 0);
                 APText.fontSize = 10;  
             }
             
