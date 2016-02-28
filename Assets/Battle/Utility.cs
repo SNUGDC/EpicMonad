@@ -8,9 +8,6 @@ public class Utility : MonoBehaviour {
     public static float GetDegreeToTarget(GameObject unit, Vector2 targetPosition)
     {
         Vector2 unitPosition = unit.GetComponent<Unit>().GetPosition();
-        
-        Debug.LogWarning("target : " + targetPosition + ", unit : " + unitPosition);
-        
         float deltaDegree = Mathf.Atan2(targetPosition.y - unitPosition.y, targetPosition.x - unitPosition.x) * Mathf.Rad2Deg;
         
         return deltaDegree;
