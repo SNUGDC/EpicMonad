@@ -648,6 +648,9 @@ public class GameManager : MonoBehaviour
         Skill appliedSkill = unitInChainInfo.GetSkillList()[chainInfo.GetSkillIndex() - 1];
         List<GameObject> selectedTiles = chainInfo.GetTargetArea();
         
+        // 시전 방향으로 유닛의 바라보는 방향을 돌림.
+        unitInChainInfo.SetDirection(Utility.GetDirectionToTarget(unitInChainInfo.gameObject, selectedTiles));
+        
         // 자신의 체인 정보 삭제.
         ChainList.RemoveChainsFromUnit(unitInChain);
         
@@ -723,6 +726,9 @@ public class GameManager : MonoBehaviour
     {
         Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
         Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
+        
+        // 시전 방향으로 유닛의 바라보는 방향을 돌림.
+        selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
         
         yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
         
