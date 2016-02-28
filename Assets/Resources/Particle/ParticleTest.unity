@@ -271,7 +271,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!1001 &65329196
 Prefab:
   m_ObjectHideFlags: 0
@@ -578,6 +578,64 @@ Prefab:
 Transform:
   m_PrefabParentObject: {fileID: 448722, guid: b29004c15830d4cfdab8db7c5e8a8d73, type: 2}
   m_PrefabInternal: {fileID: 593322027}
+--- !u!1001 &664024549
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 425102, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 425102, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 425102, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 425102, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 425102, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 425102, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 425102, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 425102, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 115350, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: m_Name
+      value: lightHeal (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 19877604, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19816956, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: looping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19816956, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 0.6
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 8cf06273a1aee446fac1f7fe7ca228ca, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1001 &730524394
 Prefab:
   m_ObjectHideFlags: 0
@@ -1279,7 +1337,7 @@ Transform:
   - {fileID: 150178154}
   - {fileID: 1882724385}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
 --- !u!1001 &1648205685
 Prefab:
   m_ObjectHideFlags: 0

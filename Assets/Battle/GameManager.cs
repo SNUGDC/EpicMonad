@@ -620,7 +620,7 @@ public class GameManager : MonoBehaviour
             {
                 GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
                 particle.transform.position = targetPos - new Vector3(0, 0, 0.01f);
-                Destroy(particle, 0.5f + 0.1f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.   
+                Destroy(particle, 0.5f + 0.3f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.   
             }
             if (targetPosList.Count == 0) // 대상이 없을 경우. 일단 가운데 이펙트를 띄운다.
             {
@@ -633,7 +633,7 @@ public class GameManager : MonoBehaviour
                 
                 GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
                 particle.transform.position = midPos - new Vector3(0, 0, 0.01f);
-                Destroy(particle, 0.5f + 0.1f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.
+                Destroy(particle, 0.5f + 0.3f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.
             }
                         
             yield return new WaitForSeconds(0.5f);
@@ -652,22 +652,6 @@ public class GameManager : MonoBehaviour
         ChainList.RemoveChainsFromUnit(unitInChain);
         
         yield return StartCoroutine(ApplySkillEffect(appliedSkill, unitInChainInfo.gameObject, selectedTiles));
-        
-        // if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
-        // {
-        //     // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
-        //     yield return StartCoroutine(ApplySkillEffect("darkExplosion", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Area, EffectMoveType.NonMove));
-        //     // yield return StartCoroutine(ApplySkillEffect("darkBall", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Area, EffectMoveType.Move));
-        // }
-        // else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
-        // {
-        //     // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
-        //     yield return StartCoroutine(ApplySkillEffect("lightHeal", unitInChainInfo.gameObject, selectedTiles, EffectVisualType.Individual, EffectMoveType.NonMove));            
-        // }
-        // else
-        // {
-        //     //
-        // }
 
         List<GameObject> targets = new List<GameObject>();
 
@@ -741,21 +725,6 @@ public class GameManager : MonoBehaviour
         Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
         
         yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
-        
-        // if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
-        // {
-        //     // 데미지 이펙트. FIXME : 다양한 이미지 적용 필요.
-        //     yield return StartCoroutine(ApplySkillEffect("darkBall", selectedUnitObject, selectedTiles, EffectVisualType.Area, EffectMoveType.Move));
-        // }
-        // else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
-        // {
-        //     // 회복 이펙트. FIXME : 다양한 이미지 적용 필요.
-        //     yield return StartCoroutine(ApplySkillEffect("lightHeal", selectedUnitObject, selectedTiles, EffectVisualType.Individual, EffectMoveType.NonMove));            
-        // }
-        // else
-        // {
-        //     //
-        // }
         
         List<GameObject> targets = new List<GameObject>();
 
