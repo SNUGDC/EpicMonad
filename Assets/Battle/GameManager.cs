@@ -643,18 +643,18 @@ public class GameManager : MonoBehaviour
     // 체인 가능 스킬일 경우의 스킬 시전 코루틴. 체인 정보와 배수를 받는다.
     IEnumerator ApplySkill(ChainInfo chainInfo, int chainCombo)
     {
-        GameObject unitInChain = chainInfo.GetUnit();
-        Unit unitInChainInfo = unitInChain.GetComponent<Unit>();
-        Skill appliedSkill = unitInChainInfo.GetSkillList()[chainInfo.GetSkillIndex() - 1];
+        GameObject unitObjectInChain = chainInfo.GetUnit();
+        Unit unitInChain = unitObjectInChain.GetComponent<Unit>();
+        Skill appliedSkill = unitInChain.GetSkillList()[chainInfo.GetSkillIndex() - 1];
         List<GameObject> selectedTiles = chainInfo.GetTargetArea();
         
         // 시전 방향으로 유닛의 바라보는 방향을 돌림.
-        unitInChainInfo.SetDirection(Utility.GetDirectionToTarget(unitInChainInfo.gameObject, selectedTiles));
+        unitInChain.SetDirection(Utility.GetDirectionToTarget(unitInChain.gameObject, selectedTiles));
         
         // 자신의 체인 정보 삭제.
-        ChainList.RemoveChainsFromUnit(unitInChain);
+        ChainList.RemoveChainsFromUnit(unitObjectInChain);
         
-        yield return StartCoroutine(ApplySkillEffect(appliedSkill, unitInChainInfo.gameObject, selectedTiles));
+        yield return StartCoroutine(ApplySkillEffect(appliedSkill, unitInChain.gameObject, selectedTiles));
 
         List<GameObject> targets = new List<GameObject>();
 
@@ -669,10 +669,16 @@ public class GameManager : MonoBehaviour
 
         foreach (var target in targets)
         {
+            // 방향 체크.
+            Utility.GetDegreeAtAttack(unitObjectInChain, target);
+            
             if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
             {
-                var damageAmount = (int)((chainCombo * chainDamageFactor) * unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
-                var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChainInfo.GetUnitClass(), damageAmount, false);
+                // 방향 보너스.
+                float directionBouns = Utility.GetDirectionBonus(unitObjectInChain, target);
+                
+                var damageAmount = (int)((chainCombo * chainDamageFactor) * directionBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
+                var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChain.GetUnitClass(), damageAmount, false);
                 
                 if (target == targets[targets.Count-1])
                 {
@@ -687,7 +693,7 @@ public class GameManager : MonoBehaviour
             }
             else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
             {
-                var recoverAmount = (int)(unitInChainInfo.GetActualPower() * appliedSkill.GetPowerFactor());
+                var recoverAmount = (int)(unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
                 var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
 
                 if (target == targets[targets.Count-1])
@@ -712,8 +718,8 @@ public class GameManager : MonoBehaviour
         // tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
         int requireAP = appliedSkill.GetRequireAP();
-        if (unitInChainInfo.gameObject == selectedUnitObject)
-            unitInChainInfo.UseActionPoint(requireAP); // 즉시시전 대상만 ap를 차감. 나머지는 선차감되었으므로 패스.
+        if (unitInChain.gameObject == selectedUnitObject)
+            unitInChain.UseActionPoint(requireAP); // 즉시시전 대상만 ap를 차감. 나머지는 선차감되었으므로 패스.
         indexOfSeletedSkillByUser = 0; // return to init value.
 
         yield return new WaitForSeconds(0.5f);
@@ -747,7 +753,10 @@ public class GameManager : MonoBehaviour
         {
             if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
             {
-                var damageAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
+                // 방향 보너스.
+                float directionBouns = Utility.GetDirectionBonus(selectedUnitObject, target);
+                
+                var damageAmount = (int)(directionBouns * selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
                 var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
                 
                 if (target == targets[targets.Count-1])
@@ -802,7 +811,9 @@ public class GameManager : MonoBehaviour
     IEnumerator ChainAndStandby(List<GameObject> selectedTiles)
     {
         tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-        
+     
+        // 방향 돌리기.
+        selectedUnitObject.GetComponent<Unit>().SetDirection(Utility.GetDirectionToTarget(selectedUnitObject, selectedTiles)); 
         // 스킬 시전에 필요한 ap만큼 선 차감. 
         int requireAP = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
         selectedUnitObject.GetComponent<Unit>().UseActionPoint(requireAP);
