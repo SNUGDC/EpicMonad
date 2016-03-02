@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
 	GameObject selectedUnitViewerUI;
 	GameObject tileViewerUI;
 	GameObject selectDirectionUI;
+	GameObject cancelButtonUI;
 
 	CurrentState currentState = CurrentState.None;
 
@@ -48,6 +49,8 @@ public class GameManager : MonoBehaviour
 
 	bool rightClicked = false; // 우클릭 : 취소 
 	bool leftClicked = false; // 좌클릭 : 유닛뷰어 고정
+
+	bool cancelClicked = false;
 
 	ActionCommand command = ActionCommand.Waiting;
 	SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
@@ -105,6 +108,7 @@ public class GameManager : MonoBehaviour
 		selectedUnitViewerUI = GameObject.Find("SelectedUnitViewerPanel");
 		tileViewerUI = GameObject.Find("TileViewerPanel");
 		selectDirectionUI = GameObject.Find("SelectDirectionUI");
+		cancelButtonUI = GameObject.Find("CancelButtonPanel");
 	}
 
 	// Use this for initialization
@@ -121,6 +125,7 @@ public class GameManager : MonoBehaviour
 		selectedUnitViewerUI.SetActive(false);
 		tileViewerUI.SetActive(false);
 		selectDirectionUI.SetActive(false);
+		cancelButtonUI.SetActive(false);
 	   
 		selectedUnitObject = null;
 
@@ -308,6 +313,11 @@ public class GameManager : MonoBehaviour
 	{
 		commandUI.SetActive(false);
 		command = ActionCommand.Standby;
+	}
+
+	public void CallbackCancel()
+	{
+		cancelClicked = true;
 	}
 
 	IEnumerator Standby()
@@ -835,6 +845,9 @@ public class GameManager : MonoBehaviour
 
 	IEnumerator SelectMovingPoint()
 	{
+		cancelClicked = false;
+		cancelButtonUI.SetActive(true);
+
 		while (currentState == CurrentState.SelectMovingPoint)
 		{
 			// List<GameObject> movableTiles = CheckMovableTiles(selectedUnitObject);
@@ -854,9 +867,11 @@ public class GameManager : MonoBehaviour
 			while (!isSelectedTileByUser)
 			{
 				//yield break 넣으면 코루틴 강제종료 
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
+					cancelButtonUI.SetActive(false);
 
 					tileManager.ChangeTilesFromSeletedColorToDefaultColor(movableTiles);
 
@@ -886,6 +901,7 @@ public class GameManager : MonoBehaviour
 
 			yield return new WaitForSeconds(0.5f);
 		}
+		cancelButtonUI.SetActive(false);
 		yield return null;
 	}
 
