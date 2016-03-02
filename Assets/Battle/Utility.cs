@@ -68,7 +68,7 @@ public class Utility : MonoBehaviour {
         if (targetObject.GetComponent<Unit>() == null) return 1;
         
         float deltaDegreeAtAttack = GetDegreeAtAttack(unitObject, targetObject);
-        if ((deltaDegreeAtAttack < 45) || (deltaDegreeAtAttack > 315)) return 1.3f;
+        if ((deltaDegreeAtAttack < 45) || (deltaDegreeAtAttack > 315)) return 1.25f;
         else if ((deltaDegreeAtAttack < 135) || (deltaDegreeAtAttack > 225)) return 1.1f;
         else return 1;
     }
