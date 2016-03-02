@@ -12,10 +12,10 @@ public class TileManager : MonoBehaviour {
 	float tileHeight = 0.5f*100/100;
 	float tileWidth = 0.5f*200/100;
 
-    public Dictionary<Vector2, GameObject> GetAllTiles()
-    {
-        return tiles;
-    }
+	public Dictionary<Vector2, GameObject> GetAllTiles()
+	{
+		return tiles;
+	}
 
 	public GameObject GetTile(int x, int y)
 	{
@@ -41,55 +41,55 @@ public class TileManager : MonoBehaviour {
 		return tile.transform.position;
 	}
 
-    public List<GameObject> GetTilesInRange(RangeForm form, Vector2 mid, int minReach, int maxReach, bool includeMyself)
-    {
-        if (form == RangeForm.Square)
-        {
-            return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself);
-        }
-        else
-            return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself); // temp return value.
-    }
-    
-    List<GameObject> GetTilesInSquareRange(Vector2 mid, int minReach, int maxReach, bool includeMyself)
-    {
-        List<GameObject> tilesInRange = new List<GameObject>();
-        tilesInRange.Add(GetTile(mid));
-        for (int i = 0; i < maxReach; i++)
-        {
-            tilesInRange = AddNearbyTiles(tilesInRange);
-        }
-        
-        if (!includeMyself)
-        {
-            tilesInRange.Remove(tilesInRange[0]);
-        }
-        
-        return tilesInRange;
-    }
-    
-    public void ChangeTilesToSeletedColor(List<GameObject> tiles, TileColor color)
-    {
-        foreach(var tile in tiles)
-        {
-            if (color == TileColor.Red)
-                tile.GetComponent<Tile>().SetTileColor(new Color(1, 0.5f, 0.5f, 1));
-            else if (color == TileColor.Blue)
-                tile.GetComponent<Tile>().SetTileColor(new Color(0.6f, 0.6f, 1, 1));
-            tile.GetComponent<Tile>().SetPreSelected(true);
-        }
-    }
-    
-    public void ChangeTilesFromSeletedColorToDefaultColor(List<GameObject> tiles)
-    {
-        foreach(var tile in tiles)
-        {
-            tile.GetComponent<Tile>().SetTileColor(Color.white);
-            tile.GetComponent<Tile>().SetPreSelected(false);
-        }
-    }
-    
-    List<GameObject> AddNearbyTiles(List<GameObject> tileList)
+	public List<GameObject> GetTilesInRange(RangeForm form, Vector2 mid, int minReach, int maxReach, bool includeMyself)
+	{
+		if (form == RangeForm.Square)
+		{
+			return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself);
+		}
+		else
+			return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself); // temp return value.
+	}
+	
+	List<GameObject> GetTilesInSquareRange(Vector2 mid, int minReach, int maxReach, bool includeMyself)
+	{
+		List<GameObject> tilesInRange = new List<GameObject>();
+		tilesInRange.Add(GetTile(mid));
+		for (int i = 0; i < maxReach; i++)
+		{
+			tilesInRange = AddNearbyTiles(tilesInRange);
+		}
+		
+		if (!includeMyself)
+		{
+			tilesInRange.Remove(tilesInRange[0]);
+		}
+		
+		return tilesInRange;
+	}
+	
+	public void ChangeTilesToSeletedColor(List<GameObject> tiles, TileColor color)
+	{
+		foreach(var tile in tiles)
+		{
+			if (color == TileColor.Red)
+				tile.GetComponent<Tile>().SetTileColor(new Color(1, 0.5f, 0.5f, 1));
+			else if (color == TileColor.Blue)
+				tile.GetComponent<Tile>().SetTileColor(new Color(0.6f, 0.6f, 1, 1));
+			tile.GetComponent<Tile>().SetPreSelected(true);
+		}
+	}
+	
+	public void ChangeTilesFromSeletedColorToDefaultColor(List<GameObject> tiles)
+	{
+		foreach(var tile in tiles)
+		{
+			tile.GetComponent<Tile>().SetTileColor(Color.white);
+			tile.GetComponent<Tile>().SetPreSelected(false);
+		}
+	}
+	
+	List<GameObject> AddNearbyTiles(List<GameObject> tileList)
 	{
 		List<GameObject> newTileList = new List<GameObject>();
 		foreach (var tile in tileList)
@@ -122,29 +122,29 @@ public class TileManager : MonoBehaviour {
 				newTileList.Add(nearbyRightTile);
 			}
 		}
-        
-        return newTileList;
-    }
+		
+		return newTileList;
+	}
 
 	void GenerateTiles (int x, int y)
 	{
-        // 지금은 랜덤으로 타일을 배치. 
+		// 지금은 랜덤으로 타일을 배치. 
 		for (int i = 0; i < x; i++)
 		{
 			for (int j = 0; j < y; j++)
 			{
 				GameObject tile = Instantiate(tilePrefab, new Vector3(tileWidth * (j+i) * 0.5f, tileHeight * (j-i) * 0.5f, (j-i) * 0.1f), Quaternion.identity) as GameObject;
 				tile.GetComponent<Tile>().SetTilePos(i, j);
-                if (Random.Range(0, 3) > 0)
-                {
-                    tile.GetComponent<Tile>().SetTileForm(TileForm.Flatland);
-                    tile.GetComponent<Tile>().SetTileElement(Element.Plant);
-                }
-                else
-                {
-                    tile.GetComponent<Tile>().SetTileForm(TileForm.Hill);
-                    tile.GetComponent<Tile>().SetTileElement(Element.None);
-                }
+				if (Random.Range(0, 3) > 0)
+				{
+					tile.GetComponent<Tile>().SetTileForm(TileForm.Flatland);
+					tile.GetComponent<Tile>().SetTileElement(Element.Plant);
+				}
+				else
+				{
+					tile.GetComponent<Tile>().SetTileForm(TileForm.Hill);
+					tile.GetComponent<Tile>().SetTileElement(Element.None);
+				}
 				tiles.Add(new Vector2(i, j), tile);
 			}
 		}
@@ -152,10 +152,10 @@ public class TileManager : MonoBehaviour {
 		Debug.Log("Generate tiles complete");
 	}
 
-    void Awake () {
-        // FIXME : num of tiles is temp constant.
+	void Awake () {
+		// FIXME : num of tiles is temp constant.
 		GenerateTiles(30, 30);
-    }
+	}
 
 	// Use this for initialization
 	void Start () {
