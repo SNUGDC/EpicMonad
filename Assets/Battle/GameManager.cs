@@ -26,19 +26,9 @@ enum SkillApplyCommand
 
 public class GameManager : MonoBehaviour
 {
-
 	TileManager tileManager;
 	UnitManager unitManager;
-
-	GameObject commandUI;
-	GameObject skillUI;
-	GameObject skillCheckUI;
-	GameObject destCheckUI;
-	GameObject unitViewerUI;
-	GameObject selectedUnitViewerUI;
-	GameObject tileViewerUI;
-	GameObject selectDirectionUI;
-	GameObject cancelButtonUI;
+	UIManager uiManager;
 
 	CurrentState currentState = CurrentState.None;
 
@@ -99,16 +89,7 @@ public class GameManager : MonoBehaviour
 	{
 		tileManager = FindObjectOfType<TileManager>();
 		unitManager = FindObjectOfType<UnitManager>();
-
-		commandUI = GameObject.Find("CommandPanel");
-		skillUI = GameObject.Find("SkillPanel");
-		skillCheckUI = GameObject.Find("SkillCheckPanel");
-		destCheckUI = GameObject.Find("DestCheckPanel");
-		unitViewerUI = GameObject.Find("UnitViewerPanel");
-		selectedUnitViewerUI = GameObject.Find("SelectedUnitViewerPanel");
-		tileViewerUI = GameObject.Find("TileViewerPanel");
-		selectDirectionUI = GameObject.Find("SelectDirectionUI");
-		cancelButtonUI = GameObject.Find("CancelButtonPanel");
+		uiManager = FindObjectOfType<UIManager>();
 	}
 
 	// Use this for initialization
@@ -117,16 +98,6 @@ public class GameManager : MonoBehaviour
 		partyLevel = GetLevelInfoFromJson();
 		unitManager.SetStandardActionPoint(partyLevel);
 
-		commandUI.SetActive(false);
-		skillUI.SetActive(false);
-		skillCheckUI.SetActive(false);
-		destCheckUI.SetActive(false);
-		unitViewerUI.SetActive(false);
-		selectedUnitViewerUI.SetActive(false);
-		tileViewerUI.SetActive(false);
-		selectDirectionUI.SetActive(false);
-		cancelButtonUI.SetActive(false);
-	   
 		selectedUnitObject = null;
 
 		currentPhase = 1;
@@ -134,16 +105,6 @@ public class GameManager : MonoBehaviour
 		InitCameraPosition(new Vector2(15, 15)); // temp init position;
 
 		StartCoroutine(InstantiateTurnManager());
-	}
-
-	public GameObject GetUnitViewerUI()
-	{
-		return unitViewerUI;
-	}
-
-	public GameObject GetTileViewerUI()
-	{
-		return tileViewerUI;
 	}
 
 	public int GetCurrentPhase()
@@ -196,13 +157,12 @@ public class GameManager : MonoBehaviour
 		ChainList.RemoveChainsFromUnit(selectedUnitObject); // 턴이 돌아오면 자신이 건 체인 삭제.	 
 		currentState = CurrentState.FocusToUnit;
 		
-		selectedUnitViewerUI.SetActive(true);
-		selectedUnitViewerUI.GetComponent<SelectedUnitViewer>().UpdateUnitViewer(selectedUnitObject);
+		uiManager.SetSelectedUnitViewerUI(selectedUnitObject);
 		selectedUnitObject.GetComponent<Unit>().SetActive();
 		
 		yield return StartCoroutine(FocusToUnit());
 
-		selectedUnitViewerUI.SetActive(false);
+		uiManager.DisableSelectedUnitViewerUI();
 		selectedUnitObject.GetComponent<Unit>().SetInactive();
 	}
 
@@ -249,10 +209,9 @@ public class GameManager : MonoBehaviour
 		{
 			Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
 			
-			selectedUnitViewerUI.GetComponent<SelectedUnitViewer>().UpdateUnitViewer(selectedUnitObject);
+			uiManager.SetSelectedUnitViewerUI(selectedUnitObject);
 
-			commandUI.SetActive(true);
-			commandUI.transform.Find("NameText").GetComponent<Text>().text = selectedUnitObject.GetComponent<Unit>().GetName();
+			uiManager.SetCommandUIName(selectedUnitObject);
 			CheckStandbyPossible();
 			CheckMovePossible();
 			CheckSkillPossible();
@@ -293,25 +252,25 @@ public class GameManager : MonoBehaviour
 
 	public void CallbackMoveCommand()
 	{
-		commandUI.SetActive(false);
+		uiManager.DisableCommandUI();
 		command = ActionCommand.Move;
 	}
 
 	public void CallbackAttackCommand()
 	{
-		commandUI.SetActive(false);
+		uiManager.DisableCommandUI();
 		command = ActionCommand.Attack;
 	}
 
 	public void CallbackRestCommand()
 	{
-		commandUI.SetActive(false);
+		uiManager.DisableCommandUI();
 		command = ActionCommand.Rest;
 	}
 
 	public void CallbackStandbyCommand()
 	{
-		commandUI.SetActive(false);
+		uiManager.DisableCommandUI();
 		command = ActionCommand.Standby;
 	}
 
@@ -344,18 +303,6 @@ public class GameManager : MonoBehaviour
 		Debug.Log(index + "th skill is selected");
 	}
 
-	void UpdateSkillInfo()
-	{
-		List<Skill> skillList = selectedUnitObject.GetComponent<Unit>().GetSkillList();
-		for (int i = 0; i < skillList.Count; i++)
-		{
-			GameObject skillButton = GameObject.Find((i + 1).ToString() + "SkillButton"); //?? skillUI.transform.Find(i + "SkillButton")
-			skillButton.transform.Find("NameText").GetComponent<Text>().text = skillList[i].GetName();
-			skillButton.transform.Find("APText").GetComponent<Text>().text = skillList[i].GetRequireAP().ToString() + " AP";
-			skillButton.transform.Find("CooldownText").GetComponent<Text>().text = "";
-		}
-	}
-
 	void CheckUsableSkill()
 	{
 		List<Skill> skillList = selectedUnitObject.GetComponent<Unit>().GetSkillList();
@@ -373,8 +320,7 @@ public class GameManager : MonoBehaviour
 	{
 		while (currentState == CurrentState.SelectSkill)
 		{
-			skillUI.SetActive(true);
-			UpdateSkillInfo();
+			uiManager.UpdateSkillInfo(selectedUnitObject);
 			CheckUsableSkill();
 
 			rightClicked = false;
@@ -387,7 +333,7 @@ public class GameManager : MonoBehaviour
 				{
 					rightClicked = false;
 
-					skillUI.SetActive(false);
+					uiManager.DisableSkillUI();
 					currentState = CurrentState.FocusToUnit;
 					isWaitingUserInput = false;
 					yield break;
@@ -396,7 +342,7 @@ public class GameManager : MonoBehaviour
 			}
 			isWaitingUserInput = false;
 
-			skillUI.SetActive(false);
+			uiManager.DisableSkillUI();
 
 			yield return new WaitForSeconds(0.5f);
 
@@ -443,7 +389,7 @@ public class GameManager : MonoBehaviour
 			// 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요 - 대부분의 스킬은 논타겟팅. 추후 보강.
 
 			tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
-			skillUI.SetActive(false);
+			uiManager.DisableSkillUI();
 
 			currentState = CurrentState.CheckApplyOrChain;
 			yield return StartCoroutine(CheckApplyOrChain(selectedTilePosition));
@@ -474,7 +420,7 @@ public class GameManager : MonoBehaviour
 			isPossible = false;
 		}
 
-		GameObject.Find("ChainButton").GetComponent<Button>().interactable = isPossible;
+		uiManager.EnableSkillCheckChainButton(isPossible);
 	}
 
 	IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition)
@@ -488,13 +434,9 @@ public class GameManager : MonoBehaviour
 
 			List<GameObject> selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), selectedTilePosition, selectedSkill.GetSecondMinReach(), selectedSkill.GetSecondMaxReach(), true);
 			tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
-			skillCheckUI.SetActive(true);
-			CheckChainPossible();
 
-			int requireAP = selectedSkill.GetRequireAP();
-			string newAPText = "소모 AP : " + requireAP + "\n" +
-							   "잔여 AP : " + (selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP);
-			skillCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
+			CheckChainPossible();
+			uiManager.SetSkillCheckAP(selectedUnitObject, selectedSkill);
 
 			rightClicked = false;
 
@@ -506,7 +448,7 @@ public class GameManager : MonoBehaviour
 					rightClicked = false;
 
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
-					skillCheckUI.SetActive(false);
+					uiManager.DisableSkillCheckUI();
 					tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 					currentState = CurrentState.SelectSkillApplyPoint;
 					yield break;
@@ -561,13 +503,13 @@ public class GameManager : MonoBehaviour
 
 	public void CallbackApplyCommand()
 	{
-		skillCheckUI.SetActive(false);
+		uiManager.DisableSkillCheckUI();
 		skillApplyCommand = SkillApplyCommand.Apply;
 	}
 
 	public void CallbackChainCommand()
 	{
-		skillCheckUI.SetActive(false);
+		uiManager.DisableSkillCheckUI();
 		skillApplyCommand = SkillApplyCommand.Chain;
 	}
 
@@ -846,7 +788,7 @@ public class GameManager : MonoBehaviour
 	IEnumerator SelectMovingPoint()
 	{
 		cancelClicked = false;
-		cancelButtonUI.SetActive(true);
+		uiManager.EnableCancelButtonUI();
 
 		while (currentState == CurrentState.SelectMovingPoint)
 		{
@@ -871,7 +813,7 @@ public class GameManager : MonoBehaviour
 				{
 					rightClicked = false;
 					cancelClicked = false;
-					cancelButtonUI.SetActive(false);
+					uiManager.DisableCancelButtonUI();
 
 					tileManager.ChangeTilesFromSeletedColorToDefaultColor(movableTiles);
 
@@ -897,11 +839,11 @@ public class GameManager : MonoBehaviour
 
 			tileManager.ChangeTilesFromSeletedColorToDefaultColor(movableTiles);
 			currentState = CurrentState.CheckDestination;
+			uiManager.DisableCancelButtonUI();
 			yield return StartCoroutine(CheckDestination(movableTiles, destTile, destPath, totalUseActionPoint, distance));
 
 			yield return new WaitForSeconds(0.5f);
 		}
-		cancelButtonUI.SetActive(false);
 		yield return null;
 	}
 
@@ -916,11 +858,8 @@ public class GameManager : MonoBehaviour
 			destTileList.Add(destTile);
 			tileManager.ChangeTilesToSeletedColor(destTileList, TileColor.Blue);
 			// UI를 띄우고
-			selectDirectionUI.SetActive(true);
-			destCheckUI.SetActive(true);
-			string newAPText = "소모 AP : " + totalUseActionPoint + "\n" +
-							   "잔여 AP : " + (selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - totalUseActionPoint);
-			destCheckUI.transform.Find("APText").GetComponent<Text>().text = newAPText;
+			uiManager.EnableSelectDirectionUI();
+			uiManager.SetDestCheckUIAP(selectedUnitObject, totalUseActionPoint);
 
 			// 카메라를 옮기고
 			Camera.main.transform.position = new Vector3(destTile.transform.position.x, destTile.transform.position.y, -10);
@@ -942,8 +881,8 @@ public class GameManager : MonoBehaviour
 					moveCount -= distance;
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x,selectedUnitObject.transform.position.y, -10);
 					tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.Blue);
-					selectDirectionUI.SetActive(false);
-					destCheckUI.SetActive(false);
+					uiManager.DisableSelectDirectionUI();
+					uiManager.DisableDestCheckUI();
 					currentState = CurrentState.SelectMovingPoint;
 					isWaitingUserInput = false;
 					yield break;
@@ -956,7 +895,7 @@ public class GameManager : MonoBehaviour
 			// 방향을 클릭하면 그 자리로 이동. MoveToTile 호출 
 			tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
 			currentState = CurrentState.MoveToTile;
-			destCheckUI.SetActive(false);
+			uiManager.DisableDestCheckUI();
 			yield return StartCoroutine(MoveToTile(destTile, selectedDirection, totalUseActionPoint));
 		}
 		yield return null;
@@ -977,7 +916,7 @@ public class GameManager : MonoBehaviour
 			selectedDirection = Direction.RightDown;
 			
 		isSelectedDirectionByUser = true;
-		selectDirectionUI.SetActive(false);
+		uiManager.DisableSelectDirectionUI();
 	}
 
 	// Update is called once per frame
@@ -999,7 +938,7 @@ public class GameManager : MonoBehaviour
 		if (Input.GetMouseButtonDown(0))
 		{
 			// 유닛 뷰어가 뜬 상태에서 좌클릭하면, 유닛 뷰어가 고정된다. 단, 행동 선택 상태(FocusToUnit)에서만 가능.
-			if ((currentState == CurrentState.FocusToUnit) && (unitViewerUI.activeInHierarchy))
+			if ((currentState == CurrentState.FocusToUnit) && (uiManager.IsUnitViewerShowing()))
 				leftClicked = true;
 		}
 	}

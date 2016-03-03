@@ -128,22 +128,20 @@ public class Tile : MonoBehaviour {
 		{
 			if (FindObjectOfType<GameManager>().IsLeftClicked()) return;
 
-			FindObjectOfType<GameManager>().GetUnitViewerUI().SetActive(true);
-			FindObjectOfType<UnitViewer>().UpdateUnitViewer(unitOnTile);
+			FindObjectOfType<UIManager>().UpdateUnitViewer(unitOnTile);
 		}
 
-		FindObjectOfType<GameManager>().GetTileViewerUI().SetActive(true);
-		FindObjectOfType<TileViewer>().UpdateTileViewer(gameObject);
+		FindObjectOfType<UIManager>().SetTileViewer(gameObject);
 	}
 	
 	void OnMouseExit()
 	{
 		tileColor.isHighlight = false;
 		
-		FindObjectOfType<GameManager>().GetTileViewerUI().SetActive(false);
+		FindObjectOfType<UIManager>().DisableTileViewerUI();
 		
 		if (FindObjectOfType<GameManager>().IsLeftClicked()) return;
-		FindObjectOfType<GameManager>().GetUnitViewerUI().SetActive(false);
+		FindObjectOfType<UIManager>().DisableUnitViewer();
 	}
 
 	void OnMouseDown()
