@@ -849,6 +849,9 @@ public class GameManager : MonoBehaviour
 			uiManager.DisableCancelButtonUI();
 			yield return StartCoroutine(CheckDestination(movableTiles, destTile, destPath, totalUseActionPoint, distance));
 
+			cancelClicked = false;
+			uiManager.EnableCancelButtonUI();
+
 			yield return new WaitForSeconds(0.5f);
 		}
 		yield return null;
