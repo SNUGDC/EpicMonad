@@ -303,6 +303,11 @@ public class GameManager : MonoBehaviour
 		Debug.Log(index + "th skill is selected");
 	}
 
+	public void CallbackSkillUICancel()
+	{
+		cancelClicked = true;
+	}
+
 	void CheckUsableSkill()
 	{
 		List<Skill> skillList = selectedUnitObject.GetComponent<Unit>().GetSkillList();
@@ -324,14 +329,16 @@ public class GameManager : MonoBehaviour
 			CheckUsableSkill();
 
 			rightClicked = false;
+			cancelClicked = false;
 
 			isWaitingUserInput = true;
 			indexOfSeletedSkillByUser = 0;
 			while (indexOfSeletedSkillByUser == 0)
 			{
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
 
 					uiManager.DisableSkillUI();
 					currentState = CurrentState.FocusToUnit;
