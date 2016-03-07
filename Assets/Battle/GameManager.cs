@@ -338,8 +338,6 @@ public class GameManager : MonoBehaviour
 
 			uiManager.DisableSkillUI();
 
-			yield return new WaitForSeconds(0.5f);
-
 			currentState = CurrentState.SelectSkillApplyPoint;
 			yield return StartCoroutine(SelectSkillApplyPoint());
 		}
@@ -788,9 +786,6 @@ public class GameManager : MonoBehaviour
 
 	IEnumerator SelectMovingPoint()
 	{
-		cancelClicked = false;
-		uiManager.EnableCancelButtonUI();
-
 		while (currentState == CurrentState.SelectMovingPoint)
 		{
 			// List<GameObject> movableTiles = CheckMovableTiles(selectedUnitObject);
@@ -804,6 +799,8 @@ public class GameManager : MonoBehaviour
 			tileManager.ChangeTilesToSeletedColor(movableTiles, TileColor.Blue);
 
 			rightClicked = false;
+			cancelClicked = false;
+			uiManager.EnableCancelButtonUI();
 
 			isWaitingUserInput = true;
 			isSelectedTileByUser = false;
@@ -842,11 +839,6 @@ public class GameManager : MonoBehaviour
 			currentState = CurrentState.CheckDestination;
 			uiManager.DisableCancelButtonUI();
 			yield return StartCoroutine(CheckDestination(movableTiles, destTile, destPath, totalUseActionPoint, distance));
-
-			cancelClicked = false;
-			uiManager.EnableCancelButtonUI();
-
-			yield return new WaitForSeconds(0.5f);
 		}
 		yield return null;
 	}
