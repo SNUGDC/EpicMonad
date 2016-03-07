@@ -374,14 +374,18 @@ public class GameManager : MonoBehaviour
 			tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.Red);
 
 			rightClicked = false;
+			cancelClicked = false;
+			uiManager.EnableCancelButtonUI();
 
 			isWaitingUserInput = true;
 			isSelectedTileByUser = false;
 			while (!isSelectedTileByUser)
 			{
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
+					uiManager.DisableCancelButtonUI();
 
 					tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
 					currentState = CurrentState.SelectSkill;
@@ -392,6 +396,7 @@ public class GameManager : MonoBehaviour
 			}
 			isSelectedTileByUser = false;
 			isWaitingUserInput = false;
+			uiManager.DisableCancelButtonUI();
 
 			// 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요 - 대부분의 스킬은 논타겟팅. 추후 보강.
 
@@ -446,13 +451,15 @@ public class GameManager : MonoBehaviour
 			uiManager.SetSkillCheckAP(selectedUnitObject, selectedSkill);
 
 			rightClicked = false;
+			cancelClicked = false;
 
 			skillApplyCommand = SkillApplyCommand.Waiting;
 			while (skillApplyCommand == SkillApplyCommand.Waiting)
 			{
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
 
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
 					uiManager.DisableSkillCheckUI();
