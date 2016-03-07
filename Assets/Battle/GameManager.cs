@@ -308,25 +308,12 @@ public class GameManager : MonoBehaviour
 		cancelClicked = true;
 	}
 
-	void CheckUsableSkill()
-	{
-		List<Skill> skillList = selectedUnitObject.GetComponent<Unit>().GetSkillList();
-		for (int i = 0; i < skillList.Count; i++)
-		{
-			GameObject.Find((i + 1).ToString() + "SkillButton").GetComponent<Button>().interactable = true;
-			if (selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() < skillList[i].GetRequireAP())
-			{
-				GameObject.Find((i + 1).ToString() + "SkillButton").GetComponent<Button>().interactable = false;
-			}
-		}
-	}
-
 	IEnumerator SelectSkill()
 	{
 		while (currentState == CurrentState.SelectSkill)
 		{
 			uiManager.UpdateSkillInfo(selectedUnitObject);
-			CheckUsableSkill();
+			uiManager.CheckUsableSkill(selectedUnitObject);
 
 			rightClicked = false;
 			cancelClicked = false;
