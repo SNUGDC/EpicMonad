@@ -875,6 +875,8 @@ public class GameManager : MonoBehaviour
 			Camera.main.transform.position = new Vector3(destTile.transform.position.x, destTile.transform.position.y, -10);
 			// 클릭 대기
 			rightClicked = false;
+			cancelClicked = false;
+			uiManager.EnableCancelButtonUI();
 
 			isWaitingUserInput = true;
 			isSelectedDirectionByUser = false;
@@ -885,9 +887,12 @@ public class GameManager : MonoBehaviour
 				// 카메라 유닛 위치로 원상복구
 				// 이동가능 위치 다시 표시해주고 
 				// UI 숨기고
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
+					uiManager.DisableCancelButtonUI();
+
 					moveCount -= distance;
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x,selectedUnitObject.transform.position.y, -10);
 					tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.Blue);
@@ -901,6 +906,7 @@ public class GameManager : MonoBehaviour
 			}
 			isSelectedDirectionByUser = false;
 			isWaitingUserInput = false;
+			uiManager.DisableCancelButtonUI();
 
 			// 방향을 클릭하면 그 자리로 이동. MoveToTile 호출 
 			tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
