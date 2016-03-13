@@ -338,13 +338,29 @@ public class GameManager : MonoBehaviour
 
 			uiManager.DisableSkillUI();
 
-			currentState = CurrentState.SelectSkillApplyPoint;
-			yield return StartCoroutine(SelectSkillApplyPoint());
+			Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
+            SkillType skillTypeOfSelectedSkill = selectedSkill.GetSkillType();
+            if (skillTypeOfSelectedSkill == SkillType.Area)
+            {
+                currentState = CurrentState.CheckApplyOrChain;
+                yield return StartCoroutine(CheckApplyOrChain(selectedUnitObject.GetComponent<Unit>().GetPosition()));    
+            }
+            else
+            {
+                currentState = CurrentState.SelectSkillApplyPoint;
+                yield return StartCoroutine(SelectSkillApplyPoint());
+            }
 		}
 	}
 
 	IEnumerator SelectSkillApplyPoint()
 	{
+        if (currentState == CurrentState.SelectSkill)
+        {
+            uiManager.DisableCancelButtonUI();
+            yield break;
+        }
+        
 		while (currentState == CurrentState.SelectSkillApplyPoint)
 		{
 			Vector2 selectedUnitPos = selectedUnitObject.GetComponent<Unit>().GetPosition();
@@ -430,7 +446,9 @@ public class GameManager : MonoBehaviour
 			Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
 
 			List<GameObject> selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), selectedTilePosition, selectedSkill.GetSecondMinReach(), selectedSkill.GetSecondMaxReach(), true);
-			tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
+			if ((selectedSkill.GetSkillType() == SkillType.Area) && (!selectedSkill.GetIncludeMyself()))
+                selectedTiles.Remove(tileManager.GetTile(selectedTilePosition));
+            tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
 
 			CheckChainPossible();
 			uiManager.SetSkillCheckAP(selectedUnitObject, selectedSkill);
@@ -449,7 +467,10 @@ public class GameManager : MonoBehaviour
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
 					uiManager.DisableSkillCheckUI();
 					tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-					currentState = CurrentState.SelectSkillApplyPoint;
+					if (selectedSkill.GetSkillType() == SkillType.Area)
+                        currentState = CurrentState.SelectSkill;
+                    else     
+                        currentState = CurrentState.SelectSkillApplyPoint;
 					yield break;
 				}
 				yield return null;
@@ -600,7 +621,8 @@ public class GameManager : MonoBehaviour
 		List<GameObject> selectedTiles = chainInfo.GetTargetArea();
 		
 		// 시전 방향으로 유닛의 바라보는 방향을 돌림.
-		unitInChain.SetDirection(Utility.GetDirectionToTarget(unitInChain.gameObject, selectedTiles));
+		if (appliedSkill.GetSkillType() != SkillType.Area)
+            unitInChain.SetDirection(Utility.GetDirectionToTarget(unitInChain.gameObject, selectedTiles));
 		
 		// 자신의 체인 정보 삭제.
 		ChainList.RemoveChainsFromUnit(unitObjectInChain);
@@ -690,7 +712,8 @@ public class GameManager : MonoBehaviour
 		Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
 		
 		// 시전 방향으로 유닛의 바라보는 방향을 돌림.
-		selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
+        if (appliedSkill.GetSkillType() != SkillType.Area)
+    		selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
 		
 		yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
 		
