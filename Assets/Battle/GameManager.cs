@@ -628,7 +628,12 @@ public class GameManager : MonoBehaviour
 				// 방향 보너스.
 				float directionBouns = Utility.GetDirectionBonus(unitObjectInChain, target);
 				
-				var damageAmount = (int)((chainCombo * chainDamageFactor) * directionBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
+                // 천체속성 보너스.
+                float celestialBouns = Utility.GetCelestialBouns(unitObjectInChain, target);
+                if (celestialBouns == 1.2f) unitObjectInChain.GetComponent<Unit>().PrintCelestialBouns();
+                else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
+                
+				var damageAmount = (int)((chainCombo * chainDamageFactor) * directionBouns * celestialBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
 				var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChain.GetUnitClass(), damageAmount, false);
 				
 				if (target == targets[targets.Count-1])
@@ -706,8 +711,13 @@ public class GameManager : MonoBehaviour
 			{
 				// 방향 보너스.
 				float directionBouns = Utility.GetDirectionBonus(selectedUnitObject, target);
-				
-				var damageAmount = (int)(directionBouns * selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
+                
+				// 천체속성 보너스.
+                float celestialBouns = Utility.GetCelestialBouns(selectedUnitObject, target);
+				if (celestialBouns == 1.2f) selectedUnitObject.GetComponent<Unit>().PrintCelestialBouns();
+                else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
+                
+                var damageAmount = (int)(directionBouns * celestialBouns * selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
 				var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
 				
 				if (target == targets[targets.Count-1])

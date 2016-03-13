@@ -562,6 +562,19 @@ public class Unit : MonoBehaviour {
 		this.element = unitInfo.element;
 		this.celestial = unitInfo.celestial;
 	}
+    
+    // using test.
+    public void PrintCelestialBouns()
+    {
+        bounsTextObject.SetActive(true);
+        bounsTextObject.GetComponent<TextMesh>().text = "Celestial bouns";
+        Invoke("ActiveFalseAtDelay", 0.4f);
+    }
+    
+    void ActiveFalseAtDelay()
+    {
+        bounsTextObject.SetActive(false);
+    }
 
 	void ApplyStats()
 	{
