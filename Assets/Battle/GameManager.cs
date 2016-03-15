@@ -363,6 +363,7 @@ public class GameManager : MonoBehaviour
 													  selectedUnitPos,
 													  selectedSkill.GetFirstMinReach(),
 													  selectedSkill.GetFirstMaxReach(),
+                                                      Direction.LeftUp,
 													  selectedSkill.GetIncludeMyself());
 			tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.Red);
 
@@ -432,7 +433,12 @@ public class GameManager : MonoBehaviour
 
 			Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
 
-			List<GameObject> selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), selectedTilePosition, selectedSkill.GetSecondMinReach(), selectedSkill.GetSecondMaxReach(), true);
+			List<GameObject> selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), 
+                                                                         selectedTilePosition, 
+                                                                         selectedSkill.GetSecondMinReach(), 
+                                                                         selectedSkill.GetSecondMaxReach(), 
+                                                                         Direction.LeftUp,
+                                                                         true);
 			tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
 
 			CheckChainPossible();

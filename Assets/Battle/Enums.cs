@@ -57,6 +57,7 @@ namespace Enums {
 	public enum RangeForm
 	{
 		Square,
+        Straight,
 		Cross,
 		Diagonal
 	}

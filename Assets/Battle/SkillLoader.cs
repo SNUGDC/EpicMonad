@@ -24,14 +24,14 @@ public class SkillLoader {
 								 "darkBall", EffectVisualType.Area, EffectMoveType.Move);
 		Skill skill2 = new Skill("태초의 빛", 35, 0, 
 								 1.0f, 
-								 RangeForm.Square, 0, 4, 0, 
+								 RangeForm.Cross, 0, 4, 0, 
 								 true,
 								 RangeForm.Square, 0, 1, 0,
 								 SkillApplyType.Heal,
 								 "lightHeal", EffectVisualType.Individual, EffectMoveType.NonMove);
 		Skill skill3 = new Skill("영혼의 불꽃", 100, 0, 
 								 3.0f, 
-								 RangeForm.Square, 0, 2, 0, 
+								 RangeForm.Straight, 0, 2, 0, 
 								 false,
 								 RangeForm.Square, 0, 2, 0,
 								 SkillApplyType.Damage,
