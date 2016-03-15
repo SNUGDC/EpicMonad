@@ -13,14 +13,15 @@ public class Skill {
 	float powerFactor;
 	
 	// reach & range
-	// 지정/범위/경로. 아직 보류중. 
-	// SkillType skillType;
+	// 지정/범위/경로. 
+	SkillType skillType;
+    // 1차범위.
 	RangeForm firstRangeForm;
 	int firstMinReach;
 	int firstMaxReach;
 	int firstWidth;
 	bool includeMyself;
-	// 2차범위.
+	// 2차범위.   ** 범위형의 경우 반드시 1차범위 = 2차범위! **
 	RangeForm secondRangeForm;
 	int secondMinReach;
 	int secondMaxReach;
@@ -35,6 +36,7 @@ public class Skill {
 	
 	public Skill(string name, int requireAP, int cooldown, 
 				 float powerFactor,
+                 SkillType skillType,
 				 RangeForm firstRangeForm, int firstMinReach, int firstMaxReach, int firstWidth,
 				 bool includeMyself,
 				 RangeForm secondRangeForm, int secondMinReach, int secondMaxReach, int secondWidth,
@@ -45,6 +47,7 @@ public class Skill {
 		this.requireAP = requireAP;
 		this.cooldown = cooldown;
 		this.powerFactor = powerFactor;
+        this.skillType = skillType;
 		this.firstRangeForm = firstRangeForm;
 		this.firstMinReach = firstMinReach;
 		this.firstMaxReach = firstMaxReach;
@@ -64,6 +67,7 @@ public class Skill {
 	public int GetRequireAP() {return requireAP;}
 	public int GetCooldown() {return cooldown;}	
 	public float GetPowerFactor() {return powerFactor;}
+    public SkillType GetSkillType() {return skillType;}
 	public RangeForm GetFirstRangeForm() {return firstRangeForm;}
 	public int GetFirstMinReach() {return firstMinReach;}
 	public int GetFirstMaxReach() {return firstMaxReach;}

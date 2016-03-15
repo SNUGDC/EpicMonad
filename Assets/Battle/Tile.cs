@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 using Enums;
 
-public class Tile : MonoBehaviour {
+public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler {
 
 	public TileForm form;
 	public Element element;
@@ -120,7 +121,7 @@ public class Tile : MonoBehaviour {
 		}
 	}
 
-	void OnMouseEnter()
+	void IPointerEnterHandler.OnPointerEnter(PointerEventData pointerData)
 	{
 		tileColor.isHighlight = true;
 		
@@ -133,8 +134,8 @@ public class Tile : MonoBehaviour {
 
 		FindObjectOfType<UIManager>().SetTileViewer(gameObject);
 	}
-	
-	void OnMouseExit()
+
+	void IPointerExitHandler.OnPointerExit(PointerEventData pointerData)
 	{
 		tileColor.isHighlight = false;
 		
@@ -144,7 +145,7 @@ public class Tile : MonoBehaviour {
 		FindObjectOfType<UIManager>().DisableUnitViewer();
 	}
 
-	void OnMouseDown()
+	void IPointerDownHandler.OnPointerDown(PointerEventData pointerData)
 	{
 		GameManager gameManager = FindObjectOfType<GameManager>();
 		if ((isPreSeleted) && (gameManager != null))

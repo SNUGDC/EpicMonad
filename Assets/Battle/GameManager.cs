@@ -303,17 +303,9 @@ public class GameManager : MonoBehaviour
 		Debug.Log(index + "th skill is selected");
 	}
 
-	void CheckUsableSkill()
+	public void CallbackSkillUICancel()
 	{
-		List<Skill> skillList = selectedUnitObject.GetComponent<Unit>().GetSkillList();
-		for (int i = 0; i < skillList.Count; i++)
-		{
-			GameObject.Find((i + 1).ToString() + "SkillButton").GetComponent<Button>().interactable = true;
-			if (selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() < skillList[i].GetRequireAP())
-			{
-				GameObject.Find((i + 1).ToString() + "SkillButton").GetComponent<Button>().interactable = false;
-			}
-		}
+		cancelClicked = true;
 	}
 
 	IEnumerator SelectSkill()
@@ -321,17 +313,19 @@ public class GameManager : MonoBehaviour
 		while (currentState == CurrentState.SelectSkill)
 		{
 			uiManager.UpdateSkillInfo(selectedUnitObject);
-			CheckUsableSkill();
+			uiManager.CheckUsableSkill(selectedUnitObject);
 
 			rightClicked = false;
+			cancelClicked = false;
 
 			isWaitingUserInput = true;
 			indexOfSeletedSkillByUser = 0;
 			while (indexOfSeletedSkillByUser == 0)
 			{
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
 
 					uiManager.DisableSkillUI();
 					currentState = CurrentState.FocusToUnit;
@@ -344,15 +338,29 @@ public class GameManager : MonoBehaviour
 
 			uiManager.DisableSkillUI();
 
-			yield return new WaitForSeconds(0.5f);
-
-			currentState = CurrentState.SelectSkillApplyPoint;
-			yield return StartCoroutine(SelectSkillApplyPoint());
+			Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
+            SkillType skillTypeOfSelectedSkill = selectedSkill.GetSkillType();
+            if (skillTypeOfSelectedSkill == SkillType.Area)
+            {
+                currentState = CurrentState.CheckApplyOrChain;
+                yield return StartCoroutine(CheckApplyOrChain(selectedUnitObject.GetComponent<Unit>().GetPosition()));    
+            }
+            else
+            {
+                currentState = CurrentState.SelectSkillApplyPoint;
+                yield return StartCoroutine(SelectSkillApplyPoint());
+            }
 		}
 	}
 
 	IEnumerator SelectSkillApplyPoint()
 	{
+        if (currentState == CurrentState.SelectSkill)
+        {
+            uiManager.DisableCancelButtonUI();
+            yield break;
+        }
+        
 		while (currentState == CurrentState.SelectSkillApplyPoint)
 		{
 			Vector2 selectedUnitPos = selectedUnitObject.GetComponent<Unit>().GetPosition();
@@ -368,14 +376,18 @@ public class GameManager : MonoBehaviour
 			tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.Red);
 
 			rightClicked = false;
+			cancelClicked = false;
+			uiManager.EnableCancelButtonUI();
 
 			isWaitingUserInput = true;
 			isSelectedTileByUser = false;
 			while (!isSelectedTileByUser)
 			{
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
+					uiManager.DisableCancelButtonUI();
 
 					tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
 					currentState = CurrentState.SelectSkill;
@@ -386,6 +398,7 @@ public class GameManager : MonoBehaviour
 			}
 			isSelectedTileByUser = false;
 			isWaitingUserInput = false;
+			uiManager.DisableCancelButtonUI();
 
 			// 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요 - 대부분의 스킬은 논타겟팅. 추후 보강.
 
@@ -439,24 +452,31 @@ public class GameManager : MonoBehaviour
                                                                          selectedSkill.GetSecondMaxReach(), 
                                                                          Direction.LeftUp,
                                                                          true);
+            if ((selectedSkill.GetSkillType() == SkillType.Area) && (!selectedSkill.GetIncludeMyself()))
+                selectedTiles.Remove(tileManager.GetTile(selectedTilePosition));
 			tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
 
 			CheckChainPossible();
 			uiManager.SetSkillCheckAP(selectedUnitObject, selectedSkill);
 
 			rightClicked = false;
+			cancelClicked = false;
 
 			skillApplyCommand = SkillApplyCommand.Waiting;
 			while (skillApplyCommand == SkillApplyCommand.Waiting)
 			{
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
 
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
 					uiManager.DisableSkillCheckUI();
 					tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-					currentState = CurrentState.SelectSkillApplyPoint;
+					if (selectedSkill.GetSkillType() == SkillType.Area)
+                        currentState = CurrentState.SelectSkill;
+                    else     
+                        currentState = CurrentState.SelectSkillApplyPoint;
 					yield break;
 				}
 				yield return null;
@@ -607,7 +627,8 @@ public class GameManager : MonoBehaviour
 		List<GameObject> selectedTiles = chainInfo.GetTargetArea();
 		
 		// 시전 방향으로 유닛의 바라보는 방향을 돌림.
-		unitInChain.SetDirection(Utility.GetDirectionToTarget(unitInChain.gameObject, selectedTiles));
+		if (appliedSkill.GetSkillType() != SkillType.Area)
+            unitInChain.SetDirection(Utility.GetDirectionToTarget(unitInChain.gameObject, selectedTiles));
 		
 		// 자신의 체인 정보 삭제.
 		ChainList.RemoveChainsFromUnit(unitObjectInChain);
@@ -635,7 +656,12 @@ public class GameManager : MonoBehaviour
 				// 방향 보너스.
 				float directionBouns = Utility.GetDirectionBonus(unitObjectInChain, target);
 				
-				var damageAmount = (int)((chainCombo * chainDamageFactor) * directionBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
+                // 천체속성 보너스.
+                float celestialBouns = Utility.GetCelestialBouns(unitObjectInChain, target);
+                if (celestialBouns == 1.2f) unitObjectInChain.GetComponent<Unit>().PrintCelestialBouns();
+                else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
+                
+				var damageAmount = (int)((chainCombo * chainDamageFactor) * directionBouns * celestialBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
 				var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChain.GetUnitClass(), damageAmount, false);
 				
 				if (target == targets[targets.Count-1])
@@ -692,7 +718,8 @@ public class GameManager : MonoBehaviour
 		Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
 		
 		// 시전 방향으로 유닛의 바라보는 방향을 돌림.
-		selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
+        if (appliedSkill.GetSkillType() != SkillType.Area)
+    		selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
 		
 		yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
 		
@@ -713,8 +740,13 @@ public class GameManager : MonoBehaviour
 			{
 				// 방향 보너스.
 				float directionBouns = Utility.GetDirectionBonus(selectedUnitObject, target);
-				
-				var damageAmount = (int)(directionBouns * selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
+                
+				// 천체속성 보너스.
+                float celestialBouns = Utility.GetCelestialBouns(selectedUnitObject, target);
+				if (celestialBouns == 1.2f) selectedUnitObject.GetComponent<Unit>().PrintCelestialBouns();
+                else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
+                
+                var damageAmount = (int)(directionBouns * celestialBouns * selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
 				var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
 				
 				if (target == targets[targets.Count-1])
@@ -793,9 +825,6 @@ public class GameManager : MonoBehaviour
 
 	IEnumerator SelectMovingPoint()
 	{
-		cancelClicked = false;
-		uiManager.EnableCancelButtonUI();
-
 		while (currentState == CurrentState.SelectMovingPoint)
 		{
 			// List<GameObject> movableTiles = CheckMovableTiles(selectedUnitObject);
@@ -809,6 +838,8 @@ public class GameManager : MonoBehaviour
 			tileManager.ChangeTilesToSeletedColor(movableTiles, TileColor.Blue);
 
 			rightClicked = false;
+			cancelClicked = false;
+			uiManager.EnableCancelButtonUI();
 
 			isWaitingUserInput = true;
 			isSelectedTileByUser = false;
@@ -847,8 +878,6 @@ public class GameManager : MonoBehaviour
 			currentState = CurrentState.CheckDestination;
 			uiManager.DisableCancelButtonUI();
 			yield return StartCoroutine(CheckDestination(movableTiles, destTile, destPath, totalUseActionPoint, distance));
-
-			yield return new WaitForSeconds(0.5f);
 		}
 		yield return null;
 	}
@@ -871,6 +900,8 @@ public class GameManager : MonoBehaviour
 			Camera.main.transform.position = new Vector3(destTile.transform.position.x, destTile.transform.position.y, -10);
 			// 클릭 대기
 			rightClicked = false;
+			cancelClicked = false;
+			uiManager.EnableCancelButtonUI();
 
 			isWaitingUserInput = true;
 			isSelectedDirectionByUser = false;
@@ -881,9 +912,12 @@ public class GameManager : MonoBehaviour
 				// 카메라 유닛 위치로 원상복구
 				// 이동가능 위치 다시 표시해주고 
 				// UI 숨기고
-				if (rightClicked)
+				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
+					cancelClicked = false;
+					uiManager.DisableCancelButtonUI();
+
 					moveCount -= distance;
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x,selectedUnitObject.transform.position.y, -10);
 					tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.Blue);
@@ -897,6 +931,7 @@ public class GameManager : MonoBehaviour
 			}
 			isSelectedDirectionByUser = false;
 			isWaitingUserInput = false;
+			uiManager.DisableCancelButtonUI();
 
 			// 방향을 클릭하면 그 자리로 이동. MoveToTile 호출 
 			tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
