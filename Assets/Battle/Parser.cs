@@ -37,4 +37,26 @@ public class Parser : MonoBehaviour {
         
         return skillInfoList;
 	}
+    
+    public static List<TileInfo> GetParsedTileInfo()
+	{
+        List<TileInfo> tileInfoList = new List<TileInfo>();
+		
+		TextAsset csvFile = Resources.Load("testMapInfo") as TextAsset;
+		string csvText = csvFile.text;
+		string[] unparsedTileInfoStrings = csvText.Split('\n');
+		
+		for (int reverseY = unparsedTileInfoStrings.Length -1; reverseY >= 0 ; reverseY--)
+		{
+            string[] parsedTileInfoStrings = unparsedTileInfoStrings[reverseY].Split(',');
+			for (int x = 0; x < parsedTileInfoStrings.Length; x++)
+            {
+                Vector2 tilePosition = new Vector2(x, unparsedTileInfoStrings.Length - reverseY);
+                TileInfo tileInfo = new TileInfo(tilePosition, parsedTileInfoStrings[x]);
+    			tileInfoList.Add(tileInfo);
+            }
+        }
+        
+        return tileInfoList;
+	}
 }
