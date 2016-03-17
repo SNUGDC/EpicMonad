@@ -8,7 +8,11 @@ public class Parser : MonoBehaviour {
 	{
         List<UnitInfo> unitInfoList = new List<UnitInfo>();
 		
-		TextAsset csvFile = Resources.Load("Data/testStageUnitData") as TextAsset;
+		TextAsset csvFile;
+        if (FindObjectOfType<StageManager>() != null)
+            csvFile = FindObjectOfType<StageManager>().unitData as TextAsset;
+        else
+            csvFile = Resources.Load("Data/testStageUnitData") as TextAsset;
 		string csvText = csvFile.text;
 		string[] unparsedUnitInfoStrings = csvText.Split('\n');
 		
@@ -42,8 +46,12 @@ public class Parser : MonoBehaviour {
 	{
         List<TileInfo> tileInfoList = new List<TileInfo>();
 		
-		TextAsset csvFile = Resources.Load("Data/testMapData") as TextAsset;
-		string csvText = csvFile.text;
+		TextAsset csvFile;
+        if (FindObjectOfType<StageManager>() != null)
+            csvFile = FindObjectOfType<StageManager>().mapData as TextAsset;
+        else
+            csvFile = Resources.Load("Data/testMapData") as TextAsset;
+        string csvText = csvFile.text;
 		string[] unparsedTileInfoStrings = csvText.Split('\n');
 		
 		for (int reverseY = unparsedTileInfoStrings.Length -1; reverseY >= 0 ; reverseY--)
