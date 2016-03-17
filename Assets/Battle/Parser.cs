@@ -8,7 +8,7 @@ public class Parser : MonoBehaviour {
 	{
         List<UnitInfo> unitInfoList = new List<UnitInfo>();
 		
-		TextAsset csvFile = Resources.Load("testStageUnitInfo") as TextAsset;
+		TextAsset csvFile = Resources.Load("Data/testStageUnitData") as TextAsset;
 		string csvText = csvFile.text;
 		string[] unparsedUnitInfoStrings = csvText.Split('\n');
 		
@@ -25,7 +25,7 @@ public class Parser : MonoBehaviour {
 	{
         List<SkillInfo> skillInfoList = new List<SkillInfo>();
 		
-		TextAsset csvFile = Resources.Load("testSkillInfo") as TextAsset;
+		TextAsset csvFile = Resources.Load("Data/testSkillData") as TextAsset;
 		string csvText = csvFile.text;
 		string[] unparsedSkillInfoStrings = csvText.Split('\n');
 		
@@ -42,7 +42,7 @@ public class Parser : MonoBehaviour {
 	{
         List<TileInfo> tileInfoList = new List<TileInfo>();
 		
-		TextAsset csvFile = Resources.Load("testMapInfo") as TextAsset;
+		TextAsset csvFile = Resources.Load("Data/testMapData") as TextAsset;
 		string csvText = csvFile.text;
 		string[] unparsedTileInfoStrings = csvText.Split('\n');
 		

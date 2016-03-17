@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
 
 	int GetLevelInfoFromJson()
 	{
-		TextAsset jsonTextAsset = Resources.Load("Data/PartyInfo") as TextAsset;
+		TextAsset jsonTextAsset = Resources.Load("Data/PartyData") as TextAsset;
 		string jsonString = jsonTextAsset.text;
 		LevelData levelData = JsonMapper.ToObject<LevelData>(jsonString);
 		
