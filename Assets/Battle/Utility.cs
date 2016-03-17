@@ -72,32 +72,32 @@ public class Utility : MonoBehaviour {
 		else if ((deltaDegreeAtAttack < 135) || (deltaDegreeAtAttack > 225)) return 1.1f;
 		else return 1;
 	}
-    
-    public static float GetCelestialBouns(GameObject attacker, GameObject defender)
-    {
-        Celestial attackerCelestial = attacker.GetComponent<Unit>().GetCelestial();
-        Celestial defenderCelestial = defender.GetComponent<Unit>().GetCelestial();
-        
-        // Earth > Sun > Moon > Earth
-        if (attackerCelestial == Celestial.Sun)
-        {
-            if (defenderCelestial == Celestial.Moon) return 1.2f;
-            else if (defenderCelestial == Celestial.Earth) return 0.8f;
-            else return 1.0f; 
-        }
-        else if (attackerCelestial == Celestial.Moon)
-        {
-            if (defenderCelestial == Celestial.Earth) return 1.2f;
-            else if (defenderCelestial == Celestial.Sun) return 0.8f;
-            else return 1.0f; 
-        }
-        else if (attackerCelestial == Celestial.Earth)
-        {
-            if (defenderCelestial == Celestial.Sun) return 1.2f;
-            else if (defenderCelestial == Celestial.Moon) return 0.8f;
-            else return 1.0f; 
-        }
-        
-        else return 1;
-    }
+	
+	public static float GetCelestialBouns(GameObject attacker, GameObject defender)
+	{
+		Celestial attackerCelestial = attacker.GetComponent<Unit>().GetCelestial();
+		Celestial defenderCelestial = defender.GetComponent<Unit>().GetCelestial();
+		
+		// Earth > Sun > Moon > Earth
+		if (attackerCelestial == Celestial.Sun)
+		{
+			if (defenderCelestial == Celestial.Moon) return 1.2f;
+			else if (defenderCelestial == Celestial.Earth) return 0.8f;
+			else return 1.0f; 
+		}
+		else if (attackerCelestial == Celestial.Moon)
+		{
+			if (defenderCelestial == Celestial.Earth) return 1.2f;
+			else if (defenderCelestial == Celestial.Sun) return 0.8f;
+			else return 1.0f; 
+		}
+		else if (attackerCelestial == Celestial.Earth)
+		{
+			if (defenderCelestial == Celestial.Sun) return 1.2f;
+			else if (defenderCelestial == Celestial.Moon) return 0.8f;
+			else return 1.0f; 
+		}
+		
+		else return 1;
+	}
 }

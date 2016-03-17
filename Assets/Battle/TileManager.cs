@@ -48,14 +48,14 @@ public class TileManager : MonoBehaviour {
 		{
 			return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself);
 		}
-        else if (form == RangeForm.Straight)
-        {
-            return GetTilesInStraightRange(mid, minReach, maxReach, dir, includeMyself);
-        }
-        else if (form == RangeForm.Cross)
-        {
-            return GetTilesInCrossRange(mid, minReach, maxReach, includeMyself);
-        }
+		else if (form == RangeForm.Straight)
+		{
+			return GetTilesInStraightRange(mid, minReach, maxReach, dir, includeMyself);
+		}
+		else if (form == RangeForm.Cross)
+		{
+			return GetTilesInCrossRange(mid, minReach, maxReach, includeMyself);
+		}
 		else
 			return GetTilesInSquareRange(mid, minReach, maxReach, includeMyself); // temp return value.
 	}
@@ -76,46 +76,46 @@ public class TileManager : MonoBehaviour {
 		
 		return tilesInRange;
 	}
-    
-    List<GameObject> GetTilesInStraightRange(Vector2 mid, int minReach, int maxReach, Direction dir, bool includeMyself)
-    {
-        List<GameObject> tilesInRange = new List<GameObject>();
-        tilesInRange.Add(GetTile(mid));
-        
-        for(int i = 0; i < maxReach; i++)
-        {
-            Vector2 position = mid + ToVector2(dir)*(i+1);
-            if (GetTile(position) != null)
+	
+	List<GameObject> GetTilesInStraightRange(Vector2 mid, int minReach, int maxReach, Direction dir, bool includeMyself)
+	{
+		List<GameObject> tilesInRange = new List<GameObject>();
+		tilesInRange.Add(GetTile(mid));
+		
+		for(int i = 0; i < maxReach; i++)
+		{
+			Vector2 position = mid + ToVector2(dir)*(i+1);
+			if (GetTile(position) != null)
 			{
 				tilesInRange.Add(GetTile(position));
 			}
-        }
-        
-        if (!includeMyself)
-        {
-            tilesInRange.Remove(tilesInRange[0]);
-        }
-        
-        return tilesInRange;
-    }
-    
-    List<GameObject> GetTilesInCrossRange(Vector2 mid, int minReach, int maxReach, bool includeMyself)
-    {
-        List<GameObject> tilesInRange = new List<GameObject>();
-        tilesInRange.Add(GetTile(mid));
+		}
+		
+		if (!includeMyself)
+		{
+			tilesInRange.Remove(tilesInRange[0]);
+		}
+		
+		return tilesInRange;
+	}
+	
+	List<GameObject> GetTilesInCrossRange(Vector2 mid, int minReach, int maxReach, bool includeMyself)
+	{
+		List<GameObject> tilesInRange = new List<GameObject>();
+		tilesInRange.Add(GetTile(mid));
 
-        tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.LeftUp, false)).ToList();
-        tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.LeftDown, false)).ToList();
-        tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.RightUp, false)).ToList();
-        tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.RightDown, false)).ToList();
-        
-        if(!includeMyself)
-        {
-            tilesInRange.Remove(tilesInRange[0]);
-        }
-        
-        return tilesInRange;
-    }
+		tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.LeftUp, false)).ToList();
+		tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.LeftDown, false)).ToList();
+		tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.RightUp, false)).ToList();
+		tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.RightDown, false)).ToList();
+		
+		if(!includeMyself)
+		{
+			tilesInRange.Remove(tilesInRange[0]);
+		}
+		
+		return tilesInRange;
+	}
 	
 	public void ChangeTilesToSeletedColor(List<GameObject> tiles, TileColor color)
 	{
@@ -174,26 +174,26 @@ public class TileManager : MonoBehaviour {
 		
 		return newTileList;
 	}
-    
-    Vector2 ToVector2(Direction dir)
-    {
-        if(dir == Direction.LeftUp)
-        {
-            return Vector2.left;
-        }
-        
-        else if(dir == Direction.LeftDown) 
-        {
-            return Vector2.down;
-        }
-        
-        else if(dir == Direction.RightUp)
-        {
-            return Vector2.up;
-        }
-        else
-            return Vector2.right;
-    }
+	
+	Vector2 ToVector2(Direction dir)
+	{
+		if(dir == Direction.LeftUp)
+		{
+			return Vector2.left;
+		}
+		
+		else if(dir == Direction.LeftDown) 
+		{
+			return Vector2.down;
+		}
+		
+		else if(dir == Direction.RightUp)
+		{
+			return Vector2.up;
+		}
+		else
+			return Vector2.right;
+	}
 
 	void GenerateTiles (int x, int y)
 	{
@@ -220,36 +220,36 @@ public class TileManager : MonoBehaviour {
 		
 		Debug.Log("Generate tiles complete");
 	}
-    
-    void GenerateTiles (List<TileInfo> tileInfoList)
-    {
-        foreach (var tileInfo in tileInfoList)
-        {
-            GenerateTile(tileInfo);
-        }
-    }
-    
-    void GenerateTile (TileInfo tileInfo)
-    {
-        if (tileInfo.IsEmptyTile()) return;
-        
-        Vector2 tilePosition = tileInfo.GetTilePosition();
-        TileForm tileForm = tileInfo.GetTileForm();
-        Element tileElement = tileInfo.GetTileElement();
-    
-        int j = (int)tilePosition.y;
-        int i = (int)tilePosition.x;
-    
-        GameObject tile = Instantiate(tilePrefab, new Vector3(tileWidth * (j+i) * 0.5f, tileHeight * (j-i) * 0.5f, (j-i) * 0.1f), Quaternion.identity) as GameObject;
-        tile.GetComponent<Tile>().SetTilePos(i, j);
-        tile.GetComponent<Tile>().SetTileForm(tileForm);
-        tile.GetComponent<Tile>().SetTileElement(tileElement);
-        
-        tiles.Add(new Vector2(i, j), tile);
-    }
+	
+	void GenerateTiles (List<TileInfo> tileInfoList)
+	{
+		foreach (var tileInfo in tileInfoList)
+		{
+			GenerateTile(tileInfo);
+		}
+	}
+	
+	void GenerateTile (TileInfo tileInfo)
+	{
+		if (tileInfo.IsEmptyTile()) return;
+		
+		Vector2 tilePosition = tileInfo.GetTilePosition();
+		TileForm tileForm = tileInfo.GetTileForm();
+		Element tileElement = tileInfo.GetTileElement();
+	
+		int j = (int)tilePosition.y;
+		int i = (int)tilePosition.x;
+	
+		GameObject tile = Instantiate(tilePrefab, new Vector3(tileWidth * (j+i) * 0.5f, tileHeight * (j-i) * 0.5f, (j-i) * 0.1f), Quaternion.identity) as GameObject;
+		tile.GetComponent<Tile>().SetTilePos(i, j);
+		tile.GetComponent<Tile>().SetTileForm(tileForm);
+		tile.GetComponent<Tile>().SetTileElement(tileElement);
+		
+		tiles.Add(new Vector2(i, j), tile);
+	}
 
 	void Awake () {
-        GenerateTiles(Parser.GetParsedTileInfo());
+		GenerateTiles(Parser.GetParsedTileInfo());
 		// // FIXME : num of tiles is temp constant.
 		// GenerateTiles(30, 30);
 	}
