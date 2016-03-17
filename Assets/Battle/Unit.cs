@@ -563,6 +563,18 @@ public class Unit : MonoBehaviour {
 		this.celestial = unitInfo.celestial;
 	}
     
+    public void ApplySkillList (List<SkillInfo> skillInfoList)
+    {
+        float partyLevel = (float)FindObjectOfType<GameManager>().GetPartyLevel();
+        
+        foreach (var skillInfo in skillInfoList)
+        {
+            if ((skillInfo.GetOwner() == "default") && 
+                (skillInfo.GetRequireLevel() <= partyLevel))
+                skillList.Add(skillInfo.GetSkill());       
+        }
+    }
+    
     // using test.
     public void PrintCelestialBouns()
     {
@@ -615,7 +627,7 @@ public class Unit : MonoBehaviour {
 		UpdateSpriteByDirection();
 		currentHealth = maxHealth;
 		activityPoint = (int)(dexturity * 1.5f);
-		skillList = SkillLoader.MakeSkillList();
+		// skillList = SkillLoader.MakeSkillList();
 		buffList = new List<Buff>();
 		debuffList = new List<Debuff>();
 		

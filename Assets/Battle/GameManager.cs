@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using Enums;
 using LitJson;
-using System.IO;
 using System;
 
 enum CurrentState

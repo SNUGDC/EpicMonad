@@ -6,6 +6,8 @@ public class UnitManager : MonoBehaviour {
 
 	int standardActionPoint;
 
+    List<SkillInfo> skillInfoList = new List<SkillInfo>();
+
 	public GameObject unitPrefab;
 	List<GameObject> units = new List<GameObject>();
 	List<GameObject> readiedUnits = new List<GameObject>();
@@ -38,6 +40,7 @@ public class UnitManager : MonoBehaviour {
 			GameObject unit = Instantiate(unitPrefab) as GameObject;
 			
 			unit.GetComponent<Unit>().ApplyUnitInfo(unitInfo);
+            unit.GetComponent<Unit>().ApplySkillList(skillInfoList);
 			
 			Vector2 initPosition = unit.GetComponent<Unit>().GetInitPosition();
 			// Vector3 tilePosition = tileManager.GetTilePos(initPosition);
@@ -105,9 +108,15 @@ public class UnitManager : MonoBehaviour {
 		else
 			return compareResultByCurrentActionPoint;
 	}
+    
+    void LoadSkills()
+    {
+        skillInfoList = Parser.GetParsedSkillInfo();
+    }
 
 	// Use this for initialization
 	void Start () {
+        LoadSkills();
 		GenerateUnits ();
 	}
 	

@@ -4,11 +4,9 @@ using System.Collections.Generic;
 
 public class Parser : MonoBehaviour {
 
-	private static List<UnitInfo> unitInfoList = new List<UnitInfo>();
-
-	public static void ParsingUnitInfo()
+	public static List<UnitInfo> GetParsedUnitInfo()
 	{
-		unitInfoList.Clear();
+        List<UnitInfo> unitInfoList = new List<UnitInfo>();
 		
 		TextAsset csvFile = Resources.Load("testStageUnitInfo") as TextAsset;
 		string csvText = csvFile.text;
@@ -19,12 +17,24 @@ public class Parser : MonoBehaviour {
 			UnitInfo unitInfo = new UnitInfo(unparsedUnitInfoStrings[i]);
 			unitInfoList.Add(unitInfo);
 		}
+        
+        return unitInfoList;
 	}
-	
-	public static List<UnitInfo> GetParsedUnitInfo()
+    
+    public static List<SkillInfo> GetParsedSkillInfo()
 	{
-		ParsingUnitInfo();
+        List<SkillInfo> skillInfoList = new List<SkillInfo>();
 		
-		return unitInfoList;
+		TextAsset csvFile = Resources.Load("testSkillInfo") as TextAsset;
+		string csvText = csvFile.text;
+		string[] unparsedSkillInfoStrings = csvText.Split('\n');
+		
+		for (int i = 1; i < unparsedSkillInfoStrings.Length; i++)
+		{
+			SkillInfo skillInfo = new SkillInfo(unparsedSkillInfoStrings[i]);
+			skillInfoList.Add(skillInfo);
+		}
+        
+        return skillInfoList;
 	}
 }
