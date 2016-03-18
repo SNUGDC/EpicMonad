@@ -45,7 +45,14 @@ namespace Enums {
 	
 	public enum Direction
 	{
-		LeftUp, LeftDown, RightUp, RightDown
+		LeftUp, 
+        LeftDown, 
+        RightUp, 
+        RightDown, 
+        Left,
+        Right,
+        Up,
+        Down
 	}
 	
 	public enum SkillType
@@ -59,7 +66,7 @@ namespace Enums {
 		Square,
         Straight,
 		Cross,
-		Diagonal
+        DiagonalCross
 	}
 	
 	public enum SkillApplyType
