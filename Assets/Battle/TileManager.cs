@@ -80,33 +80,33 @@ public class TileManager : MonoBehaviour {
 		
 		return tilesInRange;
 	}
-    
-    List<GameObject> GetTilesInStraightRange(Vector2 mid, int minReach, int maxReach, Direction dir, bool includeMyself)
-    {
-        List<GameObject> tilesInRange = new List<GameObject>();
-        tilesInRange.Add(GetTile(mid));
-        
-        for(int i = 0; i < maxReach; i++)
-        {
-            Vector2 position = mid + ToVector2(dir)*(i+1);
-            if (GetTile(position) != null)
+	
+	List<GameObject> GetTilesInStraightRange(Vector2 mid, int minReach, int maxReach, Direction dir, bool includeMyself)
+	{
+		List<GameObject> tilesInRange = new List<GameObject>();
+		tilesInRange.Add(GetTile(mid));
+		
+		for(int i = 0; i < maxReach; i++)
+		{
+			Vector2 position = mid + ToVector2(dir)*(i+1);
+			if (GetTile(position) != null)
 			{
 				tilesInRange.Add(GetTile(position));
 			}
-        }
-        
-        if (!includeMyself)
-        {
-            tilesInRange.Remove(tilesInRange[0]);
-        }
-        
-        return tilesInRange;
-    }
-    
-    List<GameObject> GetTilesInCrossRange(Vector2 mid, int minReach, int maxReach, bool includeMyself)
-    {
-        List<GameObject> tilesInRange = new List<GameObject>();
-        tilesInRange.Add(GetTile(mid));
+		}
+		
+		if (!includeMyself)
+		{
+			tilesInRange.Remove(tilesInRange[0]);
+		}
+		
+		return tilesInRange;
+	}
+	
+	List<GameObject> GetTilesInCrossRange(Vector2 mid, int minReach, int maxReach, bool includeMyself)
+	{
+		List<GameObject> tilesInRange = new List<GameObject>();
+		tilesInRange.Add(GetTile(mid));
 
         tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.LeftUp, false)).ToList();
         tilesInRange = tilesInRange.Concat(GetTilesInStraightRange(mid, minReach, maxReach, Direction.LeftDown, false)).ToList();
@@ -138,7 +138,7 @@ public class TileManager : MonoBehaviour {
         
         return tilesInRange;
     }
-	
+    
 	public void ChangeTilesToSeletedColor(List<GameObject> tiles, TileColor color)
 	{
 		foreach(var tile in tiles)
@@ -262,10 +262,38 @@ public class TileManager : MonoBehaviour {
 		
 		Debug.Log("Generate tiles complete");
 	}
+	
+	void GenerateTiles (List<TileInfo> tileInfoList)
+	{
+		foreach (var tileInfo in tileInfoList)
+		{
+			GenerateTile(tileInfo);
+		}
+	}
+	
+	void GenerateTile (TileInfo tileInfo)
+	{
+		if (tileInfo.IsEmptyTile()) return;
+		
+		Vector2 tilePosition = tileInfo.GetTilePosition();
+		TileForm tileForm = tileInfo.GetTileForm();
+		Element tileElement = tileInfo.GetTileElement();
+	
+		int j = (int)tilePosition.y;
+		int i = (int)tilePosition.x;
+	
+		GameObject tile = Instantiate(tilePrefab, new Vector3(tileWidth * (j+i) * 0.5f, tileHeight * (j-i) * 0.5f, (j-i) * 0.1f), Quaternion.identity) as GameObject;
+		tile.GetComponent<Tile>().SetTilePos(i, j);
+		tile.GetComponent<Tile>().SetTileForm(tileForm);
+		tile.GetComponent<Tile>().SetTileElement(tileElement);
+		
+		tiles.Add(new Vector2(i, j), tile);
+	}
 
 	void Awake () {
-		// FIXME : num of tiles is temp constant.
-		GenerateTiles(30, 30);
+		GenerateTiles(Parser.GetParsedTileInfo());
+		// // FIXME : num of tiles is temp constant.
+		// GenerateTiles(30, 30);
 	}
 
 	// Use this for initialization
