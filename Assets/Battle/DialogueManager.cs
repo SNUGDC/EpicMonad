@@ -7,6 +7,8 @@ public class DialogueManager : MonoBehaviour {
 
 	public TextAsset dialogueData;
 
+	Sprite transparent;
+	
 	Image leftPortrait;
 	Image rightPortrait; 
 	Text nameText;
@@ -22,10 +24,15 @@ public class DialogueManager : MonoBehaviour {
 
 	void Initialize()
 	{
+		transparent = Resources.Load("StandingImage/" + "transparent", typeof(Sprite)) as Sprite;
+		
 		leftPortrait = GameObject.Find("LeftPortrait").GetComponent<Image>();
 		rightPortrait = GameObject.Find("RightPortrait").GetComponent<Image>();
 		nameText = GameObject.Find("NameText").GetComponent<Text>();
 		dialogueText = GameObject.Find("DialogueText").GetComponent<Text>();
+		
+		leftPortrait.sprite = transparent;
+		rightPortrait.sprite = transparent;
 		
 		leftUnit = null;
 		rightUnit = null;
@@ -42,8 +49,16 @@ public class DialogueManager : MonoBehaviour {
 	{
 		while (line < endLine)
 		{
+			leftPortrait.color = Color.gray;
+			rightPortrait.color = Color.gray;
+			
 			if (!dialogueDataList[line].IsEffect())
 			{
+				if (leftUnit == dialogueDataList[line].GetNameInCode())
+					leftPortrait.color = Color.white;
+				else if (rightUnit == dialogueDataList[line].GetNameInCode())
+					rightPortrait.color = Color.white;
+				
 				if (dialogueDataList[line].GetName() != "-")
 					nameText.text = "[" + dialogueDataList[line].GetName() + "]";
 				else 
@@ -65,7 +80,7 @@ public class DialogueManager : MonoBehaviour {
 					{
 						leftUnit = dialogueDataList[line].GetNameInCode();
 						Debug.Log("StandingImage/" + dialogueDataList[line].GetNameInCode() + "_standing");
-						leftPortrait.sprite = Resources.Load<Sprite>("StandingImage/" + dialogueDataList[line].GetNameInCode() + "_standing");
+						leftPortrait.sprite = Resources.Load("StandingImage/" + dialogueDataList[line].GetNameInCode() + "_standing", typeof(Sprite)) as Sprite;
 					}
 					else if (dialogueDataList[line].GetEffectSubType() == "right")
 					{

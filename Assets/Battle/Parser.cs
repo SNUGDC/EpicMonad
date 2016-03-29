@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class Parser : MonoBehaviour {
 
@@ -9,7 +10,7 @@ public class Parser : MonoBehaviour {
 		List<DialogueData> dialogueDataList = new List<DialogueData>();
 		
 		string csvText = dialogueDataFile.text;
-		string[] unparsedDialogueDataStrings = csvText.Split('\n');
+		string[] unparsedDialogueDataStrings = csvText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 		
 		for (int i = 0; i < unparsedDialogueDataStrings.Length; i++)
 		{
@@ -30,7 +31,7 @@ public class Parser : MonoBehaviour {
 		else
 			csvFile = Resources.Load("Data/testStageUnitData") as TextAsset;
 		string csvText = csvFile.text;
-		string[] unparsedUnitInfoStrings = csvText.Split('\n');
+		string[] unparsedUnitInfoStrings = csvText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 		
 		for (int i = 1; i < unparsedUnitInfoStrings.Length; i++)
 		{
@@ -47,7 +48,7 @@ public class Parser : MonoBehaviour {
 		
 		TextAsset csvFile = Resources.Load("Data/testSkillData") as TextAsset;
 		string csvText = csvFile.text;
-		string[] unparsedSkillInfoStrings = csvText.Split('\n');
+		string[] unparsedSkillInfoStrings = csvText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 		
 		for (int i = 1; i < unparsedSkillInfoStrings.Length; i++)
 		{
@@ -68,7 +69,7 @@ public class Parser : MonoBehaviour {
 		else
 			csvFile = Resources.Load("Data/testMapData") as TextAsset;
 		string csvText = csvFile.text;
-		string[] unparsedTileInfoStrings = csvText.Split('\n');
+		string[] unparsedTileInfoStrings = csvText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 		
 		for (int reverseY = unparsedTileInfoStrings.Length -1; reverseY >= 0 ; reverseY--)
 		{
