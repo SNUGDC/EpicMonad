@@ -12,6 +12,9 @@ public class DialogueManager : MonoBehaviour {
 	Text nameText;
 	Text dialogueText;
 	
+	string leftUnit;
+	string rightUnit;
+	
 	List<DialogueData> dialogueDataList;
 	int line;
 	int endLine;
@@ -23,6 +26,9 @@ public class DialogueManager : MonoBehaviour {
 		rightPortrait = GameObject.Find("RightPortrait").GetComponent<Image>();
 		nameText = GameObject.Find("NameText").GetComponent<Text>();
 		dialogueText = GameObject.Find("DialogueText").GetComponent<Text>();
+		
+		leftUnit = null;
+		rightUnit = null;
 		
 		dialogueDataList = Parser.GetParsedDialogueData(dialogueData);
 		
@@ -41,7 +47,7 @@ public class DialogueManager : MonoBehaviour {
 				if (dialogueDataList[line].GetName() != "-")
 					nameText.text = "[" + dialogueDataList[line].GetName() + "]";
 				else 
-					nameText.text = "";
+					nameText.text = null;
 				dialogueText.text = dialogueDataList[line].GetDialogue();
 				
 							
@@ -53,6 +59,45 @@ public class DialogueManager : MonoBehaviour {
 			}
 			else 
 			{
+				if (dialogueDataList[line].GetEffectType() == "appear")
+				{
+					if (dialogueDataList[line].GetEffectSubType() == "left")
+					{
+						leftUnit = dialogueDataList[line].GetNameInCode();
+						Debug.Log("StandingImage/" + dialogueDataList[line].GetNameInCode() + "_standing");
+						leftPortrait.sprite = Resources.Load<Sprite>("StandingImage/" + dialogueDataList[line].GetNameInCode() + "_standing");
+					}
+					else if (dialogueDataList[line].GetEffectSubType() == "right")
+					{
+						rightUnit = dialogueDataList[line].GetNameInCode();
+						rightPortrait.sprite = Resources.Load("StandingImage/" + dialogueDataList[line].GetNameInCode() + "_standing", typeof(Sprite)) as Sprite;
+					}
+					else 
+					{
+						Debug.LogError("Undefined effectSubType : " + dialogueDataList[line].GetEffectSubType());
+					}
+				}
+				else if (dialogueDataList[line].GetEffectType() == "disappear")
+				{
+					if (dialogueDataList[line].GetEffectSubType() == "left")
+					{
+						leftUnit = null;
+						leftPortrait.sprite = Resources.Load("StandingImage/" + "transparent", typeof(Sprite)) as Sprite;
+					}
+					else if (dialogueDataList[line].GetEffectSubType() == "right")
+					{
+						rightUnit = null;
+						rightPortrait.sprite = Resources.Load("StandingImage/" + "transparent", typeof(Sprite)) as Sprite;
+					}
+					else 
+					{
+						Debug.LogError("Undefined effectSubType : " + dialogueDataList[line].GetEffectSubType());
+					}
+				}
+				else
+				{
+					Debug.LogError("Undefined effectType : " + dialogueDataList[line].GetEffectType());
+				}
 				line++;
 			}
 			yield return null;
