@@ -21,7 +21,7 @@ public class CustomText : MonoBehaviour
 	public Sprite spriteMinus;
 	public Sprite spritePlus;
 
-	private static int gap = 70;
+	private static int gap = 50;
 	private List<GameObject> characterInstances = new List<GameObject>();
 
 	public enum Align
@@ -95,6 +95,7 @@ public class CustomText : MonoBehaviour
 
 			rectTransform.offsetMax = new Vector2(100, 100) + relativePosition;
 			rectTransform.offsetMin = Vector2.zero + relativePosition;
+			rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y, 0);
 		}
 	}
 
