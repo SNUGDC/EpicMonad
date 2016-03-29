@@ -4,6 +4,22 @@ using System.Collections.Generic;
 
 public class Parser : MonoBehaviour {
 
+	public static List<DialogueData> GetParsedDialogueData(TextAsset dialogueDataFile)
+	{
+		List<DialogueData> dialogueDataList = new List<DialogueData>();
+		
+		string csvText = dialogueDataFile.text;
+		string[] unparsedDialogueDataStrings = csvText.Split('\n');
+		
+		for (int i = 0; i < unparsedDialogueDataStrings.Length; i++)
+		{
+			DialogueData dialogueData = new DialogueData(unparsedDialogueDataStrings[i]);
+			dialogueDataList.Add(dialogueData);
+		}
+		
+		return dialogueDataList;
+	}
+
 	public static List<UnitInfo> GetParsedUnitInfo()
 	{
 		List<UnitInfo> unitInfoList = new List<UnitInfo>();
