@@ -194,32 +194,6 @@ public class TileManager : MonoBehaviour {
 		else
 			return Vector2.right;
 	}
-
-	void GenerateTiles (int x, int y)
-	{
-		// 지금은 랜덤으로 타일을 배치. 
-		for (int i = 0; i < x; i++)
-		{
-			for (int j = 0; j < y; j++)
-			{
-				GameObject tile = Instantiate(tilePrefab, new Vector3(tileWidth * (j+i) * 0.5f, tileHeight * (j-i) * 0.5f, (j-i) * 0.1f), Quaternion.identity) as GameObject;
-				tile.GetComponent<Tile>().SetTilePos(i, j);
-				if (Random.Range(0, 3) > 0)
-				{
-					tile.GetComponent<Tile>().SetTileForm(TileForm.Flatland);
-					tile.GetComponent<Tile>().SetTileElement(Element.Plant);
-				}
-				else
-				{
-					tile.GetComponent<Tile>().SetTileForm(TileForm.Hill);
-					tile.GetComponent<Tile>().SetTileElement(Element.None);
-				}
-				tiles.Add(new Vector2(i, j), tile);
-			}
-		}
-		
-		Debug.Log("Generate tiles complete");
-	}
 	
 	void GenerateTiles (List<TileInfo> tileInfoList)
 	{
@@ -250,8 +224,6 @@ public class TileManager : MonoBehaviour {
 
 	void Awake () {
 		GenerateTiles(Parser.GetParsedTileInfo());
-		// // FIXME : num of tiles is temp constant.
-		// GenerateTiles(30, 30);
 	}
 
 	// Use this for initialization

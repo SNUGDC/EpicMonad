@@ -57,10 +57,11 @@ public class Parser : MonoBehaviour {
 		for (int reverseY = unparsedTileInfoStrings.Length -1; reverseY >= 0 ; reverseY--)
 		{
 			string[] parsedTileInfoStrings = unparsedTileInfoStrings[reverseY].Split(',');
-			for (int x = 0; x < parsedTileInfoStrings.Length; x++)
+			for (int x = 1; x <= parsedTileInfoStrings.Length; x++)
 			{
 				Vector2 tilePosition = new Vector2(x, unparsedTileInfoStrings.Length - reverseY);
-				TileInfo tileInfo = new TileInfo(tilePosition, parsedTileInfoStrings[x]);
+				Debug.Log(x + ", " + (unparsedTileInfoStrings.Length - reverseY));
+				TileInfo tileInfo = new TileInfo(tilePosition, parsedTileInfoStrings[x-1]);
 				tileInfoList.Add(tileInfo);
 			}
 		}
