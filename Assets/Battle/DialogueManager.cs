@@ -79,7 +79,6 @@ public class DialogueManager : MonoBehaviour {
 					if (dialogueDataList[line].GetEffectSubType() == "left")
 					{
 						leftUnit = dialogueDataList[line].GetNameInCode();
-						Debug.Log("StandingImage/" + dialogueDataList[line].GetNameInCode() + "_standing");
 						leftPortrait.sprite = Resources.Load("StandingImage/" + dialogueDataList[line].GetNameInCode() + "_standing", typeof(Sprite)) as Sprite;
 					}
 					else if (dialogueDataList[line].GetEffectSubType() == "right")

@@ -27,7 +27,7 @@ public class DialogueData{
 	
 	public DialogueData (string unparsedDialogueDataString)
 	{
-		string[] stringList = unparsedDialogueDataString.Split('#');
+		string[] stringList = unparsedDialogueDataString.Split('\t');
 		
 		if (stringList[0] == "*") // effects.
 		{
