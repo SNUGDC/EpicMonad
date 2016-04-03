@@ -632,7 +632,8 @@ public class GameManager : MonoBehaviour
 		// 자신의 체인 정보 삭제.
 		ChainList.RemoveChainsFromUnit(unitObjectInChain);
 		
-		yield return StartCoroutine(ApplySkillEffect(appliedSkill, unitInChain.gameObject, selectedTiles));
+		// 이펙트 임시로 비활성화.
+		// yield return StartCoroutine(ApplySkillEffect(appliedSkill, unitInChain.gameObject, selectedTiles));
 
 		List<GameObject> targets = new List<GameObject>();
 
@@ -720,7 +721,8 @@ public class GameManager : MonoBehaviour
 		if (appliedSkill.GetSkillType() != SkillType.Area)
 			selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
 		
-		yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
+		// 이펙트 임시로 비활성화.
+		// yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
 		
 		List<GameObject> targets = new List<GameObject>();
 

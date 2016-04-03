@@ -18,7 +18,7 @@ public class Unit : MonoBehaviour
 
 	Side side; // 진영. 적/아군
 
-	// 하드코딩된 기본 스킬리스트를 받아옴.
+	// 스킬리스트.
 	List<Skill> skillList = new List<Skill>();
 
 	// FIXME : temp values
@@ -570,9 +570,15 @@ public class Unit : MonoBehaviour
 
 		foreach (var skillInfo in skillInfoList)
 		{
-			if ((skillInfo.GetOwner() == "default") &&
+			if ((skillInfo.GetOwner() == this.nameInCode) &&
 				(skillInfo.GetRequireLevel() <= partyLevel))
 				skillList.Add(skillInfo.GetSkill());
+
+			// 비어있으면 디폴트 스킬로 채우도록.			
+			if (skillList.Count() == 0)
+				if ((skillInfo.GetOwner() == "default") &&
+					(skillInfo.GetRequireLevel() <= partyLevel))
+					skillList.Add(skillInfo.GetSkill());
 		}
 	}
 
