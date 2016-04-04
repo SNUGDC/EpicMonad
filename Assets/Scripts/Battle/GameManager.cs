@@ -101,7 +101,7 @@ public class GameManager : MonoBehaviour
 
 		currentPhase = 1;
 
-		InitCameraPosition(new Vector2(1, 1)); // temp init position;
+		InitCameraPosition(); // temp init position;
 
 		StartCoroutine(InstantiateTurnManager());
 	}
@@ -116,10 +116,9 @@ public class GameManager : MonoBehaviour
 		return selectedUnitObject;
 	}
 
-	void InitCameraPosition(Vector2 initTilePosition)
+	void InitCameraPosition()
 	{
-		Vector2 tilePosition = tileManager.GetTilePos(initTilePosition);
-		Camera.main.transform.position = new Vector3(tilePosition.x, tilePosition.y, -10);
+		Camera.main.transform.position = new Vector3(0, 0, -10);
 	}
 
 	IEnumerator InstantiateTurnManager()
