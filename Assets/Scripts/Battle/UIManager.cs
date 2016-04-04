@@ -51,14 +51,34 @@ public class UIManager : MonoBehaviour
 		commandUI.SetActive(false);
 	}
 
-	public void UpdateSkillInfo(GameObject selectedUnitObject)
+	private void EnableSkillUI()
 	{
 		skillUI.SetActive(true);
+		foreach (Transform transform in skillUI.transform)
+		{
+			transform.gameObject.SetActive(true);
+		}
+	}
 
+	public void UpdateSkillInfo(GameObject selectedUnitObject)
+	{
+		EnableSkillUI();
 		List<Skill> skillList = selectedUnitObject.GetComponent<Unit>().GetSkillList();
-		for (int i = 0; i < skillList.Count; i++)
+
+		const int skillButtonCount = 5;
+		if (skillList.Count > skillButtonCount) {
+			Debug.LogError("Too many skill count " + skillList.Count);
+		}
+
+		for (int i = 0; i < skillButtonCount; i++)
 		{
 			GameObject skillButton = GameObject.Find((i + 1).ToString() + "SkillButton"); //?? skillUI.transform.Find(i + "SkillButton")
+			if (i >= skillList.Count)
+			{
+				skillButton.SetActive(false);
+				continue;
+			}
+
 			skillButton.transform.Find("NameText").GetComponent<Text>().text = skillList[i].GetName();
 			skillButton.transform.Find("APText").GetComponent<Text>().text = skillList[i].GetRequireAP().ToString() + " AP";
 			skillButton.transform.Find("CooldownText").GetComponent<Text>().text = "";
