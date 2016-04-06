@@ -573,13 +573,15 @@ public class Unit : MonoBehaviour
 			if ((skillInfo.GetOwner() == this.nameInCode) &&
 				(skillInfo.GetRequireLevel() <= partyLevel))
 				skillList.Add(skillInfo.GetSkill());
-
-			// 비어있으면 디폴트 스킬로 채우도록.			
-			if (skillList.Count() == 0)
+		}
+		// 비어있으면 디폴트 스킬로 채우도록.			
+		if (skillList.Count() == 0)
+			foreach (var skillInfo in skillInfoList)
+			{
 				if ((skillInfo.GetOwner() == "default") &&
 					(skillInfo.GetRequireLevel() <= partyLevel))
 					skillList.Add(skillInfo.GetSkill());
-		}
+			}
 	}
 
 	// using test.
