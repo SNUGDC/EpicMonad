@@ -1,8 +1,8 @@
 Name,NameInCode,Side,InitPosotionX,InitPositionY,InitDirection,BaseHealth,BasePower,BaseDefense,BaseResistence,BaseDexturity,UnitClass,Element,Celestial
-???,temp01,Enemy,5,9,LeftUp,-3,0,3,3,-1,Melee,Fire,Sun
-민트 디 셀레스트,temp02,Enemy,4,8,LeftDown,4,-3,3,-1,-4,Magic,Water,Earth
-엘프 궁수 시안,temp03,Enemy,13,13,LeftUp,0,0,2,-2,3,Melee,Plant,Moon
-카야 나르딕,temp04,Enemy,14,1,RightDown,-2,4,-2,4,2,Melee,Metal,Moon
-소녀,temp05,Ally,7,4,RightDown,-3,0,-2,1,3,Magic,Plant,Sun
-초록의 신비술사,temp06,Ally,6,5,LeftDown,-2,-4,4,1,2,Magic,Water,Earth
-제국군 마법사,temp07,Ally,3,6,RightUp,4,-1,2,0,3,Magic,Plant,Moon
+???,temp01,Enemy,5,9,LeftUp,250,92,18,41,30,Melee,Fire,Sun
+민트 디 셀레스트,temp02,Enemy,4,8,LeftDown,254,72,0,31,49,Magic,Water,Earth
+엘프 궁수 시안,temp03,Enemy,13,13,LeftUp,252,82,21,24,35,Melee,Plant,Moon
+카야 나르딕,temp04,Enemy,14,1,RightDown,258,68,20,15,47,Melee,Metal,Moon
+소녀,temp05,Ally,7,4,RightDown,288,84,10,44,45,Magic,Plant,Sun
+초록의 신비술사,temp06,Ally,6,5,LeftDown,302,60,33,27,27,Magic,Water,Earth
+제국군 마법사,temp07,Ally,3,6,RightUp,255,72,37,32,20,Magic,Plant,Moon
