@@ -1,9 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using Enums;
 
 public class Utility : MonoBehaviour {
+
+	public static Direction GetMouseDirectionByUnit(GameObject unit)
+	{
+		Direction mouseDirectionByUnit;
+		Vector2 unitPosition = unit.transform.position;
+		
+		string directionString = "";
+		Vector2 mousePosition = Camera.main.ScreenToWorldPoint(new Vector3 (Input.mousePosition.x,Input.mousePosition.y,0));
+		
+		if (mousePosition.x < unitPosition.x)
+			directionString += "Left";
+		else
+			directionString += "Right";
+			
+		if (mousePosition.y > unitPosition.y)
+			directionString += "Up";
+		else
+			directionString += "Down";
+		
+		mouseDirectionByUnit = (Direction)Enum.Parse(typeof(Direction), directionString);
+		
+		return mouseDirectionByUnit;
+	}
 
 	public static float GetDegreeToTarget(GameObject unit, Vector2 targetPosition)
 	{

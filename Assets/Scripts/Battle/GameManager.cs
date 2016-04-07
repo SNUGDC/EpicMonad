@@ -9,7 +9,7 @@ using System;
 enum CurrentState
 {
 	None, FocusToUnit, SelectMovingPoint, CheckDestination,
-	MoveToTile, SelectSkill, SelectSkillApplyPoint, CheckApplyOrChain,
+	MoveToTile, SelectSkill, SelectSkillApplyPoint, SelectSkillApplyDirection, CheckApplyOrChain,
 	ApplySkill, ChainAndStandby, RestAndRecover, Standby
 }
 
@@ -340,8 +340,10 @@ public class GameManager : MonoBehaviour
 			SkillType skillTypeOfSelectedSkill = selectedSkill.GetSkillType();
 			if (skillTypeOfSelectedSkill == SkillType.Area)
 			{
-				currentState = CurrentState.CheckApplyOrChain;
-				yield return StartCoroutine(CheckApplyOrChain(selectedUnitObject.GetComponent<Unit>().GetPosition()));    
+				currentState = CurrentState.SelectSkillApplyDirection;
+				yield return StartCoroutine(SelectSkillApplyDirection(selectedUnitObject.GetComponent<Unit>().GetDirection()));
+				// currentState = CurrentState.CheckApplyOrChain;
+				// yield return StartCoroutine(CheckApplyOrChain(selectedUnitObject.GetComponent<Unit>().GetPosition()));    
 			}
 			else
 			{
@@ -349,6 +351,81 @@ public class GameManager : MonoBehaviour
 				yield return StartCoroutine(SelectSkillApplyPoint());
 			}
 		}
+	}
+	
+	IEnumerator SelectSkillApplyDirection(Direction originalDirection)
+	{
+		Direction beforeDirection = originalDirection;
+		List<GameObject> selectedTiles = new List<GameObject>();
+		Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
+		Skill selectedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
+		
+		rightClicked = false;
+		isWaitingUserInput = true;
+		isSelectedTileByUser = false;
+		
+		if (currentState == CurrentState.SelectSkill)
+		{
+			uiManager.DisableCancelButtonUI();
+			yield break;
+		}
+
+		if (currentState == CurrentState.SelectSkillApplyDirection)
+		{
+			selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), 
+														selectedUnit.GetPosition(), 
+														selectedSkill.GetSecondMinReach(), 
+														selectedSkill.GetSecondMaxReach(), 
+														selectedUnit.GetDirection(),
+														false);
+															
+			tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
+		}
+
+		while (currentState == CurrentState.SelectSkillApplyDirection)
+		{				
+			Direction newDirection = Utility.GetMouseDirectionByUnit(selectedUnitObject);
+			// Debug.LogWarning(newDirection);
+			if (beforeDirection != newDirection)
+			{
+				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+				
+				beforeDirection = newDirection;
+				selectedUnit.SetDirection(newDirection);
+				selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), 
+															selectedUnit.GetPosition(), 
+															selectedSkill.GetSecondMinReach(), 
+															selectedSkill.GetSecondMaxReach(), 
+															selectedUnit.GetDirection(),
+															false);
+															
+				tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
+			}
+			
+			if (rightClicked || cancelClicked)
+			{
+				rightClicked = false;
+				cancelClicked = false;
+				uiManager.DisableCancelButtonUI();
+				
+				selectedUnit.SetDirection(originalDirection);
+				tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
+				currentState = CurrentState.SelectSkill;
+				yield break;
+			}
+			
+			if (isSelectedTileByUser)
+			{
+				isWaitingUserInput = false;
+				uiManager.DisableCancelButtonUI();
+				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+				
+				currentState = CurrentState.CheckApplyOrChain;
+				yield return StartCoroutine(CheckApplyOrChain(selectedUnit.GetPosition()));
+			}
+			yield return null;
+		}
+		yield return null;
 	}
 
 	IEnumerator SelectSkillApplyPoint()
@@ -369,7 +446,7 @@ public class GameManager : MonoBehaviour
 													  selectedUnitPos,
 													  selectedSkill.GetFirstMinReach(),
 													  selectedSkill.GetFirstMaxReach(),
-													  Direction.LeftUp,
+													  selectedUnitObject.GetComponent<Unit>().GetDirection(),
 													  selectedSkill.GetIncludeMyself());
 			tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.Red);
 
@@ -448,7 +525,7 @@ public class GameManager : MonoBehaviour
 																		 selectedTilePosition, 
 																		 selectedSkill.GetSecondMinReach(), 
 																		 selectedSkill.GetSecondMaxReach(), 
-																		 Direction.LeftUp,
+																		 selectedUnitObject.GetComponent<Unit>().GetDirection(),
 																		 true);
 			if ((selectedSkill.GetSkillType() == SkillType.Area) && (!selectedSkill.GetIncludeMyself()))
 				selectedTiles.Remove(tileManager.GetTile(selectedTilePosition));
