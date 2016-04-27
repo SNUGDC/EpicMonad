@@ -342,13 +342,11 @@ public class GameManager : MonoBehaviour
 			{
 				currentState = CurrentState.SelectSkillApplyDirection;
 				yield return StartCoroutine(SelectSkillApplyDirection(selectedUnitObject.GetComponent<Unit>().GetDirection()));
-				// currentState = CurrentState.CheckApplyOrChain;
-				// yield return StartCoroutine(CheckApplyOrChain(selectedUnitObject.GetComponent<Unit>().GetPosition()));    
 			}
 			else
 			{
 				currentState = CurrentState.SelectSkillApplyPoint;
-				yield return StartCoroutine(SelectSkillApplyPoint());
+				yield return StartCoroutine(SelectSkillApplyPoint(selectedUnitObject.GetComponent<Unit>().GetDirection()));
 			}
 		}
 	}
@@ -409,7 +407,7 @@ public class GameManager : MonoBehaviour
 				uiManager.DisableCancelButtonUI();
 				
 				selectedUnit.SetDirection(originalDirection);
-				tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
+				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 				currentState = CurrentState.SelectSkill;
 				yield break;
 			}
@@ -421,15 +419,18 @@ public class GameManager : MonoBehaviour
 				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 				
 				currentState = CurrentState.CheckApplyOrChain;
-				yield return StartCoroutine(CheckApplyOrChain(selectedUnit.GetPosition()));
+				yield return StartCoroutine(CheckApplyOrChain(selectedUnit.GetPosition(), originalDirection));
 			}
 			yield return null;
 		}
 		yield return null;
 	}
 
-	IEnumerator SelectSkillApplyPoint()
+	IEnumerator SelectSkillApplyPoint(Direction originalDirection)
 	{
+		Direction beforeDirection = originalDirection;
+		Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
+
 		if (currentState == CurrentState.SelectSkill)
 		{
 			uiManager.DisableCancelButtonUI();
@@ -437,7 +438,7 @@ public class GameManager : MonoBehaviour
 		}
 		
 		while (currentState == CurrentState.SelectSkillApplyPoint)
-		{
+		{	
 			Vector2 selectedUnitPos = selectedUnitObject.GetComponent<Unit>().GetPosition();
 
 			List<GameObject> activeRange = new List<GameObject>();
@@ -458,6 +459,13 @@ public class GameManager : MonoBehaviour
 			isSelectedTileByUser = false;
 			while (!isSelectedTileByUser)
 			{
+				Direction newDirection = Utility.GetMouseDirectionByUnit(selectedUnitObject);
+				if (beforeDirection != newDirection)
+				{					
+					beforeDirection = newDirection;
+					selectedUnit.SetDirection(newDirection);
+				}
+				
 				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
@@ -481,7 +489,7 @@ public class GameManager : MonoBehaviour
 			uiManager.DisableSkillUI();
 
 			currentState = CurrentState.CheckApplyOrChain;
-			yield return StartCoroutine(CheckApplyOrChain(selectedTilePosition));
+			yield return StartCoroutine(CheckApplyOrChain(selectedTilePosition, originalDirection));
 		}
 	}
 
@@ -512,7 +520,7 @@ public class GameManager : MonoBehaviour
 		uiManager.EnableSkillCheckChainButton(isPossible);
 	}
 
-	IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition)
+	IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition, Direction originalDirection)
 	{
 		while (currentState == CurrentState.CheckApplyOrChain)
 		{
@@ -548,6 +556,7 @@ public class GameManager : MonoBehaviour
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
 					uiManager.DisableSkillCheckUI();
 					tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+					selectedUnitObject.GetComponent<Unit>().SetDirection(originalDirection);
 					if (selectedSkill.GetSkillType() == SkillType.Area)
 						currentState = CurrentState.SelectSkill;
 					else     
