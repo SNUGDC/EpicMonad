@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviour
 
 		selectedUnitObject = null;
 
-		currentPhase = 1;
+		currentPhase = 0;
 
 		InitCameraPosition(); // temp init position;
 
