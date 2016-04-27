@@ -642,7 +642,7 @@ public class Unit : MonoBehaviour
 		position = initPosition;
 		UpdateSpriteByDirection();
 		currentHealth = maxHealth;
-		activityPoint = (int)(dexturity * 1.5f);
+		activityPoint = (int)(dexturity * 0.5f) + FindObjectOfType<UnitManager>().GetStandardActionPoint();
 		// skillList = SkillLoader.MakeSkillList();
 		buffList = new List<Buff>();
 		debuffList = new List<Debuff>();
