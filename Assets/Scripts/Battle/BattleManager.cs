@@ -231,7 +231,7 @@ public class BattleManager : MonoBehaviour
 			{
 				command = ActionCommand.Waiting;
 				currentState = CurrentState.SelectSkill;
-				yield return StartCoroutine(SelectSkill());
+				yield return StartCoroutine(SelectSkillState.Run(this));
 			}
 			else if (command == ActionCommand.Rest)
 			{
@@ -307,52 +307,7 @@ public class BattleManager : MonoBehaviour
 		cancelClicked = true;
 	}
 
-	IEnumerator SelectSkill()
-	{
-		while (currentState == CurrentState.SelectSkill)
-		{
-			uiManager.UpdateSkillInfo(selectedUnitObject);
-			uiManager.CheckUsableSkill(selectedUnitObject);
-
-			rightClicked = false;
-			cancelClicked = false;
-
-			isWaitingUserInput = true;
-			indexOfSeletedSkillByUser = 0;
-			while (indexOfSeletedSkillByUser == 0)
-			{
-				if (rightClicked || cancelClicked)
-				{
-					rightClicked = false;
-					cancelClicked = false;
-
-					uiManager.DisableSkillUI();
-					currentState = CurrentState.FocusToUnit;
-					isWaitingUserInput = false;
-					yield break;
-				}
-				yield return null;
-			}
-			isWaitingUserInput = false;
-
-			uiManager.DisableSkillUI();
-
-			Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
-			SkillType skillTypeOfSelectedSkill = selectedSkill.GetSkillType();
-			if (skillTypeOfSelectedSkill == SkillType.Area)
-			{
-				currentState = CurrentState.SelectSkillApplyDirection;
-				yield return StartCoroutine(SelectSkillApplyDirection(selectedUnitObject.GetComponent<Unit>().GetDirection()));
-			}
-			else
-			{
-				currentState = CurrentState.SelectSkillApplyPoint;
-				yield return StartCoroutine(SelectSkillApplyPoint(selectedUnitObject.GetComponent<Unit>().GetDirection()));
-			}
-		}
-	}
-
-	IEnumerator SelectSkillApplyDirection(Direction originalDirection)
+	public IEnumerator SelectSkillApplyDirection(Direction originalDirection)
 	{
 		Direction beforeDirection = originalDirection;
 		List<GameObject> selectedTiles = new List<GameObject>();
@@ -427,7 +382,7 @@ public class BattleManager : MonoBehaviour
 		yield return null;
 	}
 
-	IEnumerator SelectSkillApplyPoint(Direction originalDirection)
+	public IEnumerator SelectSkillApplyPoint(Direction originalDirection)
 	{
 		Direction beforeDirection = originalDirection;
 		Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
