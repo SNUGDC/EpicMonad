@@ -45,7 +45,7 @@ public class SelectSkillState
 			else
 			{
 				battleManager.currentState = CurrentState.SelectSkillApplyPoint;
-				yield return battleManager.StartCoroutine(battleManager.SelectSkillApplyPoint(battleManager.selectedUnitObject.GetComponent<Unit>().GetDirection()));
+				yield return battleManager.StartCoroutine(SelectSkillApplyPoint(battleManager, battleManager.selectedUnitObject.GetComponent<Unit>().GetDirection()));
 			}
 		}
 	}
@@ -124,4 +124,72 @@ public class SelectSkillState
 		}
 		yield return null;
 	}
+
+	private static IEnumerator SelectSkillApplyPoint(BattleManager battleManager, Direction originalDirection)
+	{
+		Direction beforeDirection = originalDirection;
+		Unit selectedUnit = battleManager.selectedUnitObject.GetComponent<Unit>();
+
+		if (battleManager.currentState == CurrentState.SelectSkill)
+		{
+			battleManager.uiManager.DisableCancelButtonUI();
+			yield break;
+		}
+
+		while (battleManager.currentState == CurrentState.SelectSkillApplyPoint)
+		{
+			Vector2 selectedUnitPos = battleManager.selectedUnitObject.GetComponent<Unit>().GetPosition();
+
+			List<GameObject> activeRange = new List<GameObject>();
+			Skill selectedSkill = battleManager.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1];
+			activeRange = battleManager.tileManager.GetTilesInRange(selectedSkill.GetFirstRangeForm(),
+													  selectedUnitPos,
+													  selectedSkill.GetFirstMinReach(),
+													  selectedSkill.GetFirstMaxReach(),
+													  battleManager.selectedUnitObject.GetComponent<Unit>().GetDirection(),
+													  selectedSkill.GetIncludeMyself());
+			battleManager.tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.Red);
+
+			battleManager.rightClicked = false;
+			battleManager.cancelClicked = false;
+			battleManager.uiManager.EnableCancelButtonUI();
+
+			battleManager.isWaitingUserInput = true;
+			battleManager.isSelectedTileByUser = false;
+			while (!battleManager.isSelectedTileByUser)
+			{
+				Direction newDirection = Utility.GetMouseDirectionByUnit(battleManager.selectedUnitObject);
+				if (beforeDirection != newDirection)
+				{
+					beforeDirection = newDirection;
+					selectedUnit.SetDirection(newDirection);
+				}
+
+				if (battleManager.rightClicked || battleManager.cancelClicked)
+				{
+					battleManager.rightClicked = false;
+					battleManager.cancelClicked = false;
+					battleManager.uiManager.DisableCancelButtonUI();
+
+					battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+					battleManager.currentState = CurrentState.SelectSkill;
+					battleManager.isWaitingUserInput = false;
+					yield break;
+				}
+				yield return null;
+			}
+			battleManager.isSelectedTileByUser = false;
+			battleManager.isWaitingUserInput = false;
+			battleManager.uiManager.DisableCancelButtonUI();
+
+			// 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요 - 대부분의 스킬은 논타겟팅. 추후 보강.
+
+			battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+			battleManager.uiManager.DisableSkillUI();
+
+			battleManager.currentState = CurrentState.CheckApplyOrChain;
+			yield return battleManager.StartCoroutine(battleManager.CheckApplyOrChain(battleManager.selectedTilePosition, originalDirection));
+		}
+	}
+
 }
