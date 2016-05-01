@@ -437,7 +437,7 @@ namespace Battle.Turn
 				selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
 
 			// 이펙트 임시로 비활성화.
-			// yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
+			// yield return battleManager.StartCoroutine(ApplySkillEffect(battleManager, appliedSkill, battleManager.selectedUnitObject, selectedTiles));
 
 			List<GameObject> targets = new List<GameObject>();
 
@@ -513,5 +513,83 @@ namespace Battle.Turn
 			yield return battleManager.StartCoroutine(battleManager.FocusToUnit());
 		}
 
+		private static IEnumerator ApplySkillEffect(BattleManager battleManager, Skill appliedSkill, GameObject unitObject, List<GameObject> selectedTiles)
+		{
+			string effectName = appliedSkill.GetEffectName();
+			EffectVisualType effectVisualType = appliedSkill.GetEffectVisualType();
+			EffectMoveType effectMoveType = appliedSkill.GetEffectMoveType();
+
+			if ((effectVisualType == EffectVisualType.Area) && (effectMoveType == EffectMoveType.Move))
+			{
+				// 투사체, 범위형 이펙트.
+				Vector3 startPos = unitObject.transform.position;
+				Vector3 endPos = new Vector3(0, 0, 0);
+				foreach (var tile in selectedTiles)
+				{
+					endPos += tile.transform.position;
+				}
+				endPos = endPos / (float)selectedTiles.Count;
+
+				GameObject particle = GameObject.Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+				particle.transform.position = startPos - new Vector3(0, 0, 0.01f);
+				yield return new WaitForSeconds(0.2f);
+				iTween.MoveTo(particle, endPos - new Vector3(0, 0, 0.01f) - new Vector3(0, 0, 5f), 0.5f); // 타일 축 -> 유닛 축으로 옮기기 위해 z축으로 5만큼 앞으로 빼준다.
+				yield return new WaitForSeconds(0.3f);
+				GameObject.Destroy(particle, 0.5f);
+				yield return null;
+			}
+			else if ((effectVisualType == EffectVisualType.Area) && (effectMoveType == EffectMoveType.NonMove))
+			{
+				// 고정형, 범위형 이펙트.
+				Vector3 targetPos = new Vector3(0, 0, 0);
+				foreach (var tile in selectedTiles)
+				{
+					targetPos += tile.transform.position;
+				}
+				targetPos = targetPos / (float)selectedTiles.Count;
+				targetPos = targetPos - new Vector3(0, 0, 5f); // 타일 축 -> 유닛 축으로 옮기기 위해 z축으로 5만큼 앞으로 빼준다.
+
+				GameObject particle = GameObject.Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+				particle.transform.position = targetPos - new Vector3(0, 0, 0.01f);
+				yield return new WaitForSeconds(0.5f);
+				GameObject.Destroy(particle, 0.5f);
+				yield return null;
+			}
+			else if ((effectVisualType == EffectVisualType.Individual) && (effectMoveType == EffectMoveType.NonMove))
+			{
+				// 고정형, 개별 대상 이펙트.
+				List<Vector3> targetPosList = new List<Vector3>();
+				foreach (var tileObject in selectedTiles)
+				{
+					Tile tile = tileObject.GetComponent<Tile>();
+					if (tile.IsUnitOnTile())
+					{
+						targetPosList.Add(tile.GetUnitOnTile().transform.position);
+					}
+				}
+
+				foreach (var targetPos in targetPosList)
+				{
+					GameObject particle = GameObject.Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+					particle.transform.position = targetPos - new Vector3(0, 0, 0.01f);
+					GameObject.Destroy(particle, 0.5f + 0.3f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.
+				}
+				if (targetPosList.Count == 0) // 대상이 없을 경우. 일단 가운데 이펙트를 띄운다.
+				{
+					Vector3 midPos = new Vector3(0, 0, 0);
+					foreach (var tile in selectedTiles)
+					{
+						midPos += tile.transform.position;
+					}
+					midPos = midPos / (float)selectedTiles.Count;
+
+					GameObject particle = GameObject.Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
+					particle.transform.position = midPos - new Vector3(0, 0, 0.01f);
+					GameObject.Destroy(particle, 0.5f + 0.3f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.
+				}
+
+				yield return new WaitForSeconds(0.5f);
+			}
+		}
 	}
 }
