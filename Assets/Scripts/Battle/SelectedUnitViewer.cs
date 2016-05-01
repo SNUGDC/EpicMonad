@@ -16,11 +16,14 @@ public class SelectedUnitViewer : MonoBehaviour {
 	Image celestialImage;
 	GameObject celestialBuffIcon;
 	GameObject celestialDebuffIcon;
-	
+
 	Text hpText;
-	
+
 	Text apText;
-	
+
+	Text powerText;
+	Text defenseText;
+	Text resistanceText;
 	// FIXME : 버프/디버프는 아직 미구현.
 
 	public void UpdateUnitViewer(GameObject unitObject)
@@ -34,27 +37,45 @@ public class SelectedUnitViewer : MonoBehaviour {
 		SetCelestialImage(unit.GetCelestial());
 		UpdateHp(unit);
 		UpdateAp(unit);
+		UpdatePower(unit);
+		UpdateDefense(unit);
+		UpdateResistance(unit);
 	}
-	
+
 	void CheckElementBuff(Unit unit)
 	{
 		elementBuffIcon.SetActive(false);
 		elementDebuffIcon.SetActive(false);
-		
+
 		if (unit.GetElement() == tileManager.GetTile(unit.GetPosition()).GetComponent<Tile>().GetTileElement())
 		{
 			elementBuffIcon.SetActive(true);
-		}	
+		}
 	}
 
 	void UpdateHp(Unit unit)
 	{
 		hpText.text = unit.GetCurrentHealth() + " / " + unit.GetMaxHealth();
 	}
-	
+
 	void UpdateAp(Unit unit)
 	{
 		apText.text = unit.GetCurrentActivityPoint() + " (+" + unit.GetActualDexturity() + ")";
+	}
+
+	void UpdatePower(Unit unit)
+	{
+		powerText.text = unit.GetActualPower().ToString();
+	}
+
+	void UpdateDefense(Unit unit)
+	{
+		defenseText.text = unit.GetActualDefense().ToString();
+	}
+
+	void UpdateResistance(Unit unit)
+	{
+		resistanceText.text = unit.GetActualResistance().ToString();
 	}
 
 	void SetClassImage(UnitClass unitClass)
@@ -92,37 +113,31 @@ public class SelectedUnitViewer : MonoBehaviour {
 		else
 			celestialImage.sprite = Resources.Load("Icon/transparent", typeof(Sprite)) as Sprite;
 	}
-	
+
 	void Awake () {
 		tileManager = FindObjectOfType<TileManager>();
-		
+
 		unitImage = transform.Find("UnitImage").GetComponent<Image>();
 		nameText = transform.Find("NameText").GetComponent<Text>();
 		classImage = transform.Find("ClassImage").GetComponent<Image>();
-		
+
 		elementImage = transform.Find("ElementImage").GetComponent<Image>();
 		elementBuffIcon = transform.Find("ElementImage").Find("BuffImage").gameObject;
 		elementDebuffIcon = transform.Find("ElementImage").Find("DebuffImage").gameObject;
 		elementBuffIcon.SetActive(false);
 		elementDebuffIcon.SetActive(false);
-		
+
 		celestialImage = transform.Find("CelestialImage").GetComponent<Image>();
 		celestialBuffIcon = transform.Find("CelestialImage").Find("BuffImage").gameObject;
 		celestialDebuffIcon = transform.Find("CelestialImage").Find("DebuffImage").gameObject;
 		celestialBuffIcon.SetActive(false);
 		celestialDebuffIcon.SetActive(false);
-	
-		hpText = transform.Find("HP").Find("HPText").GetComponent<Text>();;
-		apText = transform.Find("AP").Find("APText").GetComponent<Text>();;
-	}
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+		hpText = transform.Find("HP").Find("HPText").GetComponent<Text>();
+		apText = transform.Find("AP").Find("APText").GetComponent<Text>();
+
+		powerText = transform.Find("Power").Find("PowerText").GetComponent<Text>();
+		defenseText = transform.Find("Defense").Find("DefenseText").GetComponent<Text>();
+		resistanceText = transform.Find("Resistance").Find("ResistanceText").GetComponent<Text>();
 	}
 }
