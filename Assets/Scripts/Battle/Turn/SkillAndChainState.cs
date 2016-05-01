@@ -257,7 +257,7 @@ public class SkillAndChainState
 					{
 						GameObject focusedTile = chainInfo.GetTargetArea()[0];
 						Camera.main.transform.position = new Vector3(focusedTile.transform.position.x, focusedTile.transform.position.y, -10);
-						yield return battleManager.StartCoroutine(battleManager.ApplySkill(chainInfo, chainCombo));
+						yield return battleManager.StartCoroutine(ApplySkill(battleManager, chainInfo, chainCombo));
 					}
 
 					Camera.main.transform.position = new Vector3(battleManager.selectedUnitObject.transform.position.x, battleManager.selectedUnitObject.transform.position.y, -10);
@@ -268,7 +268,7 @@ public class SkillAndChainState
 				else
 				{
 					battleManager.currentState = CurrentState.ApplySkill;
-					yield return battleManager.StartCoroutine(battleManager.ApplySkill(selectedTiles));
+					yield return battleManager.StartCoroutine(ApplySkill(battleManager, selectedTiles));
 				}
 			}
 			else if (battleManager.skillApplyCommand == SkillApplyCommand.Chain)
@@ -328,6 +328,187 @@ public class SkillAndChainState
 		battleManager.currentState = CurrentState.Standby;
 		battleManager.alreadyMoved = false;
 		yield return battleManager.StartCoroutine(battleManager.Standby()); // 이후 대기.
+	}
+
+	// 체인 가능 스킬일 경우의 스킬 시전 코루틴. 체인 정보와 배수를 받는다.
+	private static IEnumerator ApplySkill(BattleManager battleManager, ChainInfo chainInfo, int chainCombo)
+	{
+		GameObject unitObjectInChain = chainInfo.GetUnit();
+		Unit unitInChain = unitObjectInChain.GetComponent<Unit>();
+		Skill appliedSkill = unitInChain.GetSkillList()[chainInfo.GetSkillIndex() - 1];
+		List<GameObject> selectedTiles = chainInfo.GetTargetArea();
+
+		// 시전 방향으로 유닛의 바라보는 방향을 돌림.
+		if (appliedSkill.GetSkillType() != SkillType.Area)
+			unitInChain.SetDirection(Utility.GetDirectionToTarget(unitInChain.gameObject, selectedTiles));
+
+		// 자신의 체인 정보 삭제.
+		ChainList.RemoveChainsFromUnit(unitObjectInChain);
+
+		// 이펙트 임시로 비활성화.
+		// yield return StartCoroutine(ApplySkillEffect(appliedSkill, unitInChain.gameObject, selectedTiles));
+
+		List<GameObject> targets = new List<GameObject>();
+
+		foreach (var tileObject in selectedTiles)
+		{
+			Tile tile = tileObject.GetComponent<Tile>();
+			if (tile.IsUnitOnTile())
+			{
+				targets.Add(tile.GetUnitOnTile());
+			}
+		}
+
+		foreach (var target in targets)
+		{
+			// 방향 체크.
+			Utility.GetDegreeAtAttack(unitObjectInChain, target);
+
+			if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+			{
+				// 방향 보너스.
+				float directionBouns = Utility.GetDirectionBonus(unitObjectInChain, target);
+
+				// 천체속성 보너스.
+				float celestialBouns = Utility.GetCelestialBouns(unitObjectInChain, target);
+				if (celestialBouns == 1.2f) unitObjectInChain.GetComponent<Unit>().PrintCelestialBouns();
+				else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
+
+				var damageAmount = (int)((chainCombo * battleManager.chainDamageFactor) * directionBouns * celestialBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
+				var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChain.GetUnitClass(), damageAmount, false);
+
+				if (target == targets[targets.Count-1])
+				{
+					yield return battleManager.StartCoroutine(damageCoroutine);
+				}
+				else
+				{
+					battleManager.StartCoroutine(damageCoroutine);
+				}
+				Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName() + "\n" +
+							"ChainCombo : " + chainCombo);
+			}
+			else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+			{
+				var recoverAmount = (int)(unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
+				var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount);
+
+				if (target == targets[targets.Count-1])
+				{
+					yield return battleManager.StartCoroutine(recoverHealthCoroutine);
+				}
+				else
+				{
+					battleManager.StartCoroutine(recoverHealthCoroutine);
+				}
+
+				Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
+			}
+
+			// FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것.
+			else
+			{
+				Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
+			}
+		}
+
+		// tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+
+		int requireAP = appliedSkill.GetRequireAP();
+		if (unitInChain.gameObject == battleManager.selectedUnitObject)
+			unitInChain.UseActionPoint(requireAP); // 즉시시전 대상만 ap를 차감. 나머지는 선차감되었으므로 패스.
+		battleManager.indexOfSeletedSkillByUser = 0; // return to init value.
+
+		yield return new WaitForSeconds(0.5f);
+
+		battleManager.alreadyMoved = false;
+	}
+
+	// 체인 불가능 스킬일 경우의 스킬 시전 코루틴. 스킬 적용 범위만 받는다.
+	private static IEnumerator ApplySkill(BattleManager battleManager, List<GameObject> selectedTiles)
+	{
+		Unit selectedUnit = battleManager.selectedUnitObject.GetComponent<Unit>();
+		Skill appliedSkill = selectedUnit.GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1];
+
+		// 시전 방향으로 유닛의 바라보는 방향을 돌림.
+		if (appliedSkill.GetSkillType() != SkillType.Area)
+			selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
+
+		// 이펙트 임시로 비활성화.
+		// yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
+
+		List<GameObject> targets = new List<GameObject>();
+
+		foreach (var tileObject in selectedTiles)
+		{
+			Tile tile = tileObject.GetComponent<Tile>();
+			if (tile.IsUnitOnTile())
+			{
+				targets.Add(tile.GetUnitOnTile());
+			}
+		}
+
+		foreach (var target in targets)
+		{
+			if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
+			{
+				// 방향 보너스.
+				float directionBouns = Utility.GetDirectionBonus(battleManager.selectedUnitObject, target);
+
+				// 천체속성 보너스.
+				float celestialBouns = Utility.GetCelestialBouns(battleManager.selectedUnitObject, target);
+				if (celestialBouns == 1.2f) battleManager.selectedUnitObject.GetComponent<Unit>().PrintCelestialBouns();
+				else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
+
+				var damageAmount = (int)(directionBouns * celestialBouns * selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
+				var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
+
+				if (target == targets[targets.Count-1])
+				{
+					yield return battleManager.StartCoroutine(damageCoroutine);
+				}
+				else
+				{
+					battleManager.StartCoroutine(damageCoroutine);
+				}
+				Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName());
+			}
+			else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
+			{
+				var recoverAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
+				var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount);
+
+				if (target == targets[targets.Count-1])
+				{
+					yield return battleManager.StartCoroutine(recoverHealthCoroutine);
+				}
+				else
+				{
+					battleManager.StartCoroutine(recoverHealthCoroutine);
+				}
+
+				Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
+			}
+
+			// FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것.
+			else
+			{
+				Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
+			}
+		}
+
+		battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+
+		int requireAP = appliedSkill.GetRequireAP();
+		selectedUnit.UseActionPoint(requireAP);
+		battleManager.indexOfSeletedSkillByUser = 0; // return to init value.
+
+		yield return new WaitForSeconds(0.5f);
+
+		Camera.main.transform.position = new Vector3(battleManager.selectedUnitObject.transform.position.x, battleManager.selectedUnitObject.transform.position.y, -10);
+		battleManager.currentState = CurrentState.FocusToUnit;
+		battleManager.alreadyMoved = false;
+		yield return battleManager.StartCoroutine(battleManager.FocusToUnit());
 	}
 
 }
