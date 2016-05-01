@@ -7,277 +7,280 @@ namespace Battle.Turn
 {
 	public class SkillAndChainStates
 	{
-		public static IEnumerator SelectSkillState(BattleManager battleManager)
+		public static IEnumerator SelectSkillState(BattleManager.BattleData battleData)
 		{
-			while (battleManager.currentState == CurrentState.SelectSkill)
+			while (battleData.currentState == CurrentState.SelectSkill)
 			{
-				battleManager.uiManager.UpdateSkillInfo(battleManager.selectedUnitObject);
-				battleManager.uiManager.CheckUsableSkill(battleManager.selectedUnitObject);
+				battleData.uiManager.UpdateSkillInfo(battleData.selectedUnitObject);
+				battleData.uiManager.CheckUsableSkill(battleData.selectedUnitObject);
 
-				battleManager.rightClicked = false;
-				battleManager.cancelClicked = false;
+				battleData.rightClicked = false;
+				battleData.cancelClicked = false;
 
-				battleManager.isWaitingUserInput = true;
-				battleManager.indexOfSeletedSkillByUser = 0;
-				while (battleManager.indexOfSeletedSkillByUser == 0)
+				battleData.isWaitingUserInput = true;
+				battleData.indexOfSeletedSkillByUser = 0;
+				while (battleData.indexOfSeletedSkillByUser == 0)
 				{
-					if (battleManager.rightClicked || battleManager.cancelClicked)
+					if (battleData.rightClicked || battleData.cancelClicked)
 					{
-						battleManager.rightClicked = false;
-						battleManager.cancelClicked = false;
+						battleData.rightClicked = false;
+						battleData.cancelClicked = false;
 
-						battleManager.uiManager.DisableSkillUI();
-						battleManager.currentState = CurrentState.FocusToUnit;
-						battleManager.isWaitingUserInput = false;
+						battleData.uiManager.DisableSkillUI();
+						battleData.currentState = CurrentState.FocusToUnit;
+						battleData.isWaitingUserInput = false;
 						yield break;
 					}
 					yield return null;
 				}
-				battleManager.isWaitingUserInput = false;
+				battleData.isWaitingUserInput = false;
 
-				battleManager.uiManager.DisableSkillUI();
+				battleData.uiManager.DisableSkillUI();
 
-				Skill selectedSkill = battleManager.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1];
+				BattleManager battleManager = battleData.battleManager;
+				Skill selectedSkill = battleData.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleData.indexOfSeletedSkillByUser - 1];
 				SkillType skillTypeOfSelectedSkill = selectedSkill.GetSkillType();
 				if (skillTypeOfSelectedSkill == SkillType.Area)
 				{
-					battleManager.currentState = CurrentState.SelectSkillApplyDirection;
-					yield return battleManager.StartCoroutine(SelectSkillApplyDirection(battleManager, battleManager.selectedUnitObject.GetComponent<Unit>().GetDirection()));
+					battleData.currentState = CurrentState.SelectSkillApplyDirection;
+					yield return battleManager.StartCoroutine(SelectSkillApplyDirection(battleData, battleData.selectedUnitObject.GetComponent<Unit>().GetDirection()));
 				}
 				else
 				{
-					battleManager.currentState = CurrentState.SelectSkillApplyPoint;
-					yield return battleManager.StartCoroutine(SelectSkillApplyPoint(battleManager, battleManager.selectedUnitObject.GetComponent<Unit>().GetDirection()));
+					battleData.currentState = CurrentState.SelectSkillApplyPoint;
+					yield return battleManager.StartCoroutine(SelectSkillApplyPoint(battleData, battleData.selectedUnitObject.GetComponent<Unit>().GetDirection()));
 				}
 			}
 		}
 
-		private static IEnumerator SelectSkillApplyDirection(BattleManager battleManager, Direction originalDirection)
+		private static IEnumerator SelectSkillApplyDirection(BattleManager.BattleData battleData, Direction originalDirection)
 		{
 			Direction beforeDirection = originalDirection;
 			List<GameObject> selectedTiles = new List<GameObject>();
-			Unit selectedUnit = battleManager.selectedUnitObject.GetComponent<Unit>();
-			Skill selectedSkill = selectedUnit.GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1];
+			Unit selectedUnit = battleData.selectedUnitObject.GetComponent<Unit>();
+			Skill selectedSkill = selectedUnit.GetSkillList()[battleData.indexOfSeletedSkillByUser - 1];
 
-			battleManager.rightClicked = false;
-			battleManager.isWaitingUserInput = true;
-			battleManager.isSelectedTileByUser = false;
+			battleData.rightClicked = false;
+			battleData.isWaitingUserInput = true;
+			battleData.isSelectedTileByUser = false;
 
-			if (battleManager.currentState == CurrentState.SelectSkill)
+			if (battleData.currentState == CurrentState.SelectSkill)
 			{
-				battleManager.uiManager.DisableCancelButtonUI();
+				battleData.uiManager.DisableCancelButtonUI();
 				yield break;
 			}
 
-			if (battleManager.currentState == CurrentState.SelectSkillApplyDirection)
+			if (battleData.currentState == CurrentState.SelectSkillApplyDirection)
 			{
-				selectedTiles = battleManager.tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
+				selectedTiles = battleData.tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
 															selectedUnit.GetPosition(),
 															selectedSkill.GetSecondMinReach(),
 															selectedSkill.GetSecondMaxReach(),
 															selectedUnit.GetDirection(),
 															false);
 
-				battleManager.tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
+				battleData.tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
 			}
 
-			while (battleManager.currentState == CurrentState.SelectSkillApplyDirection)
+			while (battleData.currentState == CurrentState.SelectSkillApplyDirection)
 			{
-				Direction newDirection = Utility.GetMouseDirectionByUnit(battleManager.selectedUnitObject);
+				Direction newDirection = Utility.GetMouseDirectionByUnit(battleData.selectedUnitObject);
 				// Debug.LogWarning(newDirection);
 				if (beforeDirection != newDirection)
 				{
-					battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+					battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
 					beforeDirection = newDirection;
 					selectedUnit.SetDirection(newDirection);
-					selectedTiles = battleManager.tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
+					selectedTiles = battleData.tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
 																selectedUnit.GetPosition(),
 																selectedSkill.GetSecondMinReach(),
 																selectedSkill.GetSecondMaxReach(),
 																selectedUnit.GetDirection(),
 																false);
 
-					battleManager.tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
+					battleData.tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
 				}
 
-				if (battleManager.rightClicked || battleManager.cancelClicked)
+				if (battleData.rightClicked || battleData.cancelClicked)
 				{
-					battleManager.rightClicked = false;
-					battleManager.cancelClicked = false;
-					battleManager.uiManager.DisableCancelButtonUI();
+					battleData.rightClicked = false;
+					battleData.cancelClicked = false;
+					battleData.uiManager.DisableCancelButtonUI();
 
 					selectedUnit.SetDirection(originalDirection);
-					battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-					battleManager.currentState = CurrentState.SelectSkill;
+					battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+					battleData.currentState = CurrentState.SelectSkill;
 					yield break;
 				}
 
-				if (battleManager.isSelectedTileByUser)
+				if (battleData.isSelectedTileByUser)
 				{
-					battleManager.isWaitingUserInput = false;
-					battleManager.uiManager.DisableCancelButtonUI();
-					battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+					battleData.isWaitingUserInput = false;
+					battleData.uiManager.DisableCancelButtonUI();
+					battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
-					battleManager.currentState = CurrentState.CheckApplyOrChain;
-					yield return battleManager.StartCoroutine(CheckApplyOrChain(battleManager, selectedUnit.GetPosition(), originalDirection));
+					BattleManager battleManager = battleData.battleManager;
+					battleData.currentState = CurrentState.CheckApplyOrChain;
+					yield return battleManager.StartCoroutine(CheckApplyOrChain(battleData, selectedUnit.GetPosition(), originalDirection));
 				}
 				yield return null;
 			}
 			yield return null;
 		}
 
-		private static IEnumerator SelectSkillApplyPoint(BattleManager battleManager, Direction originalDirection)
+		private static IEnumerator SelectSkillApplyPoint(BattleManager.BattleData battleData, Direction originalDirection)
 		{
 			Direction beforeDirection = originalDirection;
-			Unit selectedUnit = battleManager.selectedUnitObject.GetComponent<Unit>();
+			Unit selectedUnit = battleData.selectedUnitObject.GetComponent<Unit>();
 
-			if (battleManager.currentState == CurrentState.SelectSkill)
+			if (battleData.currentState == CurrentState.SelectSkill)
 			{
-				battleManager.uiManager.DisableCancelButtonUI();
+				battleData.uiManager.DisableCancelButtonUI();
 				yield break;
 			}
 
-			while (battleManager.currentState == CurrentState.SelectSkillApplyPoint)
+			while (battleData.currentState == CurrentState.SelectSkillApplyPoint)
 			{
-				Vector2 selectedUnitPos = battleManager.selectedUnitObject.GetComponent<Unit>().GetPosition();
+				Vector2 selectedUnitPos = battleData.selectedUnitObject.GetComponent<Unit>().GetPosition();
 
 				List<GameObject> activeRange = new List<GameObject>();
-				Skill selectedSkill = battleManager.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1];
-				activeRange = battleManager.tileManager.GetTilesInRange(selectedSkill.GetFirstRangeForm(),
+				Skill selectedSkill = battleData.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleData.indexOfSeletedSkillByUser - 1];
+				activeRange = battleData.tileManager.GetTilesInRange(selectedSkill.GetFirstRangeForm(),
 														selectedUnitPos,
 														selectedSkill.GetFirstMinReach(),
 														selectedSkill.GetFirstMaxReach(),
-														battleManager.selectedUnitObject.GetComponent<Unit>().GetDirection(),
+														battleData.selectedUnitObject.GetComponent<Unit>().GetDirection(),
 														selectedSkill.GetIncludeMyself());
-				battleManager.tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.Red);
+				battleData.tileManager.ChangeTilesToSeletedColor(activeRange, TileColor.Red);
 
-				battleManager.rightClicked = false;
-				battleManager.cancelClicked = false;
-				battleManager.uiManager.EnableCancelButtonUI();
+				battleData.rightClicked = false;
+				battleData.cancelClicked = false;
+				battleData.uiManager.EnableCancelButtonUI();
 
-				battleManager.isWaitingUserInput = true;
-				battleManager.isSelectedTileByUser = false;
-				while (!battleManager.isSelectedTileByUser)
+				battleData.isWaitingUserInput = true;
+				battleData.isSelectedTileByUser = false;
+				while (!battleData.isSelectedTileByUser)
 				{
-					Direction newDirection = Utility.GetMouseDirectionByUnit(battleManager.selectedUnitObject);
+					Direction newDirection = Utility.GetMouseDirectionByUnit(battleData.selectedUnitObject);
 					if (beforeDirection != newDirection)
 					{
 						beforeDirection = newDirection;
 						selectedUnit.SetDirection(newDirection);
 					}
 
-					if (battleManager.rightClicked || battleManager.cancelClicked)
+					if (battleData.rightClicked || battleData.cancelClicked)
 					{
-						battleManager.rightClicked = false;
-						battleManager.cancelClicked = false;
-						battleManager.uiManager.DisableCancelButtonUI();
+						battleData.rightClicked = false;
+						battleData.cancelClicked = false;
+						battleData.uiManager.DisableCancelButtonUI();
 
-						battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
-						battleManager.currentState = CurrentState.SelectSkill;
-						battleManager.isWaitingUserInput = false;
+						battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+						battleData.currentState = CurrentState.SelectSkill;
+						battleData.isWaitingUserInput = false;
 						yield break;
 					}
 					yield return null;
 				}
-				battleManager.isSelectedTileByUser = false;
-				battleManager.isWaitingUserInput = false;
-				battleManager.uiManager.DisableCancelButtonUI();
+				battleData.isSelectedTileByUser = false;
+				battleData.isWaitingUserInput = false;
+				battleData.uiManager.DisableCancelButtonUI();
 
 				// 타겟팅 스킬을 타겟이 없는 장소에 지정했을 경우 적용되지 않도록 예외처리 필요 - 대부분의 스킬은 논타겟팅. 추후 보강.
 
-				battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
-				battleManager.uiManager.DisableSkillUI();
+				battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(activeRange);
+				battleData.uiManager.DisableSkillUI();
 
-				battleManager.currentState = CurrentState.CheckApplyOrChain;
-				yield return battleManager.StartCoroutine(CheckApplyOrChain(battleManager, battleManager.selectedTilePosition, originalDirection));
+				BattleManager battleManager = battleData.battleManager;
+				battleData.currentState = CurrentState.CheckApplyOrChain;
+				yield return battleManager.StartCoroutine(CheckApplyOrChain(battleData, battleData.selectedTilePosition, originalDirection));
 			}
 		}
 
-		private static IEnumerator CheckApplyOrChain(BattleManager battleManager, Vector2 selectedTilePosition, Direction originalDirection)
+		private static IEnumerator CheckApplyOrChain(BattleManager.BattleData battleData, Vector2 selectedTilePosition, Direction originalDirection)
 		{
-			while (battleManager.currentState == CurrentState.CheckApplyOrChain)
+			while (battleData.currentState == CurrentState.CheckApplyOrChain)
 			{
-				GameObject selectedTile = battleManager.tileManager.GetTile(selectedTilePosition);
+				GameObject selectedTile = battleData.tileManager.GetTile(selectedTilePosition);
 				Camera.main.transform.position = new Vector3(selectedTile.transform.position.x, selectedTile.transform.position.y, -10);
 
-				Skill selectedSkill = battleManager.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1];
+				Skill selectedSkill = battleData.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleData.indexOfSeletedSkillByUser - 1];
 
-				List<GameObject> selectedTiles = battleManager.tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
+				List<GameObject> selectedTiles = battleData.tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
 																			selectedTilePosition,
 																			selectedSkill.GetSecondMinReach(),
 																			selectedSkill.GetSecondMaxReach(),
-																			battleManager.selectedUnitObject.GetComponent<Unit>().GetDirection(),
+																			battleData.selectedUnitObject.GetComponent<Unit>().GetDirection(),
 																			true);
 				if ((selectedSkill.GetSkillType() == SkillType.Area) && (!selectedSkill.GetIncludeMyself()))
-					selectedTiles.Remove(battleManager.tileManager.GetTile(selectedTilePosition));
-				battleManager.tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
+					selectedTiles.Remove(battleData.tileManager.GetTile(selectedTilePosition));
+				battleData.tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
 
-				CheckChainPossible(battleManager);
-				battleManager.uiManager.SetSkillCheckAP(battleManager.selectedUnitObject, selectedSkill);
+				CheckChainPossible(battleData);
+				battleData.uiManager.SetSkillCheckAP(battleData.selectedUnitObject, selectedSkill);
 
-				battleManager.rightClicked = false;
-				battleManager.cancelClicked = false;
+				battleData.rightClicked = false;
+				battleData.cancelClicked = false;
 
-				battleManager.skillApplyCommand = SkillApplyCommand.Waiting;
-				while (battleManager.skillApplyCommand == SkillApplyCommand.Waiting)
+				battleData.skillApplyCommand = SkillApplyCommand.Waiting;
+				while (battleData.skillApplyCommand == SkillApplyCommand.Waiting)
 				{
-					if (battleManager.rightClicked || battleManager.cancelClicked)
+					if (battleData.rightClicked || battleData.cancelClicked)
 					{
-						battleManager.rightClicked = false;
-						battleManager.cancelClicked = false;
+						battleData.rightClicked = false;
+						battleData.cancelClicked = false;
 
-						Camera.main.transform.position = new Vector3(battleManager.selectedUnitObject.transform.position.x, battleManager.selectedUnitObject.transform.position.y, -10);
-						battleManager.uiManager.DisableSkillCheckUI();
-						battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-						battleManager.selectedUnitObject.GetComponent<Unit>().SetDirection(originalDirection);
+						Camera.main.transform.position = new Vector3(battleData.selectedUnitObject.transform.position.x, battleData.selectedUnitObject.transform.position.y, -10);
+						battleData.uiManager.DisableSkillCheckUI();
+						battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+						battleData.selectedUnitObject.GetComponent<Unit>().SetDirection(originalDirection);
 						if (selectedSkill.GetSkillType() == SkillType.Area)
-							battleManager.currentState = CurrentState.SelectSkill;
+							battleData.currentState = CurrentState.SelectSkill;
 						else
-							battleManager.currentState = CurrentState.SelectSkillApplyPoint;
+							battleData.currentState = CurrentState.SelectSkillApplyPoint;
 						yield break;
 					}
 					yield return null;
 				}
 
-				battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-
-				if (battleManager.skillApplyCommand == SkillApplyCommand.Apply)
+				battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+				BattleManager battleManager = battleData.battleManager;
+				if (battleData.skillApplyCommand == SkillApplyCommand.Apply)
 				{
-					battleManager.skillApplyCommand = SkillApplyCommand.Waiting;
+					battleData.skillApplyCommand = SkillApplyCommand.Waiting;
 					// 체인이 가능한 스킬일 경우. 체인 발동.
 					if (selectedSkill.GetSkillApplyType() == SkillApplyType.Damage)
 					{
 						// 자기 자신을 체인 리스트에 추가.
-						ChainList.AddChains(battleManager.selectedUnitObject, selectedTiles, battleManager.indexOfSeletedSkillByUser);
+						ChainList.AddChains(battleData.selectedUnitObject, selectedTiles, battleData.indexOfSeletedSkillByUser);
 						// 체인 체크, 순서대로 공격.
-						List<ChainInfo> allVaildChainInfo = ChainList.GetAllChainInfoToTargetArea(battleManager.selectedUnitObject, selectedTiles);
+						List<ChainInfo> allVaildChainInfo = ChainList.GetAllChainInfoToTargetArea(battleData.selectedUnitObject, selectedTiles);
 						int chainCombo = allVaildChainInfo.Count;
-						battleManager.currentState = CurrentState.ApplySkill;
+						battleData.currentState = CurrentState.ApplySkill;
 
 						foreach (var chainInfo in allVaildChainInfo)
 						{
 							GameObject focusedTile = chainInfo.GetTargetArea()[0];
 							Camera.main.transform.position = new Vector3(focusedTile.transform.position.x, focusedTile.transform.position.y, -10);
-							yield return battleManager.StartCoroutine(ApplySkill(battleManager, chainInfo, chainCombo));
+							yield return battleManager.StartCoroutine(ApplySkill(battleData, chainInfo, chainCombo));
 						}
 
-						Camera.main.transform.position = new Vector3(battleManager.selectedUnitObject.transform.position.x, battleManager.selectedUnitObject.transform.position.y, -10);
-						battleManager.currentState = CurrentState.FocusToUnit;
-						yield return battleManager.StartCoroutine(battleManager.FocusToUnit());
+						Camera.main.transform.position = new Vector3(battleData.selectedUnitObject.transform.position.x, battleData.selectedUnitObject.transform.position.y, -10);
+						battleData.currentState = CurrentState.FocusToUnit;
+						yield return battleManager.StartCoroutine(BattleManager.FocusToUnit(battleData));
 					}
 					// 체인이 불가능한 스킬일 경우, 그냥 발동.
 					else
 					{
-						battleManager.currentState = CurrentState.ApplySkill;
-						yield return battleManager.StartCoroutine(ApplySkill(battleManager, selectedTiles));
+						battleData.currentState = CurrentState.ApplySkill;
+						yield return battleManager.StartCoroutine(ApplySkill(battleData, selectedTiles));
 					}
 				}
-				else if (battleManager.skillApplyCommand == SkillApplyCommand.Chain)
+				else if (battleData.skillApplyCommand == SkillApplyCommand.Chain)
 				{
-					battleManager.skillApplyCommand = SkillApplyCommand.Waiting;
-					battleManager.currentState = CurrentState.ChainAndStandby;
-					yield return battleManager.StartCoroutine(ChainAndStandby(battleManager, selectedTiles));
+					battleData.skillApplyCommand = SkillApplyCommand.Waiting;
+					battleData.currentState = CurrentState.ChainAndStandby;
+					yield return battleManager.StartCoroutine(ChainAndStandby(battleData, selectedTiles));
 				}
 				else
 					yield return null;
@@ -285,17 +288,17 @@ namespace Battle.Turn
 			yield return null;
 		}
 
-		private static void CheckChainPossible(BattleManager battleManager)
+		private static void CheckChainPossible(BattleManager.BattleData battleData)
 		{
 			bool isPossible = false;
 
 			// ap 조건으로 체크.
-			int requireAP = battleManager.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1].GetRequireAP();
-			int remainAPAfterChain = battleManager.selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP;
+			int requireAP = battleData.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleData.indexOfSeletedSkillByUser - 1].GetRequireAP();
+			int remainAPAfterChain = battleData.selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP;
 
-			foreach (var unit in battleManager.unitManager.GetAllUnits())
+			foreach (var unit in battleData.unitManager.GetAllUnits())
 			{
-				if ((unit != battleManager.selectedUnitObject) &&
+				if ((unit != battleData.selectedUnitObject) &&
 				(unit.GetComponent<Unit>().GetCurrentActivityPoint() > remainAPAfterChain))
 				{
 					isPossible = true;
@@ -303,37 +306,38 @@ namespace Battle.Turn
 			}
 
 			// 스킬 타입으로 체크. 공격스킬만 체인을 걸 수 있음.
-			if (battleManager.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1].GetSkillApplyType()
+			if (battleData.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleData.indexOfSeletedSkillByUser - 1].GetSkillApplyType()
 				!= SkillApplyType.Damage)
 			{
 				isPossible = false;
 			}
 
-			battleManager.uiManager.EnableSkillCheckChainButton(isPossible);
+			battleData.uiManager.EnableSkillCheckChainButton(isPossible);
 		}
 
-		private static IEnumerator ChainAndStandby(BattleManager battleManager, List<GameObject> selectedTiles)
+		private static IEnumerator ChainAndStandby(BattleManager.BattleData battleData, List<GameObject> selectedTiles)
 		{
-			battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+			battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
 			// 방향 돌리기.
-			battleManager.selectedUnitObject.GetComponent<Unit>().SetDirection(Utility.GetDirectionToTarget(battleManager.selectedUnitObject, selectedTiles));
+			battleData.selectedUnitObject.GetComponent<Unit>().SetDirection(Utility.GetDirectionToTarget(battleData.selectedUnitObject, selectedTiles));
 			// 스킬 시전에 필요한 ap만큼 선 차감.
-			int requireAP = battleManager.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1].GetRequireAP();
-			battleManager.selectedUnitObject.GetComponent<Unit>().UseActionPoint(requireAP);
+			int requireAP = battleData.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleData.indexOfSeletedSkillByUser - 1].GetRequireAP();
+			battleData.selectedUnitObject.GetComponent<Unit>().UseActionPoint(requireAP);
 			// 체인 목록에 추가.
-			ChainList.AddChains(battleManager.selectedUnitObject, selectedTiles, battleManager.indexOfSeletedSkillByUser);
-			battleManager.indexOfSeletedSkillByUser = 0; // return to init value.
+			ChainList.AddChains(battleData.selectedUnitObject, selectedTiles, battleData.indexOfSeletedSkillByUser);
+			battleData.indexOfSeletedSkillByUser = 0; // return to init value.
 			yield return new WaitForSeconds(0.5f);
 
-			Camera.main.transform.position = new Vector3(battleManager.selectedUnitObject.transform.position.x, battleManager.selectedUnitObject.transform.position.y, -10);
-			battleManager.currentState = CurrentState.Standby;
-			battleManager.alreadyMoved = false;
-			yield return battleManager.StartCoroutine(battleManager.Standby()); // 이후 대기.
+			Camera.main.transform.position = new Vector3(battleData.selectedUnitObject.transform.position.x, battleData.selectedUnitObject.transform.position.y, -10);
+			battleData.currentState = CurrentState.Standby;
+			battleData.alreadyMoved = false;
+			BattleManager battleManager = battleData.battleManager;
+			yield return battleManager.StartCoroutine(BattleManager.Standby()); // 이후 대기.
 		}
 
 		// 체인 가능 스킬일 경우의 스킬 시전 코루틴. 체인 정보와 배수를 받는다.
-		private static IEnumerator ApplySkill(BattleManager battleManager, ChainInfo chainInfo, int chainCombo)
+		private static IEnumerator ApplySkill(BattleManager.BattleData battleData, ChainInfo chainInfo, int chainCombo)
 		{
 			GameObject unitObjectInChain = chainInfo.GetUnit();
 			Unit unitInChain = unitObjectInChain.GetComponent<Unit>();
@@ -365,7 +369,7 @@ namespace Battle.Turn
 			{
 				// 방향 체크.
 				Utility.GetDegreeAtAttack(unitObjectInChain, target);
-
+				BattleManager battleManager = battleData.battleManager;
 				if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
 				{
 					// 방향 보너스.
@@ -376,7 +380,7 @@ namespace Battle.Turn
 					if (celestialBouns == 1.2f) unitObjectInChain.GetComponent<Unit>().PrintCelestialBouns();
 					else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
 
-					var damageAmount = (int)((chainCombo * battleManager.chainDamageFactor) * directionBouns * celestialBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
+					var damageAmount = (int)((chainCombo * battleData.chainDamageFactor) * directionBouns * celestialBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
 					var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChain.GetUnitClass(), damageAmount, false);
 
 					if (target == targets[targets.Count-1])
@@ -417,27 +421,28 @@ namespace Battle.Turn
 			// tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
 			int requireAP = appliedSkill.GetRequireAP();
-			if (unitInChain.gameObject == battleManager.selectedUnitObject)
+			if (unitInChain.gameObject == battleData.selectedUnitObject)
 				unitInChain.UseActionPoint(requireAP); // 즉시시전 대상만 ap를 차감. 나머지는 선차감되었으므로 패스.
-			battleManager.indexOfSeletedSkillByUser = 0; // return to init value.
+			battleData.indexOfSeletedSkillByUser = 0; // return to init value.
 
 			yield return new WaitForSeconds(0.5f);
 
-			battleManager.alreadyMoved = false;
+			battleData.alreadyMoved = false;
 		}
 
 		// 체인 불가능 스킬일 경우의 스킬 시전 코루틴. 스킬 적용 범위만 받는다.
-		private static IEnumerator ApplySkill(BattleManager battleManager, List<GameObject> selectedTiles)
+		private static IEnumerator ApplySkill(BattleManager.BattleData battleData, List<GameObject> selectedTiles)
 		{
-			Unit selectedUnit = battleManager.selectedUnitObject.GetComponent<Unit>();
-			Skill appliedSkill = selectedUnit.GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1];
+			Unit selectedUnit = battleData.selectedUnitObject.GetComponent<Unit>();
+			Skill appliedSkill = selectedUnit.GetSkillList()[battleData.indexOfSeletedSkillByUser - 1];
+			BattleManager battleManager = battleData.battleManager;
 
 			// 시전 방향으로 유닛의 바라보는 방향을 돌림.
 			if (appliedSkill.GetSkillType() != SkillType.Area)
 				selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
 
 			// 이펙트 임시로 비활성화.
-			// yield return battleManager.StartCoroutine(ApplySkillEffect(battleManager, appliedSkill, battleManager.selectedUnitObject, selectedTiles));
+			// yield return battleManager.StartCoroutine(ApplySkillEffect(appliedSkill, battleData.selectedUnitObject, selectedTiles));
 
 			List<GameObject> targets = new List<GameObject>();
 
@@ -455,11 +460,11 @@ namespace Battle.Turn
 				if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
 				{
 					// 방향 보너스.
-					float directionBouns = Utility.GetDirectionBonus(battleManager.selectedUnitObject, target);
+					float directionBouns = Utility.GetDirectionBonus(battleData.selectedUnitObject, target);
 
 					// 천체속성 보너스.
-					float celestialBouns = Utility.GetCelestialBouns(battleManager.selectedUnitObject, target);
-					if (celestialBouns == 1.2f) battleManager.selectedUnitObject.GetComponent<Unit>().PrintCelestialBouns();
+					float celestialBouns = Utility.GetCelestialBouns(battleData.selectedUnitObject, target);
+					if (celestialBouns == 1.2f) battleData.selectedUnitObject.GetComponent<Unit>().PrintCelestialBouns();
 					else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
 
 					var damageAmount = (int)(directionBouns * celestialBouns * selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
@@ -499,21 +504,21 @@ namespace Battle.Turn
 				}
 			}
 
-			battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+			battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
 			int requireAP = appliedSkill.GetRequireAP();
 			selectedUnit.UseActionPoint(requireAP);
-			battleManager.indexOfSeletedSkillByUser = 0; // return to init value.
+			battleData.indexOfSeletedSkillByUser = 0; // return to init value.
 
 			yield return new WaitForSeconds(0.5f);
 
-			Camera.main.transform.position = new Vector3(battleManager.selectedUnitObject.transform.position.x, battleManager.selectedUnitObject.transform.position.y, -10);
-			battleManager.currentState = CurrentState.FocusToUnit;
-			battleManager.alreadyMoved = false;
-			yield return battleManager.StartCoroutine(battleManager.FocusToUnit());
+			Camera.main.transform.position = new Vector3(battleData.selectedUnitObject.transform.position.x, battleData.selectedUnitObject.transform.position.y, -10);
+			battleData.currentState = CurrentState.FocusToUnit;
+			battleData.alreadyMoved = false;
+			yield return battleManager.StartCoroutine(BattleManager.FocusToUnit(battleData));
 		}
 
-		private static IEnumerator ApplySkillEffect(BattleManager battleManager, Skill appliedSkill, GameObject unitObject, List<GameObject> selectedTiles)
+		private static IEnumerator ApplySkillEffect(Skill appliedSkill, GameObject unitObject, List<GameObject> selectedTiles)
 		{
 			string effectName = appliedSkill.GetEffectName();
 			EffectVisualType effectVisualType = appliedSkill.GetEffectVisualType();

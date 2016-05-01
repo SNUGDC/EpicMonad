@@ -26,41 +26,47 @@ public enum SkillApplyCommand
 
 public class BattleManager : MonoBehaviour
 {
-	public TileManager tileManager;
-	public UnitManager unitManager;
-	public UIManager uiManager;
+	public class BattleData
+	{
+		public TileManager tileManager;
+		public UnitManager unitManager;
+		public UIManager uiManager;
+		public BattleManager battleManager;
 
-	public CurrentState currentState = CurrentState.None;
+		public CurrentState currentState = CurrentState.None;
 
-	public bool isSelectedTileByUser = false;
-	public bool isSelectedDirectionByUser = false;
-	public int indexOfSeletedSkillByUser = 0;
-	public bool isWaitingUserInput = false;
+		public bool isSelectedTileByUser = false;
+		public bool isSelectedDirectionByUser = false;
+		public int indexOfSeletedSkillByUser = 0;
+		public bool isWaitingUserInput = false;
 
-	public bool rightClicked = false; // 우클릭 : 취소
-	public bool leftClicked = false; // 좌클릭 : 유닛뷰어 고정
+		public bool rightClicked = false; // 우클릭 : 취소
+		public bool leftClicked = false; // 좌클릭 : 유닛뷰어 고정
 
-	public bool cancelClicked = false;
+		public bool cancelClicked = false;
 
-	public ActionCommand command = ActionCommand.Waiting;
-	public SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
+		public ActionCommand command = ActionCommand.Waiting;
+		public SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
 
-	public int moveCount;
-	public bool alreadyMoved;
-	public Vector2 selectedTilePosition;
-	public Direction selectedDirection;
-	public GameObject selectedUnitObject;
-	public List<GameObject> readiedUnits = new List<GameObject>();
+		public int moveCount;
+		public bool alreadyMoved;
+		public Vector2 selectedTilePosition;
+		public Direction selectedDirection;
+		public GameObject selectedUnitObject;
+		public List<GameObject> readiedUnits = new List<GameObject>();
 
-	public List<ChainInfo> chainList = new List<ChainInfo>();
+		public List<ChainInfo> chainList = new List<ChainInfo>();
 
-	public int currentPhase;
+		public int currentPhase;
 
-	// temp values.
-	public int chainDamageFactor = 1;
+		// temp values.
+		public int chainDamageFactor = 1;
 
-	// Load from json.
-	public int partyLevel;
+		// Load from json.
+		public int partyLevel;
+	}
+
+	private BattleData battleData = new BattleData();
 
 	public class LevelData {
 		public int level;
@@ -77,30 +83,31 @@ public class BattleManager : MonoBehaviour
 
 	public int GetPartyLevel()
 	{
-		return partyLevel;
+		return battleData.partyLevel;
 	}
 
 	public List<ChainInfo> GetChainList()
 	{
-		return chainList;
+		return battleData.chainList;
 	}
 
 	void Awake ()
 	{
-		tileManager = FindObjectOfType<TileManager>();
-		unitManager = FindObjectOfType<UnitManager>();
-		uiManager = FindObjectOfType<UIManager>();
+		battleData.tileManager = FindObjectOfType<TileManager>();
+		battleData.unitManager = FindObjectOfType<UnitManager>();
+		battleData.uiManager = FindObjectOfType<UIManager>();
+		battleData.battleManager = this;
 	}
 
 	// Use this for initialization
 	void Start()
 	{
-		partyLevel = GetLevelInfoFromJson();
-		unitManager.SetStandardActionPoint(partyLevel);
+		battleData.partyLevel = GetLevelInfoFromJson();
+		battleData.unitManager.SetStandardActionPoint(battleData.partyLevel);
 
-		selectedUnitObject = null;
+		battleData.selectedUnitObject = null;
 
-		currentPhase = 0;
+		battleData.currentPhase = 0;
 
 		InitCameraPosition(); // temp init position;
 
@@ -109,12 +116,12 @@ public class BattleManager : MonoBehaviour
 
 	public int GetCurrentPhase()
 	{
-		return currentPhase;
+		return battleData.currentPhase;
 	}
 
 	public GameObject GetSelectedUnit()
 	{
-		return selectedUnitObject;
+		return battleData.selectedUnitObject;
 	}
 
 	void InitCameraPosition()
@@ -126,17 +133,17 @@ public class BattleManager : MonoBehaviour
 	{
 		while (true)
 		{
-			readiedUnits = unitManager.GetUpdatedReadiedUnits();
+			battleData.readiedUnits = battleData.unitManager.GetUpdatedReadiedUnits();
 
-			while (readiedUnits.Count != 0)
+			while (battleData.readiedUnits.Count != 0)
 			{
-				FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
-				FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+				FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(battleData.unitManager.GetAllUnits());
+				FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(battleData.unitManager.GetAllUnits());
 
-				yield return StartCoroutine(ActionAtTurn(readiedUnits[0]));
-				selectedUnitObject = null;
+				yield return StartCoroutine(ActionAtTurn(battleData.readiedUnits[0]));
+				battleData.selectedUnitObject = null;
 
-				readiedUnits = unitManager.GetUpdatedReadiedUnits();
+				battleData.readiedUnits = battleData.unitManager.GetUpdatedReadiedUnits();
 				yield return null;
 			}
 
@@ -146,33 +153,33 @@ public class BattleManager : MonoBehaviour
 
 	IEnumerator ActionAtTurn(GameObject unit)
 	{
-		FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
-		FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
+		FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(battleData.unitManager.GetAllUnits());
+		FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(battleData.unitManager.GetAllUnits());
 
 		Debug.Log(unit.GetComponent<Unit>().GetName() + "'s turn");
-		selectedUnitObject = unit;
-		moveCount = 0; // 누적 이동 수
-		alreadyMoved = false; // 연속 이동 불가를 위한 변수.
-		ChainList.RemoveChainsFromUnit(selectedUnitObject); // 턴이 돌아오면 자신이 건 체인 삭제.
-		currentState = CurrentState.FocusToUnit;
+		battleData.selectedUnitObject = unit;
+		battleData.moveCount = 0; // 누적 이동 수
+		battleData.alreadyMoved = false; // 연속 이동 불가를 위한 변수.
+		ChainList.RemoveChainsFromUnit(battleData.selectedUnitObject); // 턴이 돌아오면 자신이 건 체인 삭제.
+		battleData.currentState = CurrentState.FocusToUnit;
 
-		uiManager.SetSelectedUnitViewerUI(selectedUnitObject);
-		selectedUnitObject.GetComponent<Unit>().SetActive();
+		battleData.uiManager.SetSelectedUnitViewerUI(battleData.selectedUnitObject);
+		battleData.selectedUnitObject.GetComponent<Unit>().SetActive();
 
-		yield return StartCoroutine(FocusToUnit());
+		yield return StartCoroutine(FocusToUnit(battleData));
 
-		uiManager.DisableSelectedUnitViewerUI();
-		selectedUnitObject.GetComponent<Unit>().SetInactive();
+		battleData.uiManager.DisableSelectedUnitViewerUI();
+		battleData.selectedUnitObject.GetComponent<Unit>().SetInactive();
 	}
 
-	void CheckStandbyPossible()
+	static void CheckStandbyPossible(BattleData battleData)
 	{
 		bool isPossible = false;
 
-		foreach (var unit in unitManager.GetAllUnits())
+		foreach (var unit in battleData.unitManager.GetAllUnits())
 		{
-			if ((unit != selectedUnitObject) &&
-			(unit.GetComponent<Unit>().GetCurrentActivityPoint() > selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint()))
+			if ((unit != battleData.selectedUnitObject) &&
+			(unit.GetComponent<Unit>().GetCurrentActivityPoint() > battleData.selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint()))
 			{
 				isPossible = true;
 			}
@@ -181,69 +188,73 @@ public class BattleManager : MonoBehaviour
 		GameObject.Find("StandbyButton").GetComponent<Button>().interactable = isPossible;
 	}
 
-	void CheckSkillPossible()
+	static void CheckSkillPossible(BattleData battleData)
 	{
 		bool isPossible = false;
 
-		isPossible = !(selectedUnitObject.GetComponent<Unit>().IsSilenced() ||
-					 selectedUnitObject.GetComponent<Unit>().IsFainted());
+		isPossible = !(battleData.selectedUnitObject.GetComponent<Unit>().IsSilenced() ||
+					 battleData.selectedUnitObject.GetComponent<Unit>().IsFainted());
 
 		GameObject.Find("SkillButton").GetComponent<Button>().interactable = isPossible;
 	}
 
-	void CheckMovePossible()
+	static void CheckMovePossible(BattleData battleData)
 	{
 		bool isPossible = false;
 
-		isPossible = !(selectedUnitObject.GetComponent<Unit>().IsBound() ||
-					 selectedUnitObject.GetComponent<Unit>().IsFainted() ||
-					 alreadyMoved);
+		isPossible = !(battleData.selectedUnitObject.GetComponent<Unit>().IsBound() ||
+					 battleData.selectedUnitObject.GetComponent<Unit>().IsFainted() ||
+					 battleData.alreadyMoved);
 
 		GameObject.Find("MoveButton").GetComponent<Button>().interactable = isPossible;
 	}
 
-	public IEnumerator FocusToUnit()
+	public static IEnumerator FocusToUnit(BattleData battleData)
 	{
-		while (currentState == CurrentState.FocusToUnit)
+		while (battleData.currentState == CurrentState.FocusToUnit)
 		{
-			Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
+			Camera.main.transform.position = new Vector3(
+				battleData.selectedUnitObject.transform.position.x,
+				battleData.selectedUnitObject.transform.position.y,
+				-10);
 
-			uiManager.SetSelectedUnitViewerUI(selectedUnitObject);
+			battleData.uiManager.SetSelectedUnitViewerUI(battleData.selectedUnitObject);
 
-			uiManager.SetCommandUIName(selectedUnitObject);
-			CheckStandbyPossible();
-			CheckMovePossible();
-			CheckSkillPossible();
+			battleData.uiManager.SetCommandUIName(battleData.selectedUnitObject);
+			CheckStandbyPossible(battleData);
+			CheckMovePossible(battleData);
+			CheckSkillPossible(battleData);
 
-			command = ActionCommand.Waiting;
-			while (command == ActionCommand.Waiting)
+			BattleManager battleManager = battleData.battleManager;
+			battleData.command = ActionCommand.Waiting;
+			while (battleData.command == ActionCommand.Waiting)
 			{
 				yield return null;
 			}
 
-			if (command == ActionCommand.Move)
+			if (battleData.command == ActionCommand.Move)
 			{
-				command = ActionCommand.Waiting;
-				currentState = CurrentState.SelectMovingPoint;
-				yield return StartCoroutine(MoveStates.SelectMovingPointState(this));
+				battleData.command = ActionCommand.Waiting;
+				battleData.currentState = CurrentState.SelectMovingPoint;
+				yield return battleManager.StartCoroutine(MoveStates.SelectMovingPointState(battleData));
 			}
-			else if (command == ActionCommand.Attack)
+			else if (battleData.command == ActionCommand.Attack)
 			{
-				command = ActionCommand.Waiting;
-				currentState = CurrentState.SelectSkill;
-				yield return StartCoroutine(SkillAndChainStates.SelectSkillState(this));
+				battleData.command = ActionCommand.Waiting;
+				battleData.currentState = CurrentState.SelectSkill;
+				yield return battleManager.StartCoroutine(SkillAndChainStates.SelectSkillState(battleData));
 			}
-			else if (command == ActionCommand.Rest)
+			else if (battleData.command == ActionCommand.Rest)
 			{
-				command = ActionCommand.Waiting;
-				currentState = CurrentState.RestAndRecover;
-				yield return StartCoroutine(RestAndRecover.Run(this));
+				battleData.command = ActionCommand.Waiting;
+				battleData.currentState = CurrentState.RestAndRecover;
+				yield return battleManager.StartCoroutine(RestAndRecover.Run(battleData));
 			}
-			else if (command == ActionCommand.Standby)
+			else if (battleData.command == ActionCommand.Standby)
 			{
-				command = ActionCommand.Waiting;
-				currentState = CurrentState.Standby;
-				yield return StartCoroutine(Standby());
+				battleData.command = ActionCommand.Waiting;
+				battleData.currentState = CurrentState.Standby;
+				yield return battleManager.StartCoroutine(Standby());
 			}
 		}
 		yield return null;
@@ -251,82 +262,82 @@ public class BattleManager : MonoBehaviour
 
 	public void CallbackMoveCommand()
 	{
-		uiManager.DisableCommandUI();
-		command = ActionCommand.Move;
+		battleData.uiManager.DisableCommandUI();
+		battleData.command = ActionCommand.Move;
 	}
 
 	public void CallbackAttackCommand()
 	{
-		uiManager.DisableCommandUI();
-		command = ActionCommand.Attack;
+		battleData.uiManager.DisableCommandUI();
+		battleData.command = ActionCommand.Attack;
 	}
 
 	public void CallbackRestCommand()
 	{
-		uiManager.DisableCommandUI();
-		command = ActionCommand.Rest;
+		battleData.uiManager.DisableCommandUI();
+		battleData.command = ActionCommand.Rest;
 	}
 
 	public void CallbackStandbyCommand()
 	{
-		uiManager.DisableCommandUI();
-		command = ActionCommand.Standby;
+		battleData.uiManager.DisableCommandUI();
+		battleData.command = ActionCommand.Standby;
 	}
 
 	public void CallbackCancel()
 	{
-		cancelClicked = true;
+		battleData.cancelClicked = true;
 	}
 
-	public IEnumerator Standby()
+	public static IEnumerator Standby()
 	{
 		yield return new WaitForSeconds(0.5f);
 	}
 
 	public void CallbackSkillIndex(int index)
 	{
-		indexOfSeletedSkillByUser = index;
+		battleData.indexOfSeletedSkillByUser = index;
 		Debug.Log(index + "th skill is selected");
 	}
 
 	public void CallbackSkillUICancel()
 	{
-		cancelClicked = true;
+		battleData.cancelClicked = true;
 	}
 
 	public void CallbackApplyCommand()
 	{
-		uiManager.DisableSkillCheckUI();
-		skillApplyCommand = SkillApplyCommand.Apply;
+		battleData.uiManager.DisableSkillCheckUI();
+		battleData.skillApplyCommand = SkillApplyCommand.Apply;
 	}
 
 	public void CallbackChainCommand()
 	{
-		uiManager.DisableSkillCheckUI();
-		skillApplyCommand = SkillApplyCommand.Chain;
+		battleData.uiManager.DisableSkillCheckUI();
+		battleData.skillApplyCommand = SkillApplyCommand.Chain;
 	}
 
 	public void CallbackRightClick()
 	{
-		rightClicked = true;
+		battleData.rightClicked = true;
 	}
 
 	public void CallbackDirection(String directionString)
 	{
-		if (!isWaitingUserInput)
+		if (!battleData.isWaitingUserInput)
 			return;
 
 		if (directionString == "LeftUp")
-			selectedDirection = Direction.LeftUp;
+			battleData.selectedDirection = Direction.LeftUp;
 		else if (directionString == "LeftDown")
-			selectedDirection = Direction.LeftDown;
+			battleData.selectedDirection = Direction.LeftDown;
 		else if (directionString == "RightUp")
-			selectedDirection = Direction.RightUp;
+			battleData.selectedDirection = Direction.RightUp;
 		else if (directionString == "RightDown")
-			selectedDirection = Direction.RightDown;
+			battleData.selectedDirection = Direction.RightDown;
 
-		isSelectedDirectionByUser = true;
-		uiManager.DisableSelectDirectionUI();
+		battleData.isSelectedDirectionByUser = true;
+		battleData.uiManager.DisableSelectDirectionUI();
 	}
 
 	// Update is called once per frame
@@ -334,36 +345,36 @@ public class BattleManager : MonoBehaviour
 	{
 		if (Input.GetMouseButtonDown(1))
 		{
-			if (leftClicked)
-				leftClicked = false; // 유닛 고정이 되어있을 경우, 고정 해제가 우선으로 된다.
+			if (battleData.leftClicked)
+				battleData.leftClicked = false; // 유닛 고정이 되어있을 경우, 고정 해제가 우선으로 된다.
 			else
 				CallbackRightClick(); // 우클릭 취소를 받기 위한 핸들러.
 		}
 
-		if (currentState != CurrentState.FocusToUnit)
+		if (battleData.currentState != CurrentState.FocusToUnit)
 		{
-			leftClicked = false; // 행동을 선택하면 홀드가 자동으로 풀림.
+			battleData.leftClicked = false; // 행동을 선택하면 홀드가 자동으로 풀림.
 		}
 
 		if (Input.GetMouseButtonDown(0))
 		{
 			// 유닛 뷰어가 뜬 상태에서 좌클릭하면, 유닛 뷰어가 고정된다. 단, 행동 선택 상태(FocusToUnit)에서만 가능.
-			if ((currentState == CurrentState.FocusToUnit) && (uiManager.IsUnitViewerShowing()))
-				leftClicked = true;
+			if ((battleData.currentState == CurrentState.FocusToUnit) && (battleData.uiManager.IsUnitViewerShowing()))
+				battleData.leftClicked = true;
 		}
 	}
 
 	public bool IsLeftClicked()
 	{
-		return leftClicked;
+		return battleData.leftClicked;
 	}
 
 	public void OnMouseDownHandlerFromTile(Vector2 position)
 	{
-		if (isWaitingUserInput)
+		if (battleData.isWaitingUserInput)
 		{
-			isSelectedTileByUser = true;
-			selectedTilePosition = position;
+			battleData.isSelectedTileByUser = true;
+			battleData.selectedTilePosition = position;
 		}
 	}
 
@@ -371,9 +382,9 @@ public class BattleManager : MonoBehaviour
 	{
 		Debug.Log("Phase End.");
 
-		currentPhase++;
+		battleData.currentPhase++;
 
-		unitManager.EndPhase();
+		battleData.unitManager.EndPhase();
 		yield return new WaitForSeconds(0.5f);
 	}
 }

@@ -3,12 +3,14 @@ using System.Collections;
 
 public class RestAndRecover {
 
-	public static IEnumerator Run(BattleManager battleManager)
+	public static IEnumerator Run(BattleManager.BattleData battleData)
 	{
-		int usingActivityPointToRest = (int)(battleManager.selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() * 0.9f);
-		int recoverHealthDuringRest = (int)(battleManager.selectedUnitObject.GetComponent<Unit>().GetMaxHealth() * (usingActivityPointToRest / 100f));
-		battleManager.selectedUnitObject.GetComponent<Unit>().UseActionPoint(usingActivityPointToRest);
-		IEnumerator recoverHealthCoroutine = battleManager.selectedUnitObject.GetComponent<Unit>().RecoverHealth(recoverHealthDuringRest);
+		int usingActivityPointToRest = (int)(battleData.selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() * 0.9f);
+		int recoverHealthDuringRest = (int)(battleData.selectedUnitObject.GetComponent<Unit>().GetMaxHealth() * (usingActivityPointToRest / 100f));
+		battleData.selectedUnitObject.GetComponent<Unit>().UseActionPoint(usingActivityPointToRest);
+		IEnumerator recoverHealthCoroutine = battleData.selectedUnitObject.GetComponent<Unit>().RecoverHealth(recoverHealthDuringRest);
+
+		BattleManager battleManager = battleData.battleManager;
 		yield return battleManager.StartCoroutine(recoverHealthCoroutine);
 
 		Debug.Log("Rest. Using " + usingActivityPointToRest + "AP and recover " + recoverHealthDuringRest + " HP");
