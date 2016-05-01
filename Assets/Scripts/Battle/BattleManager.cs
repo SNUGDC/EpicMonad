@@ -231,7 +231,7 @@ public class BattleManager : MonoBehaviour
 			{
 				command = ActionCommand.Waiting;
 				currentState = CurrentState.SelectSkill;
-				yield return StartCoroutine(SelectSkillState.Run(this));
+				yield return StartCoroutine(SkillAndChainState.SelectSkillState(this));
 			}
 			else if (command == ActionCommand.Rest)
 			{

@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Enums;
 
-public class SelectSkillState
+public class SkillAndChainState
 {
-	public static IEnumerator Run(BattleManager battleManager)
+	public static IEnumerator SelectSkillState(BattleManager battleManager)
 	{
 		while (battleManager.currentState == CurrentState.SelectSkill)
 		{
