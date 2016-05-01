@@ -307,81 +307,6 @@ public class BattleManager : MonoBehaviour
 		cancelClicked = true;
 	}
 
-	public IEnumerator SelectSkillApplyDirection(Direction originalDirection)
-	{
-		Direction beforeDirection = originalDirection;
-		List<GameObject> selectedTiles = new List<GameObject>();
-		Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
-		Skill selectedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
-
-		rightClicked = false;
-		isWaitingUserInput = true;
-		isSelectedTileByUser = false;
-
-		if (currentState == CurrentState.SelectSkill)
-		{
-			uiManager.DisableCancelButtonUI();
-			yield break;
-		}
-
-		if (currentState == CurrentState.SelectSkillApplyDirection)
-		{
-			selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
-														selectedUnit.GetPosition(),
-														selectedSkill.GetSecondMinReach(),
-														selectedSkill.GetSecondMaxReach(),
-														selectedUnit.GetDirection(),
-														false);
-
-			tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
-		}
-
-		while (currentState == CurrentState.SelectSkillApplyDirection)
-		{
-			Direction newDirection = Utility.GetMouseDirectionByUnit(selectedUnitObject);
-			// Debug.LogWarning(newDirection);
-			if (beforeDirection != newDirection)
-			{
-				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-
-				beforeDirection = newDirection;
-				selectedUnit.SetDirection(newDirection);
-				selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
-															selectedUnit.GetPosition(),
-															selectedSkill.GetSecondMinReach(),
-															selectedSkill.GetSecondMaxReach(),
-															selectedUnit.GetDirection(),
-															false);
-
-				tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
-			}
-
-			if (rightClicked || cancelClicked)
-			{
-				rightClicked = false;
-				cancelClicked = false;
-				uiManager.DisableCancelButtonUI();
-
-				selectedUnit.SetDirection(originalDirection);
-				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-				currentState = CurrentState.SelectSkill;
-				yield break;
-			}
-
-			if (isSelectedTileByUser)
-			{
-				isWaitingUserInput = false;
-				uiManager.DisableCancelButtonUI();
-				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-
-				currentState = CurrentState.CheckApplyOrChain;
-				yield return StartCoroutine(CheckApplyOrChain(selectedUnit.GetPosition(), originalDirection));
-			}
-			yield return null;
-		}
-		yield return null;
-	}
-
 	public IEnumerator SelectSkillApplyPoint(Direction originalDirection)
 	{
 		Direction beforeDirection = originalDirection;
@@ -476,7 +401,7 @@ public class BattleManager : MonoBehaviour
 		uiManager.EnableSkillCheckChainButton(isPossible);
 	}
 
-	IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition, Direction originalDirection)
+	public IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition, Direction originalDirection)
 	{
 		while (currentState == CurrentState.CheckApplyOrChain)
 		{
