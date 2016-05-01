@@ -5,67 +5,68 @@ using UnityEngine.UI;
 using Enums;
 using LitJson;
 using System;
+using Battle.Turn;
 
-enum CurrentState
+public enum CurrentState
 {
 	None, FocusToUnit, SelectMovingPoint, CheckDestination,
 	MoveToTile, SelectSkill, SelectSkillApplyPoint, SelectSkillApplyDirection, CheckApplyOrChain,
 	ApplySkill, ChainAndStandby, RestAndRecover, Standby
 }
 
-enum ActionCommand
+public enum ActionCommand
 {
 	Waiting, Move, Attack, Rest, Standby, Cancel
 }
 
-enum SkillApplyCommand
+public enum SkillApplyCommand
 {
 	Waiting, Apply, Chain
 }
 
 public class BattleManager : MonoBehaviour
 {
-	TileManager tileManager;
-	UnitManager unitManager;
-	UIManager uiManager;
+	public TileManager tileManager;
+	public UnitManager unitManager;
+	public UIManager uiManager;
 
-	CurrentState currentState = CurrentState.None;
+	public CurrentState currentState = CurrentState.None;
 
-	bool isSelectedTileByUser = false;
-	bool isSelectedDirectionByUser = false;
-	int indexOfSeletedSkillByUser = 0;
-	bool isWaitingUserInput = false;
+	public bool isSelectedTileByUser = false;
+	public bool isSelectedDirectionByUser = false;
+	public int indexOfSeletedSkillByUser = 0;
+	public bool isWaitingUserInput = false;
 
-	bool rightClicked = false; // 우클릭 : 취소
-	bool leftClicked = false; // 좌클릭 : 유닛뷰어 고정
+	public bool rightClicked = false; // 우클릭 : 취소
+	public bool leftClicked = false; // 좌클릭 : 유닛뷰어 고정
 
-	bool cancelClicked = false;
+	public bool cancelClicked = false;
 
-	ActionCommand command = ActionCommand.Waiting;
-	SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
+	public ActionCommand command = ActionCommand.Waiting;
+	public SkillApplyCommand skillApplyCommand = SkillApplyCommand.Waiting;
 
-	int moveCount;
-	bool alreadyMoved;
-	Vector2 selectedTilePosition;
-	Direction selectedDirection;
-	GameObject selectedUnitObject;
-	List<GameObject> readiedUnits = new List<GameObject>();
+	public int moveCount;
+	public bool alreadyMoved;
+	public Vector2 selectedTilePosition;
+	public Direction selectedDirection;
+	public GameObject selectedUnitObject;
+	public List<GameObject> readiedUnits = new List<GameObject>();
 
-	List<ChainInfo> chainList = new List<ChainInfo>();
+	public List<ChainInfo> chainList = new List<ChainInfo>();
 
-	int currentPhase;
+	public int currentPhase;
 
 	// temp values.
-	int chainDamageFactor = 1;
+	public int chainDamageFactor = 1;
 
 	// Load from json.
-	int partyLevel;
+	public int partyLevel;
 
-	class LevelData {
+	public class LevelData {
 		public int level;
 	}
 
-	int GetLevelInfoFromJson()
+	public int GetLevelInfoFromJson()
 	{
 		TextAsset jsonTextAsset = Resources.Load("Data/PartyData") as TextAsset;
 		string jsonString = jsonTextAsset.text;
@@ -224,7 +225,7 @@ public class BattleManager : MonoBehaviour
 			{
 				command = ActionCommand.Waiting;
 				currentState = CurrentState.SelectMovingPoint;
-				yield return StartCoroutine(SelectMovingPoint());
+				yield return StartCoroutine(SelectMovingPointState.Run(this));
 			}
 			else if (command == ActionCommand.Attack)
 			{
@@ -909,66 +910,7 @@ public class BattleManager : MonoBehaviour
 		rightClicked = true;
 	}
 
-	IEnumerator SelectMovingPoint()
-	{
-		while (currentState == CurrentState.SelectMovingPoint)
-		{
-			// List<GameObject> movableTiles = CheckMovableTiles(selectedUnitObject);
-			Dictionary<Vector2, TileWithPath> movableTilesWithPath = PathFinder.CalculatePath(selectedUnitObject);
-			List<GameObject> movableTiles = new List<GameObject>();
-			foreach (KeyValuePair<Vector2, TileWithPath> movableTileWithPath in movableTilesWithPath)
-			{
-				movableTiles.Add(movableTileWithPath.Value.tile);
-			}
-
-			tileManager.ChangeTilesToSeletedColor(movableTiles, TileColor.Blue);
-
-			rightClicked = false;
-			cancelClicked = false;
-			uiManager.EnableCancelButtonUI();
-
-			isWaitingUserInput = true;
-			isSelectedTileByUser = false;
-			while (!isSelectedTileByUser)
-			{
-				//yield break 넣으면 코루틴 강제종료
-				if (rightClicked || cancelClicked)
-				{
-					rightClicked = false;
-					cancelClicked = false;
-					uiManager.DisableCancelButtonUI();
-
-					tileManager.ChangeTilesFromSeletedColorToDefaultColor(movableTiles);
-
-					currentState = CurrentState.FocusToUnit;
-					isWaitingUserInput = false;
-					yield break;
-				}
-				yield return null;
-			}
-			isSelectedTileByUser = false;
-			isWaitingUserInput = false;
-
-
-			// FIXME : 어딘가로 옮겨야 할 텐데...
-			GameObject destTile = tileManager.GetTile(selectedTilePosition);
-			List<GameObject> destPath = movableTilesWithPath[selectedTilePosition].path;
-			Vector2 currentTilePos = selectedUnitObject.GetComponent<Unit>().GetPosition();
-			Vector2 distanceVector = selectedTilePosition - currentTilePos;
-			int distance = (int)Mathf.Abs(distanceVector.x) + (int)Mathf.Abs(distanceVector.y);
-			int totalUseActionPoint = movableTilesWithPath[selectedTilePosition].requireActivityPoint;
-
-			moveCount += distance;
-
-			tileManager.ChangeTilesFromSeletedColorToDefaultColor(movableTiles);
-			currentState = CurrentState.CheckDestination;
-			uiManager.DisableCancelButtonUI();
-			yield return StartCoroutine(CheckDestination(movableTiles, destTile, destPath, totalUseActionPoint, distance));
-		}
-		yield return null;
-	}
-
-	IEnumerator CheckDestination(List<GameObject> nearbyTiles, GameObject destTile, List<GameObject> destPath, int totalUseActionPoint, int distance)
+	public IEnumerator CheckDestination(List<GameObject> nearbyTiles, GameObject destTile, List<GameObject> destPath, int totalUseActionPoint, int distance)
 	{
 		while (currentState == CurrentState.CheckDestination)
 		{
