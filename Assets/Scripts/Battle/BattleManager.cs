@@ -390,66 +390,6 @@ public class BattleManager : MonoBehaviour
 		rightClicked = true;
 	}
 
-	public IEnumerator CheckDestination(List<GameObject> nearbyTiles, GameObject destTile, List<GameObject> destPath, int totalUseActionPoint, int distance)
-	{
-		while (currentState == CurrentState.CheckDestination)
-		{
-			// 목표지점만 푸른색으로 표시
-			// List<GameObject> destTileList = new List<GameObject>();
-			// destTileList.Add(destTile);
-			List<GameObject> destTileList = destPath;
-			destTileList.Add(destTile);
-			tileManager.ChangeTilesToSeletedColor(destTileList, TileColor.Blue);
-			// UI를 띄우고
-			uiManager.EnableSelectDirectionUI();
-			uiManager.SetDestCheckUIAP(selectedUnitObject, totalUseActionPoint);
-
-			// 카메라를 옮기고
-			Camera.main.transform.position = new Vector3(destTile.transform.position.x, destTile.transform.position.y, -10);
-			// 클릭 대기
-			rightClicked = false;
-			cancelClicked = false;
-			uiManager.EnableCancelButtonUI();
-
-			isWaitingUserInput = true;
-			isSelectedDirectionByUser = false;
-			while (!isSelectedDirectionByUser)
-			{
-				// 클릭 중 취소하면 돌아감
-				// moveCount 되돌리기
-				// 카메라 유닛 위치로 원상복구
-				// 이동가능 위치 다시 표시해주고
-				// UI 숨기고
-				if (rightClicked || cancelClicked)
-				{
-					rightClicked = false;
-					cancelClicked = false;
-					uiManager.DisableCancelButtonUI();
-
-					moveCount -= distance;
-					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x,selectedUnitObject.transform.position.y, -10);
-					tileManager.ChangeTilesToSeletedColor(nearbyTiles, TileColor.Blue);
-					uiManager.DisableSelectDirectionUI();
-					uiManager.DisableDestCheckUI();
-					currentState = CurrentState.SelectMovingPoint;
-					isWaitingUserInput = false;
-					yield break;
-				}
-				yield return null;
-			}
-			isSelectedDirectionByUser = false;
-			isWaitingUserInput = false;
-			uiManager.DisableCancelButtonUI();
-
-			// 방향을 클릭하면 그 자리로 이동. MoveToTile 호출
-			tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
-			currentState = CurrentState.MoveToTile;
-			uiManager.DisableDestCheckUI();
-			yield return StartCoroutine(MoveToTile(destTile, selectedDirection, totalUseActionPoint));
-		}
-		yield return null;
-	}
-
 	public void CallbackDirection(String directionString)
 	{
 		if (!isWaitingUserInput)
@@ -506,7 +446,7 @@ public class BattleManager : MonoBehaviour
 		}
 	}
 
-	IEnumerator MoveToTile(GameObject destTile, Direction directionAtDest, int totalUseActionPoint)
+	public IEnumerator MoveToTile(GameObject destTile, Direction directionAtDest, int totalUseActionPoint)
 	{
 		GameObject currentTile = tileManager.GetTile(selectedUnitObject.GetComponent<Unit>().GetPosition());
 		currentTile.GetComponent<Tile>().SetUnitOnTile(null);
