@@ -278,7 +278,7 @@ public class BattleManager : MonoBehaviour
 		cancelClicked = true;
 	}
 
-	IEnumerator Standby()
+	public IEnumerator Standby()
 	{
 		yield return new WaitForSeconds(0.5f);
 	}
@@ -577,26 +577,6 @@ public class BattleManager : MonoBehaviour
 		currentState = CurrentState.FocusToUnit;
 		alreadyMoved = false;
 		yield return StartCoroutine(FocusToUnit());
-	}
-
-	public IEnumerator ChainAndStandby(List<GameObject> selectedTiles)
-	{
-		tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-
-		// 방향 돌리기.
-		selectedUnitObject.GetComponent<Unit>().SetDirection(Utility.GetDirectionToTarget(selectedUnitObject, selectedTiles));
-		// 스킬 시전에 필요한 ap만큼 선 차감.
-		int requireAP = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
-		selectedUnitObject.GetComponent<Unit>().UseActionPoint(requireAP);
-		// 체인 목록에 추가.
-		ChainList.AddChains(selectedUnitObject, selectedTiles, indexOfSeletedSkillByUser);
-		indexOfSeletedSkillByUser = 0; // return to init value.
-		yield return new WaitForSeconds(0.5f);
-
-		Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
-		currentState = CurrentState.Standby;
-		alreadyMoved = false;
-		yield return StartCoroutine(Standby()); // 이후 대기.
 	}
 
 	public void CallbackRightClick()

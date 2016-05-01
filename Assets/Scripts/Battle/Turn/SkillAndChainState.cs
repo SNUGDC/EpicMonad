@@ -275,7 +275,7 @@ public class SkillAndChainState
 			{
 				battleManager.skillApplyCommand = SkillApplyCommand.Waiting;
 				battleManager.currentState = CurrentState.ChainAndStandby;
-				yield return battleManager.StartCoroutine(battleManager.ChainAndStandby(selectedTiles));
+				yield return battleManager.StartCoroutine(ChainAndStandby(battleManager, selectedTiles));
 			}
 			else
 				yield return null;
@@ -308,6 +308,26 @@ public class SkillAndChainState
 		}
 
 		battleManager.uiManager.EnableSkillCheckChainButton(isPossible);
+	}
+
+	private static IEnumerator ChainAndStandby(BattleManager battleManager, List<GameObject> selectedTiles)
+	{
+		battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
+
+		// 방향 돌리기.
+		battleManager.selectedUnitObject.GetComponent<Unit>().SetDirection(Utility.GetDirectionToTarget(battleManager.selectedUnitObject, selectedTiles));
+		// 스킬 시전에 필요한 ap만큼 선 차감.
+		int requireAP = battleManager.selectedUnitObject.GetComponent<Unit>().GetSkillList()[battleManager.indexOfSeletedSkillByUser - 1].GetRequireAP();
+		battleManager.selectedUnitObject.GetComponent<Unit>().UseActionPoint(requireAP);
+		// 체인 목록에 추가.
+		ChainList.AddChains(battleManager.selectedUnitObject, selectedTiles, battleManager.indexOfSeletedSkillByUser);
+		battleManager.indexOfSeletedSkillByUser = 0; // return to init value.
+		yield return new WaitForSeconds(0.5f);
+
+		Camera.main.transform.position = new Vector3(battleManager.selectedUnitObject.transform.position.x, battleManager.selectedUnitObject.transform.position.y, -10);
+		battleManager.currentState = CurrentState.Standby;
+		battleManager.alreadyMoved = false;
+		yield return battleManager.StartCoroutine(battleManager.Standby()); // 이후 대기.
 	}
 
 }
