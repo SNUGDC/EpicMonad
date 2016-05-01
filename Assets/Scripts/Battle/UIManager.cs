@@ -155,7 +155,7 @@ public class UIManager : MonoBehaviour
 	public void SetSelectedUnitViewerUI(GameObject selectedUnitObject)
 	{
 		selectedUnitViewerUI.SetActive(true);
-		selectedUnitViewerUI.GetComponent<SelectedUnitViewer>().UpdateUnitViewer(selectedUnitObject);
+		selectedUnitViewerUI.GetComponent<UnitViewer>().UpdateUnitViewer(selectedUnitObject);
 	}
 
 	public void DisableSelectedUnitViewerUI()
