@@ -6,9 +6,9 @@ using Enums;
 
 namespace Battle.Turn
 {
-	public class SelectMovingPointState
+	public class MoveStates
 	{
-		public static IEnumerator Run(BattleManager battleManager)
+		public static IEnumerator SelectMovingPointState(BattleManager battleManager)
 		{
 			while (battleManager.currentState == CurrentState.SelectMovingPoint)
 			{

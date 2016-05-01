@@ -225,13 +225,13 @@ public class BattleManager : MonoBehaviour
 			{
 				command = ActionCommand.Waiting;
 				currentState = CurrentState.SelectMovingPoint;
-				yield return StartCoroutine(SelectMovingPointState.Run(this));
+				yield return StartCoroutine(MoveStates.SelectMovingPointState(this));
 			}
 			else if (command == ActionCommand.Attack)
 			{
 				command = ActionCommand.Waiting;
 				currentState = CurrentState.SelectSkill;
-				yield return StartCoroutine(SkillAndChainState.SelectSkillState(this));
+				yield return StartCoroutine(SkillAndChainStates.SelectSkillState(this));
 			}
 			else if (command == ActionCommand.Rest)
 			{

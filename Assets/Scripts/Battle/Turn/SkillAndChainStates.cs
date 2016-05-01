@@ -5,7 +5,7 @@ using Enums;
 
 namespace Battle.Turn
 {
-	public class SkillAndChainState
+	public class SkillAndChainStates
 	{
 		public static IEnumerator SelectSkillState(BattleManager battleManager)
 		{
