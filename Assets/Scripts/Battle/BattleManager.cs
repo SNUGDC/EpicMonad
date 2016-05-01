@@ -202,7 +202,7 @@ public class BattleManager : MonoBehaviour
 		GameObject.Find("MoveButton").GetComponent<Button>().interactable = isPossible;
 	}
 
-	IEnumerator FocusToUnit()
+	public IEnumerator FocusToUnit()
 	{
 		while (currentState == CurrentState.FocusToUnit)
 		{
@@ -307,124 +307,6 @@ public class BattleManager : MonoBehaviour
 		cancelClicked = true;
 	}
 
-	void CheckChainPossible()
-	{
-		bool isPossible = false;
-
-		// ap 조건으로 체크.
-		int requireAP = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
-		int remainAPAfterChain = selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP;
-
-		foreach (var unit in unitManager.GetAllUnits())
-		{
-			if ((unit != selectedUnitObject) &&
-			(unit.GetComponent<Unit>().GetCurrentActivityPoint() > remainAPAfterChain))
-			{
-				isPossible = true;
-			}
-		}
-
-		// 스킬 타입으로 체크. 공격스킬만 체인을 걸 수 있음.
-		if (selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetSkillApplyType()
-			!= SkillApplyType.Damage)
-		{
-			isPossible = false;
-		}
-
-		uiManager.EnableSkillCheckChainButton(isPossible);
-	}
-
-	public IEnumerator CheckApplyOrChain(Vector2 selectedTilePosition, Direction originalDirection)
-	{
-		while (currentState == CurrentState.CheckApplyOrChain)
-		{
-			GameObject selectedTile = tileManager.GetTile(selectedTilePosition);
-			Camera.main.transform.position = new Vector3(selectedTile.transform.position.x, selectedTile.transform.position.y, -10);
-
-			Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
-
-			List<GameObject> selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
-																		 selectedTilePosition,
-																		 selectedSkill.GetSecondMinReach(),
-																		 selectedSkill.GetSecondMaxReach(),
-																		 selectedUnitObject.GetComponent<Unit>().GetDirection(),
-																		 true);
-			if ((selectedSkill.GetSkillType() == SkillType.Area) && (!selectedSkill.GetIncludeMyself()))
-				selectedTiles.Remove(tileManager.GetTile(selectedTilePosition));
-			tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
-
-			CheckChainPossible();
-			uiManager.SetSkillCheckAP(selectedUnitObject, selectedSkill);
-
-			rightClicked = false;
-			cancelClicked = false;
-
-			skillApplyCommand = SkillApplyCommand.Waiting;
-			while (skillApplyCommand == SkillApplyCommand.Waiting)
-			{
-				if (rightClicked || cancelClicked)
-				{
-					rightClicked = false;
-					cancelClicked = false;
-
-					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
-					uiManager.DisableSkillCheckUI();
-					tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-					selectedUnitObject.GetComponent<Unit>().SetDirection(originalDirection);
-					if (selectedSkill.GetSkillType() == SkillType.Area)
-						currentState = CurrentState.SelectSkill;
-					else
-						currentState = CurrentState.SelectSkillApplyPoint;
-					yield break;
-				}
-				yield return null;
-			}
-
-			tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-
-			if (skillApplyCommand == SkillApplyCommand.Apply)
-			{
-				skillApplyCommand = SkillApplyCommand.Waiting;
-				// 체인이 가능한 스킬일 경우. 체인 발동.
-				if (selectedSkill.GetSkillApplyType() == SkillApplyType.Damage)
-				{
-					// 자기 자신을 체인 리스트에 추가.
-					ChainList.AddChains(selectedUnitObject, selectedTiles, indexOfSeletedSkillByUser);
-					// 체인 체크, 순서대로 공격.
-					List<ChainInfo> allVaildChainInfo = ChainList.GetAllChainInfoToTargetArea(selectedUnitObject, selectedTiles);
-					int chainCombo = allVaildChainInfo.Count;
-					currentState = CurrentState.ApplySkill;
-
-					foreach (var chainInfo in allVaildChainInfo)
-					{
-						GameObject focusedTile = chainInfo.GetTargetArea()[0];
-						Camera.main.transform.position = new Vector3(focusedTile.transform.position.x, focusedTile.transform.position.y, -10);
-						yield return StartCoroutine(ApplySkill(chainInfo, chainCombo));
-					}
-
-					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
-					currentState = CurrentState.FocusToUnit;
-					yield return StartCoroutine(FocusToUnit());
-				}
-				// 체인이 불가능한 스킬일 경우, 그냥 발동.
-				else
-				{
-					currentState = CurrentState.ApplySkill;
-					yield return StartCoroutine(ApplySkill(selectedTiles));
-				}
-			}
-			else if (skillApplyCommand == SkillApplyCommand.Chain)
-			{
-				skillApplyCommand = SkillApplyCommand.Waiting;
-				currentState = CurrentState.ChainAndStandby;
-				yield return StartCoroutine(ChainAndStandby(selectedTiles));
-			}
-			else
-				yield return null;
-		}
-		yield return null;
-	}
-
 	public void CallbackApplyCommand()
 	{
 		uiManager.DisableSkillCheckUI();
@@ -437,7 +319,7 @@ public class BattleManager : MonoBehaviour
 		skillApplyCommand = SkillApplyCommand.Chain;
 	}
 
-	IEnumerator ApplySkillEffect(Skill appliedSkill, GameObject unitObject, List<GameObject> selectedTiles)
+	public IEnumerator ApplySkillEffect(Skill appliedSkill, GameObject unitObject, List<GameObject> selectedTiles)
 	{
 		string effectName = appliedSkill.GetEffectName();
 		EffectVisualType effectVisualType = appliedSkill.GetEffectVisualType();
@@ -517,7 +399,7 @@ public class BattleManager : MonoBehaviour
 	}
 
 	// 체인 가능 스킬일 경우의 스킬 시전 코루틴. 체인 정보와 배수를 받는다.
-	IEnumerator ApplySkill(ChainInfo chainInfo, int chainCombo)
+	public IEnumerator ApplySkill(ChainInfo chainInfo, int chainCombo)
 	{
 		GameObject unitObjectInChain = chainInfo.GetUnit();
 		Unit unitInChain = unitObjectInChain.GetComponent<Unit>();
@@ -611,7 +493,7 @@ public class BattleManager : MonoBehaviour
 	}
 
 	// 체인 불가능 스킬일 경우의 스킬 시전 코루틴. 스킬 적용 범위만 받는다.
-	IEnumerator ApplySkill(List<GameObject> selectedTiles)
+	public IEnumerator ApplySkill(List<GameObject> selectedTiles)
 	{
 		Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
 		Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
@@ -697,8 +579,7 @@ public class BattleManager : MonoBehaviour
 		yield return StartCoroutine(FocusToUnit());
 	}
 
-
-	IEnumerator ChainAndStandby(List<GameObject> selectedTiles)
+	public IEnumerator ChainAndStandby(List<GameObject> selectedTiles)
 	{
 		tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
