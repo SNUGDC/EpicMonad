@@ -122,8 +122,26 @@ namespace Battle.Turn
 				battleManager.tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
 				battleManager.currentState = CurrentState.MoveToTile;
 				battleManager.uiManager.DisableDestCheckUI();
-				yield return battleManager.StartCoroutine(battleManager.MoveToTile(destTile, battleManager.selectedDirection, totalUseActionPoint));
+				yield return battleManager.StartCoroutine(MoveToTile(battleManager, destTile, battleManager.selectedDirection, totalUseActionPoint));
 			}
+			yield return null;
+		}
+
+		private static IEnumerator MoveToTile(BattleManager battleManager, GameObject destTile, Direction directionAtDest, int totalUseActionPoint)
+		{
+			GameObject currentTile = battleManager.tileManager.GetTile(battleManager.selectedUnitObject.GetComponent<Unit>().GetPosition());
+			currentTile.GetComponent<Tile>().SetUnitOnTile(null);
+			battleManager.selectedUnitObject.transform.position = destTile.transform.position + new Vector3(0, 0, -5f);
+			battleManager.selectedUnitObject.GetComponent<Unit>().SetPosition(destTile.GetComponent<Tile>().GetTilePos());
+			battleManager.selectedUnitObject.GetComponent<Unit>().SetDirection(directionAtDest);
+			destTile.GetComponent<Tile>().SetUnitOnTile(battleManager.selectedUnitObject);
+
+			battleManager.selectedUnitObject.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
+
+			battleManager.currentState = CurrentState.FocusToUnit;
+			battleManager.alreadyMoved = true;
+			yield return battleManager.StartCoroutine(battleManager.FocusToUnit());
+
 			yield return null;
 		}
 	}

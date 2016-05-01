@@ -446,24 +446,6 @@ public class BattleManager : MonoBehaviour
 		}
 	}
 
-	public IEnumerator MoveToTile(GameObject destTile, Direction directionAtDest, int totalUseActionPoint)
-	{
-		GameObject currentTile = tileManager.GetTile(selectedUnitObject.GetComponent<Unit>().GetPosition());
-		currentTile.GetComponent<Tile>().SetUnitOnTile(null);
-		selectedUnitObject.transform.position = destTile.transform.position + new Vector3(0, 0, -5f);
-		selectedUnitObject.GetComponent<Unit>().SetPosition(destTile.GetComponent<Tile>().GetTilePos());
-		selectedUnitObject.GetComponent<Unit>().SetDirection(directionAtDest);
-		destTile.GetComponent<Tile>().SetUnitOnTile(selectedUnitObject);
-
-		selectedUnitObject.GetComponent<Unit>().UseActionPoint(totalUseActionPoint);
-
-		currentState = CurrentState.FocusToUnit;
-		alreadyMoved = true;
-		yield return StartCoroutine(FocusToUnit());
-
-		yield return null;
-	}
-
 	IEnumerator EndPhaseOnGameManager()
 	{
 		Debug.Log("Phase End.");
