@@ -9,13 +9,13 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 	public Element element;
 	Vector2 position;
 	GameObject unitOnTile = null;
-	
+
 	class TileColor
 	{
 		public SpriteRenderer sprite;
 		public Color originalColor;
 		public bool isHighlight;
-		
+
 		public TileColor(GameObject tile)
 		{
 			sprite = tile.GetComponent<SpriteRenderer>();
@@ -23,21 +23,21 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 			isHighlight = false;
 		}
 	}
-	
+
 	TileColor tileColor;
 
 	bool isPreSeleted = false;
-	
+
 	public void SetPreSelected(bool input)
 	{
 		isPreSeleted = input;
 	}
-	
+
 	public void SetTilePos(int x, int y)
 	{
 		position = new Vector2(x, y);
 	}
-		
+
 	public Vector2 GetTilePos()
 	{
 		return position;
@@ -49,7 +49,7 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 		GetComponent<SpriteRenderer>().sprite = Resources.Load(imagePath, typeof(Sprite)) as Sprite;
 		this.form = form;
 	}
-	
+
 	public void SetTileElement(Element element)
 	{
 		this.element = element;
@@ -59,12 +59,12 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 	{
 		return form;
 	}
-	
+
 	public Element GetTileElement()
 	{
 		return element;
 	}
-	
+
 	public int GetRequireAPAtTile()
 	{
 		return GetRequireAPFromTileType(form);
@@ -74,22 +74,22 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 	{
 		return !(unitOnTile == null);
 	}
-	
+
 	public void SetUnitOnTile(GameObject unit)
 	{
 		unitOnTile = unit;
 	}
-	
+
 	public void SetTileColor(Color color)
 	{
 		tileColor.originalColor = color;
 	}
-	
+
 	public GameObject GetUnitOnTile ()
 	{
 		return unitOnTile;
 	}
-	
+
 	public string GetTileName()
 	{
 		if (form == TileForm.Flatland)
@@ -124,10 +124,10 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 	void IPointerEnterHandler.OnPointerEnter(PointerEventData pointerData)
 	{
 		tileColor.isHighlight = true;
-		
+
 		if (IsUnitOnTile())
 		{
-			if (FindObjectOfType<GameManager>().IsLeftClicked()) return;
+			if (FindObjectOfType<BattleManager>().IsLeftClicked()) return;
 
 			FindObjectOfType<UIManager>().UpdateUnitViewer(unitOnTile);
 		}
@@ -138,16 +138,16 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 	void IPointerExitHandler.OnPointerExit(PointerEventData pointerData)
 	{
 		tileColor.isHighlight = false;
-		
+
 		FindObjectOfType<UIManager>().DisableTileViewerUI();
-		
-		if (FindObjectOfType<GameManager>().IsLeftClicked()) return;
+
+		if (FindObjectOfType<BattleManager>().IsLeftClicked()) return;
 		FindObjectOfType<UIManager>().DisableUnitViewer();
 	}
 
 	void IPointerDownHandler.OnPointerDown(PointerEventData pointerData)
 	{
-		GameManager gameManager = FindObjectOfType<GameManager>();
+		BattleManager gameManager = FindObjectOfType<BattleManager>();
 		if ((isPreSeleted) && (gameManager != null))
 		{
 			gameManager.OnMouseDownHandlerFromTile(position);
@@ -163,7 +163,7 @@ public class Tile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 	void Start () {
 
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		if (tileColor.isHighlight)

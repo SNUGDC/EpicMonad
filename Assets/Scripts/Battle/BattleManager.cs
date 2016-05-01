@@ -23,7 +23,7 @@ enum SkillApplyCommand
 	Waiting, Apply, Chain
 }
 
-public class GameManager : MonoBehaviour
+public class BattleManager : MonoBehaviour
 {
 	TileManager tileManager;
 	UnitManager unitManager;
@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
 	int indexOfSeletedSkillByUser = 0;
 	bool isWaitingUserInput = false;
 
-	bool rightClicked = false; // 우클릭 : 취소 
+	bool rightClicked = false; // 우클릭 : 취소
 	bool leftClicked = false; // 좌클릭 : 유닛뷰어 고정
 
 	bool cancelClicked = false;
@@ -70,20 +70,20 @@ public class GameManager : MonoBehaviour
 		TextAsset jsonTextAsset = Resources.Load("Data/PartyData") as TextAsset;
 		string jsonString = jsonTextAsset.text;
 		LevelData levelData = JsonMapper.ToObject<LevelData>(jsonString);
-		
+
 		return levelData.level;
 	}
-	
+
 	public int GetPartyLevel()
 	{
 		return partyLevel;
 	}
-	
+
 	public List<ChainInfo> GetChainList()
 	{
 		return chainList;
 	}
-	
+
 	void Awake ()
 	{
 		tileManager = FindObjectOfType<TileManager>();
@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour
 
 	// Use this for initialization
 	void Start()
-	{   
+	{
 		partyLevel = GetLevelInfoFromJson();
 		unitManager.SetStandardActionPoint(partyLevel);
 
@@ -126,12 +126,12 @@ public class GameManager : MonoBehaviour
 		while (true)
 		{
 			readiedUnits = unitManager.GetUpdatedReadiedUnits();
-			
+
 			while (readiedUnits.Count != 0)
 			{
 				FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
 				FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
-				
+
 				yield return StartCoroutine(ActionAtTurn(readiedUnits[0]));
 				selectedUnitObject = null;
 
@@ -147,17 +147,17 @@ public class GameManager : MonoBehaviour
 	{
 		FindObjectOfType<APDisplayCurrentViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
 		FindObjectOfType<APDisplayNextViewer>().UpdateAPDisplay(unitManager.GetAllUnits());
-		
+
 		Debug.Log(unit.GetComponent<Unit>().GetName() + "'s turn");
 		selectedUnitObject = unit;
-		moveCount = 0; // 누적 이동 수 
-		alreadyMoved = false; // 연속 이동 불가를 위한 변수.  
-		ChainList.RemoveChainsFromUnit(selectedUnitObject); // 턴이 돌아오면 자신이 건 체인 삭제.	 
+		moveCount = 0; // 누적 이동 수
+		alreadyMoved = false; // 연속 이동 불가를 위한 변수.
+		ChainList.RemoveChainsFromUnit(selectedUnitObject); // 턴이 돌아오면 자신이 건 체인 삭제.
 		currentState = CurrentState.FocusToUnit;
-		
+
 		uiManager.SetSelectedUnitViewerUI(selectedUnitObject);
 		selectedUnitObject.GetComponent<Unit>().SetActive();
-		
+
 		yield return StartCoroutine(FocusToUnit());
 
 		uiManager.DisableSelectedUnitViewerUI();
@@ -179,7 +179,7 @@ public class GameManager : MonoBehaviour
 
 		GameObject.Find("StandbyButton").GetComponent<Button>().interactable = isPossible;
 	}
-	
+
 	void CheckSkillPossible()
 	{
 		bool isPossible = false;
@@ -187,9 +187,9 @@ public class GameManager : MonoBehaviour
 		isPossible = !(selectedUnitObject.GetComponent<Unit>().IsSilenced() ||
 					 selectedUnitObject.GetComponent<Unit>().IsFainted());
 
-		GameObject.Find("SkillButton").GetComponent<Button>().interactable = isPossible;   
+		GameObject.Find("SkillButton").GetComponent<Button>().interactable = isPossible;
 	}
-	
+
 	void CheckMovePossible()
 	{
 		bool isPossible = false;
@@ -198,7 +198,7 @@ public class GameManager : MonoBehaviour
 					 selectedUnitObject.GetComponent<Unit>().IsFainted() ||
 					 alreadyMoved);
 
-		GameObject.Find("MoveButton").GetComponent<Button>().interactable = isPossible;		
+		GameObject.Find("MoveButton").GetComponent<Button>().interactable = isPossible;
 	}
 
 	IEnumerator FocusToUnit()
@@ -206,7 +206,7 @@ public class GameManager : MonoBehaviour
 		while (currentState == CurrentState.FocusToUnit)
 		{
 			Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
-			
+
 			uiManager.SetSelectedUnitViewerUI(selectedUnitObject);
 
 			uiManager.SetCommandUIName(selectedUnitObject);
@@ -350,18 +350,18 @@ public class GameManager : MonoBehaviour
 			}
 		}
 	}
-	
+
 	IEnumerator SelectSkillApplyDirection(Direction originalDirection)
 	{
 		Direction beforeDirection = originalDirection;
 		List<GameObject> selectedTiles = new List<GameObject>();
 		Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
 		Skill selectedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
-		
+
 		rightClicked = false;
 		isWaitingUserInput = true;
 		isSelectedTileByUser = false;
-		
+
 		if (currentState == CurrentState.SelectSkill)
 		{
 			uiManager.DisableCancelButtonUI();
@@ -370,54 +370,54 @@ public class GameManager : MonoBehaviour
 
 		if (currentState == CurrentState.SelectSkillApplyDirection)
 		{
-			selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), 
-														selectedUnit.GetPosition(), 
-														selectedSkill.GetSecondMinReach(), 
-														selectedSkill.GetSecondMaxReach(), 
+			selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
+														selectedUnit.GetPosition(),
+														selectedSkill.GetSecondMinReach(),
+														selectedSkill.GetSecondMaxReach(),
 														selectedUnit.GetDirection(),
 														false);
-															
+
 			tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
 		}
 
 		while (currentState == CurrentState.SelectSkillApplyDirection)
-		{				
+		{
 			Direction newDirection = Utility.GetMouseDirectionByUnit(selectedUnitObject);
 			// Debug.LogWarning(newDirection);
 			if (beforeDirection != newDirection)
 			{
 				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-				
+
 				beforeDirection = newDirection;
 				selectedUnit.SetDirection(newDirection);
-				selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), 
-															selectedUnit.GetPosition(), 
-															selectedSkill.GetSecondMinReach(), 
-															selectedSkill.GetSecondMaxReach(), 
+				selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
+															selectedUnit.GetPosition(),
+															selectedSkill.GetSecondMinReach(),
+															selectedSkill.GetSecondMaxReach(),
 															selectedUnit.GetDirection(),
 															false);
-															
+
 				tileManager.ChangeTilesToSeletedColor(selectedTiles, TileColor.Red);
 			}
-			
+
 			if (rightClicked || cancelClicked)
 			{
 				rightClicked = false;
 				cancelClicked = false;
 				uiManager.DisableCancelButtonUI();
-				
+
 				selectedUnit.SetDirection(originalDirection);
 				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 				currentState = CurrentState.SelectSkill;
 				yield break;
 			}
-			
+
 			if (isSelectedTileByUser)
 			{
 				isWaitingUserInput = false;
 				uiManager.DisableCancelButtonUI();
 				tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-				
+
 				currentState = CurrentState.CheckApplyOrChain;
 				yield return StartCoroutine(CheckApplyOrChain(selectedUnit.GetPosition(), originalDirection));
 			}
@@ -436,9 +436,9 @@ public class GameManager : MonoBehaviour
 			uiManager.DisableCancelButtonUI();
 			yield break;
 		}
-		
+
 		while (currentState == CurrentState.SelectSkillApplyPoint)
-		{	
+		{
 			Vector2 selectedUnitPos = selectedUnitObject.GetComponent<Unit>().GetPosition();
 
 			List<GameObject> activeRange = new List<GameObject>();
@@ -461,11 +461,11 @@ public class GameManager : MonoBehaviour
 			{
 				Direction newDirection = Utility.GetMouseDirectionByUnit(selectedUnitObject);
 				if (beforeDirection != newDirection)
-				{					
+				{
 					beforeDirection = newDirection;
 					selectedUnit.SetDirection(newDirection);
 				}
-				
+
 				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
@@ -496,9 +496,9 @@ public class GameManager : MonoBehaviour
 	void CheckChainPossible()
 	{
 		bool isPossible = false;
-		
+
 		// ap 조건으로 체크.
-		int requireAP = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();		
+		int requireAP = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
 		int remainAPAfterChain = selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() - requireAP;
 
 		foreach (var unit in unitManager.GetAllUnits())
@@ -509,9 +509,9 @@ public class GameManager : MonoBehaviour
 				isPossible = true;
 			}
 		}
-		
+
 		// 스킬 타입으로 체크. 공격스킬만 체인을 걸 수 있음.
-		if (selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetSkillApplyType() 
+		if (selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetSkillApplyType()
 			!= SkillApplyType.Damage)
 		{
 			isPossible = false;
@@ -529,10 +529,10 @@ public class GameManager : MonoBehaviour
 
 			Skill selectedSkill = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1];
 
-			List<GameObject> selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(), 
-																		 selectedTilePosition, 
-																		 selectedSkill.GetSecondMinReach(), 
-																		 selectedSkill.GetSecondMaxReach(), 
+			List<GameObject> selectedTiles = tileManager.GetTilesInRange(selectedSkill.GetSecondRangeForm(),
+																		 selectedTilePosition,
+																		 selectedSkill.GetSecondMinReach(),
+																		 selectedSkill.GetSecondMaxReach(),
 																		 selectedUnitObject.GetComponent<Unit>().GetDirection(),
 																		 true);
 			if ((selectedSkill.GetSkillType() == SkillType.Area) && (!selectedSkill.GetIncludeMyself()))
@@ -559,7 +559,7 @@ public class GameManager : MonoBehaviour
 					selectedUnitObject.GetComponent<Unit>().SetDirection(originalDirection);
 					if (selectedSkill.GetSkillType() == SkillType.Area)
 						currentState = CurrentState.SelectSkill;
-					else     
+					else
 						currentState = CurrentState.SelectSkillApplyPoint;
 					yield break;
 				}
@@ -571,7 +571,7 @@ public class GameManager : MonoBehaviour
 			if (skillApplyCommand == SkillApplyCommand.Apply)
 			{
 				skillApplyCommand = SkillApplyCommand.Waiting;
-				// 체인이 가능한 스킬일 경우. 체인 발동. 
+				// 체인이 가능한 스킬일 경우. 체인 발동.
 				if (selectedSkill.GetSkillApplyType() == SkillApplyType.Damage)
 				{
 					// 자기 자신을 체인 리스트에 추가.
@@ -580,14 +580,14 @@ public class GameManager : MonoBehaviour
 					List<ChainInfo> allVaildChainInfo = ChainList.GetAllChainInfoToTargetArea(selectedUnitObject, selectedTiles);
 					int chainCombo = allVaildChainInfo.Count;
 					currentState = CurrentState.ApplySkill;
-					
+
 					foreach (var chainInfo in allVaildChainInfo)
 					{
 						GameObject focusedTile = chainInfo.GetTargetArea()[0];
 						Camera.main.transform.position = new Vector3(focusedTile.transform.position.x, focusedTile.transform.position.y, -10);
-						yield return StartCoroutine(ApplySkill(chainInfo, chainCombo)); 
+						yield return StartCoroutine(ApplySkill(chainInfo, chainCombo));
 					}
-					
+
 					Camera.main.transform.position = new Vector3(selectedUnitObject.transform.position.x, selectedUnitObject.transform.position.y, -10);
 					currentState = CurrentState.FocusToUnit;
 					yield return StartCoroutine(FocusToUnit());
@@ -628,18 +628,18 @@ public class GameManager : MonoBehaviour
 		string effectName = appliedSkill.GetEffectName();
 		EffectVisualType effectVisualType = appliedSkill.GetEffectVisualType();
 		EffectMoveType effectMoveType = appliedSkill.GetEffectMoveType();
-		
+
 		if ((effectVisualType == EffectVisualType.Area) && (effectMoveType == EffectMoveType.Move))
 		{
 			// 투사체, 범위형 이펙트.
-			Vector3 startPos = unitObject.transform.position;		
+			Vector3 startPos = unitObject.transform.position;
 			Vector3 endPos = new Vector3(0, 0, 0);
 			foreach (var tile in selectedTiles)
 			{
 				endPos += tile.transform.position;
 			}
 			endPos = endPos / (float)selectedTiles.Count;
-			
+
 			GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
 			particle.transform.position = startPos - new Vector3(0, 0, 0.01f);
 			yield return new WaitForSeconds(0.2f);
@@ -651,14 +651,14 @@ public class GameManager : MonoBehaviour
 		else if ((effectVisualType == EffectVisualType.Area) && (effectMoveType == EffectMoveType.NonMove))
 		{
 			// 고정형, 범위형 이펙트.
-			Vector3 targetPos = new Vector3(0, 0, 0);  
+			Vector3 targetPos = new Vector3(0, 0, 0);
 			foreach (var tile in selectedTiles)
 			{
 				targetPos += tile.transform.position;
 			}
 			targetPos = targetPos / (float)selectedTiles.Count;
 			targetPos = targetPos - new Vector3(0, 0, 5f); // 타일 축 -> 유닛 축으로 옮기기 위해 z축으로 5만큼 앞으로 빼준다.
-		
+
 			GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
 			particle.transform.position = targetPos - new Vector3(0, 0, 0.01f);
 			yield return new WaitForSeconds(0.5f);
@@ -667,8 +667,8 @@ public class GameManager : MonoBehaviour
 		}
 		else if ((effectVisualType == EffectVisualType.Individual) && (effectMoveType == EffectMoveType.NonMove))
 		{
-			// 고정형, 개별 대상 이펙트. 
-			List<Vector3> targetPosList = new List<Vector3>(); 
+			// 고정형, 개별 대상 이펙트.
+			List<Vector3> targetPosList = new List<Vector3>();
 			foreach (var tileObject in selectedTiles)
 			{
 				Tile tile = tileObject.GetComponent<Tile>();
@@ -682,7 +682,7 @@ public class GameManager : MonoBehaviour
 			{
 				GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
 				particle.transform.position = targetPos - new Vector3(0, 0, 0.01f);
-				Destroy(particle, 0.5f + 0.3f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.   
+				Destroy(particle, 0.5f + 0.3f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.
 			}
 			if (targetPosList.Count == 0) // 대상이 없을 경우. 일단 가운데 이펙트를 띄운다.
 			{
@@ -692,12 +692,12 @@ public class GameManager : MonoBehaviour
 					midPos += tile.transform.position;
 				}
 				midPos = midPos / (float)selectedTiles.Count;
-				
+
 				GameObject particle = Instantiate(Resources.Load("Particle/" + effectName)) as GameObject;
 				particle.transform.position = midPos - new Vector3(0, 0, 0.01f);
 				Destroy(particle, 0.5f + 0.3f); // 아랫줄에서의 지연시간을 고려한 값이어야 함.
 			}
-						
+
 			yield return new WaitForSeconds(0.5f);
 		}
 	}
@@ -709,14 +709,14 @@ public class GameManager : MonoBehaviour
 		Unit unitInChain = unitObjectInChain.GetComponent<Unit>();
 		Skill appliedSkill = unitInChain.GetSkillList()[chainInfo.GetSkillIndex() - 1];
 		List<GameObject> selectedTiles = chainInfo.GetTargetArea();
-		
+
 		// 시전 방향으로 유닛의 바라보는 방향을 돌림.
 		if (appliedSkill.GetSkillType() != SkillType.Area)
 			unitInChain.SetDirection(Utility.GetDirectionToTarget(unitInChain.gameObject, selectedTiles));
-		
+
 		// 자신의 체인 정보 삭제.
 		ChainList.RemoveChainsFromUnit(unitObjectInChain);
-		
+
 		// 이펙트 임시로 비활성화.
 		// yield return StartCoroutine(ApplySkillEffect(appliedSkill, unitInChain.gameObject, selectedTiles));
 
@@ -735,35 +735,35 @@ public class GameManager : MonoBehaviour
 		{
 			// 방향 체크.
 			Utility.GetDegreeAtAttack(unitObjectInChain, target);
-			
+
 			if (appliedSkill.GetSkillApplyType() == SkillApplyType.Damage)
 			{
 				// 방향 보너스.
 				float directionBouns = Utility.GetDirectionBonus(unitObjectInChain, target);
-				
+
 				// 천체속성 보너스.
 				float celestialBouns = Utility.GetCelestialBouns(unitObjectInChain, target);
 				if (celestialBouns == 1.2f) unitObjectInChain.GetComponent<Unit>().PrintCelestialBouns();
 				else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
-				
+
 				var damageAmount = (int)((chainCombo * chainDamageFactor) * directionBouns * celestialBouns * unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
 				var damageCoroutine = target.GetComponent<Unit>().Damaged(unitInChain.GetUnitClass(), damageAmount, false);
-				
+
 				if (target == targets[targets.Count-1])
 				{
-					yield return StartCoroutine(damageCoroutine);	
+					yield return StartCoroutine(damageCoroutine);
 				}
 				else
 				{
 					StartCoroutine(damageCoroutine);
 				}
-				Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName() + "\n" + 
+				Debug.Log("Apply " + damageAmount + " damage to " + target.GetComponent<Unit>().GetName() + "\n" +
 							"ChainCombo : " + chainCombo);
 			}
 			else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
 			{
 				var recoverAmount = (int)(unitInChain.GetActualPower() * appliedSkill.GetPowerFactor());
-				var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
+				var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount);
 
 				if (target == targets[targets.Count-1])
 				{
@@ -776,7 +776,7 @@ public class GameManager : MonoBehaviour
 
 				Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
 			}
-			
+
 			// FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것.
 			else
 			{
@@ -795,20 +795,20 @@ public class GameManager : MonoBehaviour
 
 		alreadyMoved = false;
 	}
-	
+
 	// 체인 불가능 스킬일 경우의 스킬 시전 코루틴. 스킬 적용 범위만 받는다.
 	IEnumerator ApplySkill(List<GameObject> selectedTiles)
 	{
 		Unit selectedUnit = selectedUnitObject.GetComponent<Unit>();
 		Skill appliedSkill = selectedUnit.GetSkillList()[indexOfSeletedSkillByUser - 1];
-		
+
 		// 시전 방향으로 유닛의 바라보는 방향을 돌림.
 		if (appliedSkill.GetSkillType() != SkillType.Area)
 			selectedUnit.SetDirection(Utility.GetDirectionToTarget(selectedUnit.gameObject, selectedTiles));
-		
+
 		// 이펙트 임시로 비활성화.
 		// yield return StartCoroutine(ApplySkillEffect(appliedSkill, selectedUnitObject, selectedTiles));
-		
+
 		List<GameObject> targets = new List<GameObject>();
 
 		foreach (var tileObject in selectedTiles)
@@ -826,18 +826,18 @@ public class GameManager : MonoBehaviour
 			{
 				// 방향 보너스.
 				float directionBouns = Utility.GetDirectionBonus(selectedUnitObject, target);
-				
+
 				// 천체속성 보너스.
 				float celestialBouns = Utility.GetCelestialBouns(selectedUnitObject, target);
 				if (celestialBouns == 1.2f) selectedUnitObject.GetComponent<Unit>().PrintCelestialBouns();
 				else if (celestialBouns == 0.8f) target.GetComponent<Unit>().PrintCelestialBouns();
-				
+
 				var damageAmount = (int)(directionBouns * celestialBouns * selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
 				var damageCoroutine = target.GetComponent<Unit>().Damaged(selectedUnit.GetUnitClass(), damageAmount, false);
-				
+
 				if (target == targets[targets.Count-1])
 				{
-					yield return StartCoroutine(damageCoroutine);	
+					yield return StartCoroutine(damageCoroutine);
 				}
 				else
 				{
@@ -848,7 +848,7 @@ public class GameManager : MonoBehaviour
 			else if (appliedSkill.GetSkillApplyType() == SkillApplyType.Heal)
 			{
 				var recoverAmount = (int)(selectedUnit.GetActualPower() * appliedSkill.GetPowerFactor());
-				var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount); 
+				var recoverHealthCoroutine = target.GetComponent<Unit>().RecoverHealth(recoverAmount);
 
 				if (target == targets[targets.Count-1])
 				{
@@ -861,14 +861,14 @@ public class GameManager : MonoBehaviour
 
 				Debug.Log("Apply " + recoverAmount + " heal to " + target.GetComponent<Unit>().GetName());
 			}
-			
+
 			// FIXME : 버프, 디버프는 아직 미구현. 데미지/힐과 별개일 때도 있고 같이 들어갈 때도 있으므로 별도의 if문으로 구현할 것.
 			else
 			{
 				Debug.Log("Apply additional effect to " + target.GetComponent<Unit>().name);
 			}
 		}
-		
+
 		tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
 		int requireAP = appliedSkill.GetRequireAP();
@@ -887,13 +887,13 @@ public class GameManager : MonoBehaviour
 	IEnumerator ChainAndStandby(List<GameObject> selectedTiles)
 	{
 		tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
-	 
+
 		// 방향 돌리기.
-		selectedUnitObject.GetComponent<Unit>().SetDirection(Utility.GetDirectionToTarget(selectedUnitObject, selectedTiles)); 
-		// 스킬 시전에 필요한 ap만큼 선 차감. 
+		selectedUnitObject.GetComponent<Unit>().SetDirection(Utility.GetDirectionToTarget(selectedUnitObject, selectedTiles));
+		// 스킬 시전에 필요한 ap만큼 선 차감.
 		int requireAP = selectedUnitObject.GetComponent<Unit>().GetSkillList()[indexOfSeletedSkillByUser - 1].GetRequireAP();
 		selectedUnitObject.GetComponent<Unit>().UseActionPoint(requireAP);
-		// 체인 목록에 추가. 
+		// 체인 목록에 추가.
 		ChainList.AddChains(selectedUnitObject, selectedTiles, indexOfSeletedSkillByUser);
 		indexOfSeletedSkillByUser = 0; // return to init value.
 		yield return new WaitForSeconds(0.5f);
@@ -920,7 +920,7 @@ public class GameManager : MonoBehaviour
 			{
 				movableTiles.Add(movableTileWithPath.Value.tile);
 			}
-			
+
 			tileManager.ChangeTilesToSeletedColor(movableTiles, TileColor.Blue);
 
 			rightClicked = false;
@@ -931,7 +931,7 @@ public class GameManager : MonoBehaviour
 			isSelectedTileByUser = false;
 			while (!isSelectedTileByUser)
 			{
-				//yield break 넣으면 코루틴 강제종료 
+				//yield break 넣으면 코루틴 강제종료
 				if (rightClicked || cancelClicked)
 				{
 					rightClicked = false;
@@ -950,7 +950,7 @@ public class GameManager : MonoBehaviour
 			isWaitingUserInput = false;
 
 
-			// FIXME : 어딘가로 옮겨야 할 텐데...		
+			// FIXME : 어딘가로 옮겨야 할 텐데...
 			GameObject destTile = tileManager.GetTile(selectedTilePosition);
 			List<GameObject> destPath = movableTilesWithPath[selectedTilePosition].path;
 			Vector2 currentTilePos = selectedUnitObject.GetComponent<Unit>().GetPosition();
@@ -994,9 +994,9 @@ public class GameManager : MonoBehaviour
 			while (!isSelectedDirectionByUser)
 			{
 				// 클릭 중 취소하면 돌아감
-				// moveCount 되돌리기 
+				// moveCount 되돌리기
 				// 카메라 유닛 위치로 원상복구
-				// 이동가능 위치 다시 표시해주고 
+				// 이동가능 위치 다시 표시해주고
 				// UI 숨기고
 				if (rightClicked || cancelClicked)
 				{
@@ -1019,7 +1019,7 @@ public class GameManager : MonoBehaviour
 			isWaitingUserInput = false;
 			uiManager.DisableCancelButtonUI();
 
-			// 방향을 클릭하면 그 자리로 이동. MoveToTile 호출 
+			// 방향을 클릭하면 그 자리로 이동. MoveToTile 호출
 			tileManager.ChangeTilesFromSeletedColorToDefaultColor(destTileList);
 			currentState = CurrentState.MoveToTile;
 			uiManager.DisableDestCheckUI();
@@ -1027,12 +1027,12 @@ public class GameManager : MonoBehaviour
 		}
 		yield return null;
 	}
-	
+
 	public void CallbackDirection(String directionString)
 	{
 		if (!isWaitingUserInput)
 			return;
-		
+
 		if (directionString == "LeftUp")
 			selectedDirection = Direction.LeftUp;
 		else if (directionString == "LeftDown")
@@ -1041,7 +1041,7 @@ public class GameManager : MonoBehaviour
 			selectedDirection = Direction.RightUp;
 		else if (directionString == "RightDown")
 			selectedDirection = Direction.RightDown;
-			
+
 		isSelectedDirectionByUser = true;
 		uiManager.DisableSelectDirectionUI();
 	}
@@ -1054,14 +1054,14 @@ public class GameManager : MonoBehaviour
 			if (leftClicked)
 				leftClicked = false; // 유닛 고정이 되어있을 경우, 고정 해제가 우선으로 된다.
 			else
-				CallbackRightClick(); // 우클릭 취소를 받기 위한 핸들러. 
+				CallbackRightClick(); // 우클릭 취소를 받기 위한 핸들러.
 		}
-		
+
 		if (currentState != CurrentState.FocusToUnit)
 		{
 			leftClicked = false; // 행동을 선택하면 홀드가 자동으로 풀림.
 		}
-		
+
 		if (Input.GetMouseButtonDown(0))
 		{
 			// 유닛 뷰어가 뜬 상태에서 좌클릭하면, 유닛 뷰어가 고정된다. 단, 행동 선택 상태(FocusToUnit)에서만 가능.
@@ -1069,7 +1069,7 @@ public class GameManager : MonoBehaviour
 				leftClicked = true;
 		}
 	}
-	
+
 	public bool IsLeftClicked()
 	{
 		return leftClicked;

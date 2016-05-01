@@ -14,7 +14,7 @@ public class Unit : MonoBehaviour
 	HealthViewer healthViewer;
 
 	new string name; // 한글이름
-	string nameInCode; // 영어이름 
+	string nameInCode; // 영어이름
 
 	Side side; // 진영. 적/아군
 
@@ -25,7 +25,7 @@ public class Unit : MonoBehaviour
 	Vector2 initPosition;
 
 	// Base stats. FIXME : 지금은 수동으로 셋팅.
-	float baseHealth; // 체력 
+	float baseHealth; // 체력
 	float basePower; // 공격력
 	float baseDefense; // 방어력
 	float baseResistence; // 저항력
@@ -123,7 +123,7 @@ public class Unit : MonoBehaviour
 		// 공격력 감소 효과 적용.
 		if (debuffList.Any(k => k.GetName() == DebuffType.PowerDecrease))
 		{
-			// 상대치 곱연산 
+			// 상대치 곱연산
 			float totalDegree = 1.0f;
 			foreach (var debuff in debuffList)
 			{
@@ -134,7 +134,7 @@ public class Unit : MonoBehaviour
 			}
 			actualPower = (int)((float)actualPower * totalDegree);
 
-			// 절대치 합연산 
+			// 절대치 합연산
 			int totalAmount = 0;
 			foreach (var debuff in debuffList)
 			{
@@ -212,7 +212,7 @@ public class Unit : MonoBehaviour
 		}
 		else if (debuffList.Any(k => k.GetName() == DebuffType.Exhaust))
 		{
-			// 상대치 곱연산 
+			// 상대치 곱연산
 			float totalDegree = 1.0f;
 			foreach (var debuff in debuffList)
 			{
@@ -371,7 +371,7 @@ public class Unit : MonoBehaviour
 		// 방어력 감소 효과 적용.
 		if (debuffList.Any(k => k.GetName() == DebuffType.DefenseDecrease))
 		{
-			// 상대치 곱연산 
+			// 상대치 곱연산
 			float totalDegree = 1.0f;
 			foreach (var debuff in debuffList)
 			{
@@ -382,7 +382,7 @@ public class Unit : MonoBehaviour
 			}
 			actualDefense = (int)((float)actualDefense * totalDegree);
 
-			// 절대치 합연산 
+			// 절대치 합연산
 			int totalAmount = 0;
 			foreach (var debuff in debuffList)
 			{
@@ -401,10 +401,10 @@ public class Unit : MonoBehaviour
 	{
 		int actualResistance = resistence;
 
-		// 저항력 감소 효과 적용. 
+		// 저항력 감소 효과 적용.
 		if (debuffList.Any(k => k.GetName() == DebuffType.ResistanceDecrease))
 		{
-			// 상대치 곱연산 
+			// 상대치 곱연산
 			float totalDegree = 1.0f;
 			foreach (var debuff in debuffList)
 			{
@@ -415,7 +415,7 @@ public class Unit : MonoBehaviour
 			}
 			actualResistance = (int)((float)actualResistance * totalDegree);
 
-			// 절대치 합연산 
+			// 절대치 합연산
 			int totalAmount = 0;
 			foreach (var debuff in debuffList)
 			{
@@ -435,8 +435,8 @@ public class Unit : MonoBehaviour
 		int actualDamage = 0;
 		// 공격이 물리인지 마법인지 체크
 		// 방어력 / 저항력 중 맞는 값을 적용
-		// 방어 증가/감소 / 저항 증가/감소 적용			 // FIXME : 증가분 미적용 
-		// 체력 깎임 
+		// 방어 증가/감소 / 저항 증가/감소 적용			 // FIXME : 증가분 미적용
+		// 체력 깎임
 		// 체인 해제
 		if (unitClass == UnitClass.Melee)
 		{
@@ -497,7 +497,7 @@ public class Unit : MonoBehaviour
 		// 내상 효과
 		if (debuffList.Any(k => k.GetName() == DebuffType.Wound))
 		{
-			// 상대치 곱연산 
+			// 상대치 곱연산
 			float totalDegree = 1.0f;
 			foreach (var debuff in debuffList)
 			{
@@ -525,7 +525,7 @@ public class Unit : MonoBehaviour
 
 	public void RegenerateActionPoint()
 	{
-		activityPoint += GetActualDexturity(); // 페이즈당 행동력 회복량 = 민첩성 * 보정치(버프/디버프) 
+		activityPoint += GetActualDexturity(); // 페이즈당 행동력 회복량 = 민첩성 * 보정치(버프/디버프)
 		Debug.Log(name + " recover " + dexturity + "AP. Current AP : " + activityPoint);
 	}
 
@@ -566,7 +566,7 @@ public class Unit : MonoBehaviour
 
 	public void ApplySkillList(List<SkillInfo> skillInfoList)
 	{
-		float partyLevel = (float)FindObjectOfType<GameManager>().GetPartyLevel();
+		float partyLevel = (float)FindObjectOfType<BattleManager>().GetPartyLevel();
 
 		foreach (var skillInfo in skillInfoList)
 		{
@@ -574,7 +574,7 @@ public class Unit : MonoBehaviour
 				(skillInfo.GetRequireLevel() <= partyLevel))
 				skillList.Add(skillInfo.GetSkill());
 		}
-		// 비어있으면 디폴트 스킬로 채우도록.			
+		// 비어있으면 디폴트 스킬로 채우도록.
 		if (skillList.Count() == 0)
 			foreach (var skillInfo in skillInfoList)
 			{
@@ -599,14 +599,14 @@ public class Unit : MonoBehaviour
 
 	void ApplyStats()
 	{
-		float partyLevel = (float)FindObjectOfType<GameManager>().GetPartyLevel();
+		float partyLevel = (float)FindObjectOfType<BattleManager>().GetPartyLevel();
 
 		maxHealth = (int)baseHealth;
 		power = (int)basePower;
 		defense = (int)baseDefense;
 		resistence = (int)baseResistence;
 		dexturity = (int)baseDexturity;
-		
+
 		// 절대값으로 그대로 넣도록 변경.
 		// float actualHealthAcceleration = healthAcceleration + (healthAccelerationInterval * baseHealth);
 		// float actualHealthInitialGrowth = healthInitialGrowth + (healthInitialGrowthInterval * baseHealth);
