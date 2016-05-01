@@ -2,8 +2,7 @@
 using System.Collections;
 
 public class RestAndRecover {
-
-	public static IEnumerator Run(BattleManager.BattleData battleData)
+	public static IEnumerator Run(BattleData battleData)
 	{
 		int usingActivityPointToRest = (int)(battleData.selectedUnitObject.GetComponent<Unit>().GetCurrentActivityPoint() * 0.9f);
 		int recoverHealthDuringRest = (int)(battleData.selectedUnitObject.GetComponent<Unit>().GetMaxHealth() * (usingActivityPointToRest / 100f));
@@ -17,5 +16,4 @@ public class RestAndRecover {
 
 		yield return new WaitForSeconds(0.5f);
 	}
-
 }

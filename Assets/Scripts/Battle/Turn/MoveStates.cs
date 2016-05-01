@@ -8,7 +8,7 @@ namespace Battle.Turn
 {
 	public class MoveStates
 	{
-		public static IEnumerator SelectMovingPointState(BattleManager.BattleData battleData)
+		public static IEnumerator SelectMovingPointState(BattleData battleData)
 		{
 			while (battleData.currentState == CurrentState.SelectMovingPoint)
 			{
@@ -68,7 +68,7 @@ namespace Battle.Turn
 			yield return null;
 		}
 
-		private static IEnumerator CheckDestination(BattleManager.BattleData battleData, List<GameObject> nearbyTiles, GameObject destTile, List<GameObject> destPath, int totalUseActionPoint, int distance)
+		private static IEnumerator CheckDestination(BattleData battleData, List<GameObject> nearbyTiles, GameObject destTile, List<GameObject> destPath, int totalUseActionPoint, int distance)
 		{
 			while (battleData.currentState == CurrentState.CheckDestination)
 			{
@@ -129,7 +129,7 @@ namespace Battle.Turn
 			yield return null;
 		}
 
-		private static IEnumerator MoveToTile(BattleManager.BattleData battleData, GameObject destTile, Direction directionAtDest, int totalUseActionPoint)
+		private static IEnumerator MoveToTile(BattleData battleData, GameObject destTile, Direction directionAtDest, int totalUseActionPoint)
 		{
 			GameObject currentTile = battleData.tileManager.GetTile(battleData.selectedUnitObject.GetComponent<Unit>().GetPosition());
 			currentTile.GetComponent<Tile>().SetUnitOnTile(null);

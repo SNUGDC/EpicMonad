@@ -7,7 +7,7 @@ namespace Battle.Turn
 {
 	public class SkillAndChainStates
 	{
-		public static IEnumerator SelectSkillState(BattleManager.BattleData battleData)
+		public static IEnumerator SelectSkillState(BattleData battleData)
 		{
 			while (battleData.currentState == CurrentState.SelectSkill)
 			{
@@ -53,7 +53,7 @@ namespace Battle.Turn
 			}
 		}
 
-		private static IEnumerator SelectSkillApplyDirection(BattleManager.BattleData battleData, Direction originalDirection)
+		private static IEnumerator SelectSkillApplyDirection(BattleData battleData, Direction originalDirection)
 		{
 			Direction beforeDirection = originalDirection;
 			List<GameObject> selectedTiles = new List<GameObject>();
@@ -129,7 +129,7 @@ namespace Battle.Turn
 			yield return null;
 		}
 
-		private static IEnumerator SelectSkillApplyPoint(BattleManager.BattleData battleData, Direction originalDirection)
+		private static IEnumerator SelectSkillApplyPoint(BattleData battleData, Direction originalDirection)
 		{
 			Direction beforeDirection = originalDirection;
 			Unit selectedUnit = battleData.selectedUnitObject.GetComponent<Unit>();
@@ -197,7 +197,7 @@ namespace Battle.Turn
 			}
 		}
 
-		private static IEnumerator CheckApplyOrChain(BattleManager.BattleData battleData, Vector2 selectedTilePosition, Direction originalDirection)
+		private static IEnumerator CheckApplyOrChain(BattleData battleData, Vector2 selectedTilePosition, Direction originalDirection)
 		{
 			while (battleData.currentState == CurrentState.CheckApplyOrChain)
 			{
@@ -288,7 +288,7 @@ namespace Battle.Turn
 			yield return null;
 		}
 
-		private static void CheckChainPossible(BattleManager.BattleData battleData)
+		private static void CheckChainPossible(BattleData battleData)
 		{
 			bool isPossible = false;
 
@@ -315,7 +315,7 @@ namespace Battle.Turn
 			battleData.uiManager.EnableSkillCheckChainButton(isPossible);
 		}
 
-		private static IEnumerator ChainAndStandby(BattleManager.BattleData battleData, List<GameObject> selectedTiles)
+		private static IEnumerator ChainAndStandby(BattleData battleData, List<GameObject> selectedTiles)
 		{
 			battleData.tileManager.ChangeTilesFromSeletedColorToDefaultColor(selectedTiles);
 
@@ -337,7 +337,7 @@ namespace Battle.Turn
 		}
 
 		// 체인 가능 스킬일 경우의 스킬 시전 코루틴. 체인 정보와 배수를 받는다.
-		private static IEnumerator ApplySkill(BattleManager.BattleData battleData, ChainInfo chainInfo, int chainCombo)
+		private static IEnumerator ApplySkill(BattleData battleData, ChainInfo chainInfo, int chainCombo)
 		{
 			GameObject unitObjectInChain = chainInfo.GetUnit();
 			Unit unitInChain = unitObjectInChain.GetComponent<Unit>();
@@ -431,7 +431,7 @@ namespace Battle.Turn
 		}
 
 		// 체인 불가능 스킬일 경우의 스킬 시전 코루틴. 스킬 적용 범위만 받는다.
-		private static IEnumerator ApplySkill(BattleManager.BattleData battleData, List<GameObject> selectedTiles)
+		private static IEnumerator ApplySkill(BattleData battleData, List<GameObject> selectedTiles)
 		{
 			Unit selectedUnit = battleData.selectedUnitObject.GetComponent<Unit>();
 			Skill appliedSkill = selectedUnit.GetSkillList()[battleData.indexOfSeletedSkillByUser - 1];
